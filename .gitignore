@@ -1,0 +1,23 @@
+src/.env
+
+# Node.js
+node_modules/
+npm-debug.log
+.npm/
+.yarn/
+tmp/
+*.log
+
+# Compiled output
+dist/
+build/
+.tscache/
+
+# Environment variables
+.env
+.env.*
+.DS_Store # macOS specific
+Thumbs.db # Windows specific
+
+# VS Code
+.vscode/

@@ -1,0 +1,47 @@
+{
+  "name": "myhives-app",
+  "version": "1.0.0",
+  "description": "Node.js/TS backend app for inspection audits of my bee hives",
+  "keywords": [
+    "hives"
+  ],
+  "license": "ISC",
+  "author": "Peter Korosec",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --watch src --ext ts,json --exec \"node --loader ts-node/esm\" src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.16.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/helmet": "^0.0.48",
+    "@types/joi": "^17.2.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.15.31",
+    "@types/pg": "^8.15.4",
+    "@types/sequelize": "^4.28.20",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}
