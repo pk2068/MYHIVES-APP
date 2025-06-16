@@ -8,7 +8,7 @@ import {
   BeehiveConfiguration,
 } from '../../types/models';
 
-interface HiveInspectionCreationAttributes extends Optional<HiveInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface HiveInspectionCreationAttributes extends Optional<HiveInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class HiveInspection extends Model<HiveInspectionInterface, HiveInspectionCreationAttributes> implements HiveInspectionInterface {
   public id!: string;
@@ -130,6 +130,16 @@ export class HiveInspection extends Model<HiveInspectionInterface, HiveInspectio
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        // --- ADDED THESE TIMESTAMP FIELDS FOR TYPESCRIPT ---
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        // --- END ADDED FIELDS ---
       },
       {
         tableName: 'hive_inspections',

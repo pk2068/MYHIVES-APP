@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import config from './config/index';
-import errorHandler from './middleware/errorHandler'; // Import the error handler
+import errorHandler, {CustomError} from './middleware/errorHandler'; // Import the error handler
 
 // You'll import your routes here as you create them
 // import authRoutes from './routes/authRoutes';

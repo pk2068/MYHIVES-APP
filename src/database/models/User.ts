@@ -4,7 +4,7 @@ import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { User as UserInterface } from '../../types/models'; // Corrected the path
 
 // Define a type for the attributes that are allowed for creation
-interface UserCreationAttributes extends Optional<UserInterface, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface UserCreationAttributes extends Optional<UserInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 // Extend the Sequelize Model for your User model
 export class User extends Model<UserInterface, UserCreationAttributes> implements UserInterface {
@@ -56,6 +56,16 @@ export class User extends Model<UserInterface, UserCreationAttributes> implement
           type: DataTypes.STRING, // Hashed password
           allowNull: true,
         },
+        // --- ADDED THESE TIMESTAMP FIELDS FOR TYPESCRIPT ---
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        // --- END ADDED FIELDS ---
       },
       {
         tableName: 'users',

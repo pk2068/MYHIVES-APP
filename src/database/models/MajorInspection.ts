@@ -2,7 +2,7 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { MajorInspection as MajorInspectionInterface } from '../../types/models';
 
-interface MajorInspectionCreationAttributes extends Optional<MajorInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface MajorInspectionCreationAttributes extends Optional<MajorInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class MajorInspection extends Model<MajorInspectionInterface, MajorInspectionCreationAttributes> implements MajorInspectionInterface {
   public id!: string;
@@ -39,6 +39,16 @@ export class MajorInspection extends Model<MajorInspectionInterface, MajorInspec
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        // --- ADDED THESE TIMESTAMP FIELDS FOR TYPESCRIPT ---
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        // --- END ADDED FIELDS ---
       },
       {
         tableName: 'major_inspections',

@@ -2,7 +2,7 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Location as LocationInterface } from '../../types/models';
 
-interface LocationCreationAttributes extends Optional<LocationInterface, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface LocationCreationAttributes extends Optional<LocationInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class Location extends Model<LocationInterface, LocationCreationAttributes> implements LocationInterface {
   public id!: string;
@@ -62,6 +62,16 @@ export class Location extends Model<LocationInterface, LocationCreationAttribute
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        // --- ADDED THESE TIMESTAMP FIELDS FOR TYPESCRIPT ---
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        // --- END ADDED FIELDS ---
       },
       {
         tableName: 'locations',
