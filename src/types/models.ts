@@ -30,7 +30,7 @@ export interface BaseModel {
   export interface MajorInspection extends BaseModel {
     locationId: string;
     inspectionDate: Date; // Date only, but TS Date type is fine
-    notes?: string | null;
+    generalNotes?: string | null;
   }
   
   // HiveInspection Model

@@ -35,7 +35,7 @@ export class MajorInspection extends Model<MajorInspectionInterface, MajorInspec
           type: DataTypes.DATEONLY, // Stores only date (YYYY-MM-DD)
           allowNull: false,
         },
-        notes: {
+        generalNotes: {
           type: DataTypes.TEXT,
           allowNull: true,
         },
