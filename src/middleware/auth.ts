@@ -33,6 +33,34 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      const error = new Error('No token provided or invalid token format.') as CustomError;
+      error.statusCode = 401; // Unauthorized
+      throw error;
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Ensure 'verifyToken' is imported correctly and handles token verification,
+    // returning an object with 'userId' or throwing an error.
+    const decoded = verifyToken(token);
+
+    // This line requires your 'express.d.ts' or 'custom-request.d.ts'
+    // to extend the Request interface with a 'user' property.
+    req.user = { id: decoded.userId };
+
+    next();
+  } catch (error: any) {
+    const err = error as CustomError;
+    err.statusCode = err.statusCode || 401;
+    next(err);
+  }
+};
+
 // Middleware for authorization (e.g., check if user owns data)
 // This is a placeholder and will be implemented within controllers or more specific middlewares
 export const authorizeOwner = async (req: Request, res: Response, next: NextFunction) => {

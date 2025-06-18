@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { CustomError } from './errorHandler';
+import { validationResult, body, param, ValidationChain } from 'express-validator'; // Import ValidationChain
+
 import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/models';
 
 // Type definition for a validation schema map
@@ -53,6 +55,7 @@ export const validate = (schemas: SchemaMap) => {
     }
   };
 };
+
 
 // --- Example Joi Schemas (you will create these in your controllers or a separate schema file) ---
 export const locationSchema = Joi.object({

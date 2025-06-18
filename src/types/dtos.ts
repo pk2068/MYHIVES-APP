@@ -1,10 +1,23 @@
 import { BeehiveConfiguration, ColonyHealthStatus, QueenCellStatus, QueenStatus, TreatmentApplied } from "./models";
 
+// DTO for user registration (excluding fields like ID, timestamps, OAuth IDs)
+export interface RegisterUserDto {
+  username: string;
+  email: string;
+  password: string; // Password is required for direct registration
+}
+
 // DTO for user update (all fields optional)
 export interface UpdateUserDto {
   username?: string;
   email?: string;
   password?: string;
+}
+
+// DTO for user login
+export interface LoginUserDto {
+  email: string;
+  password: string;
 }
 
 // DTO for creating a Location
