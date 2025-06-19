@@ -3,7 +3,7 @@
 import { MajorInspection } from '../database/models/MajorInspection';
 import { MajorInspection as MajorInspectionInterface } from '../types/models';
 //import {MajorInspectionCreationAttributes} from '../database/models/MajorInspection'; // Import the creation attributes type
-import { CreateMajorInspectionDto } from '../types/dtos'; // <-- IMPORT THE NEW DTO
+import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos'; // <-- IMPORT THE NEW DTO
 
 
 export class MajorInspectionService {
@@ -71,9 +71,18 @@ export class MajorInspectionService {
   public static async updateMajorInspection(
     id: string,
     locationId: string,
-    updateData: Partial<MajorInspectionInterface>
+    updateData: UpdateMajorInspectionDto
+     // Partial<MajorInspectionInterface>
   ): Promise<MajorInspectionInterface | null> {
-    const [numberOfAffectedRows, affectedRows] = await MajorInspection.update(updateData, {
+
+    // create new date variable and the create new object with that variable and then this object will be passed to the update method
+    let newDate = updateData.inspectionDate ? new Date(updateData.inspectionDate) : new Date();
+    let newUpdateDataForUpdate  = { ...updateData, 
+      inspectionDate: newDate // Use the converted Date object
+     };
+
+
+    const [numberOfAffectedRows, affectedRows] = await MajorInspection.update(newUpdateDataForUpdate, {
       where: { id, locationId },
       returning: true,
     });

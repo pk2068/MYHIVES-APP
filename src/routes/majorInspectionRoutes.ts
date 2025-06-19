@@ -82,8 +82,8 @@ majorInspectionRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { locationId } = req.params;
-      const userId = req.user!.id;
-      const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId, userId);
+      // const userId = req.user!.id;
+      const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId);
       res.status(200).json(majorInspections);
     } catch (error) {
       next(error);
@@ -132,8 +132,7 @@ majorInspectionRouter.put(
 
       const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(
         majorInspectionId,
-        locationId,
-        userId,
+        locationId,        
         updateData
       );
 
@@ -161,8 +160,7 @@ majorInspectionRouter.delete(
 
       const success = await MajorInspectionService.deleteMajorInspection(
         majorInspectionId,
-        locationId,
-        userId
+        locationId
       );
 
       if (!success) {
