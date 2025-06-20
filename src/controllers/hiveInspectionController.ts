@@ -10,7 +10,6 @@ import { CustomError } from '../middleware/errorHandler';
 import httpStatus from 'http-status';
 
 export class HiveInspectionController {
-
   // POST /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections
   public static async createHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -18,9 +17,8 @@ export class HiveInspectionController {
       const userId = req.user!.id; // Authenticated user ID
 
       // 1. Verify ownership of the Major Inspection to the user and location
-      const majorInspection = await MajorInspectionService.getMajorInspectionById(
-        majorInspectionId, locationId, userId);
-      if (!majorInspection) {        
+      const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
+      if (!majorInspection) {
         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;
         throw _err;
@@ -30,10 +28,7 @@ export class HiveInspectionController {
       const hiveData: CreateHiveInspectionDto = { ...req.body, majorInspectionId: majorInspectionId }; // Ensure majorInspectionId from param is used
 
       // 3. Create the Hive Inspection
-      const newHiveInspection = await HiveInspectionService.createHiveInspection(
-        majorInspectionId,
-        hiveData
-      );
+      const newHiveInspection = await HiveInspectionService.createHiveInspection(majorInspectionId, hiveData);
 
       res.status(httpStatus.CREATED).send(newHiveInspection);
     } catch (error) {
@@ -49,7 +44,7 @@ export class HiveInspectionController {
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
-      if (!majorInspection) {        
+      if (!majorInspection) {
         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;
         throw _err;
@@ -71,7 +66,7 @@ export class HiveInspectionController {
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
-      if (!majorInspection) {        
+      if (!majorInspection) {
         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;
         throw _err;
@@ -106,17 +101,12 @@ export class HiveInspectionController {
 
       const updateData: UpdateHiveInspectionDto = req.body; // Joi validation should ensure valid partial data
 
-      const updatedHiveInspection = await HiveInspectionService.updateHiveInspection(
-        hiveInspectionId,
-        majorInspectionId,
-        updateData
-      );
+      const updatedHiveInspection = await HiveInspectionService.updateHiveInspection(hiveInspectionId, majorInspectionId, updateData);
 
-      if (!updatedHiveInspection) {        
-         const _err = new Error('Hive inspection not found or could not be updated.') as CustomError;
-         _err.statusCode = httpStatus.NOT_FOUND;  
-         throw _err;
-
+      if (!updatedHiveInspection) {
+        const _err = new Error('Hive inspection not found or could not be updated.') as CustomError;
+        _err.statusCode = httpStatus.NOT_FOUND;
+        throw _err;
       }
 
       res.status(httpStatus.OK).send(updatedHiveInspection);
@@ -133,11 +123,10 @@ export class HiveInspectionController {
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
-      if (!majorInspection) {        
-         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
+      if (!majorInspection) {
+        const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;
-         throw _err;  
-
+        throw _err;
       }
 
       const deleted = await HiveInspectionService.deleteHiveInspection(hiveInspectionId, majorInspectionId);

@@ -8,13 +8,35 @@ import config from './config/index';
 import errorHandler, {CustomError} from './middleware/errorHandler'; // Import the error handler
 
 // You'll import your routes here as you create them
-// import authRoutes from './routes/authRoutes';
-// import locationRoutes from './routes/locationRoutes';
+ import authRoutes from './routes/authRoutes';
+ import locationRoutes from './routes/locationRoutes';
+ import majorInspectionRoutes from './routes/majorInspectionRoutes';
+import hiveInspectionRoutes from './routes/hiveInspectionRoutes';
 
 const app: Application = express();
 
 // --- Middleware ---
 // ... (existing middleware like cors, helmet, morgan, express.json, express.urlencoded) ...
+// Enable CORS - allows requests from your frontend domain
+// In production, tighten this to specific origins
+app.use(cors({
+  origin: config.frontendUrl, // Allow requests from your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // Allow cookies to be sent
+}));
+
+// Add security headers (helps prevent common web vulnerabilities)
+app.use(helmet());
+
+// Logging HTTP requests to the console
+// 'dev' format is concise, change to 'combined' for more details in production
+app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
+
+// Parse JSON request bodies
+app.use(express.json());
+
+// Parse URL-encoded request bodies
+app.use(express.urlencoded({ extended: true }));
 
 // --- Routes ---
 // Basic health check route
@@ -23,11 +45,11 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 });
 
 // Mount your API routes here
-// app.use('/api/v1/auth', authRoutes);
-// app.use('/api/v1/locations', locationRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/locations', locationRoutes);
 // For nested routes, you might pass sequelize instances or use controllers directly
-// app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
-// app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
+app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
+app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
 
 
 // --- Error Handling Middleware ---
@@ -44,31 +66,3 @@ app.use(errorHandler); // This MUST be the last middleware in your chain
 
 export default app;
 
-// import { Client } from 'pg';
-
-// const client = new Client({
-//   user: 'postgres',         // replace if different
-//   host: 'localhost',
-//   database: 'myhives_db',
-//   password: 'Cada_2068_new', // replace with your actual password
-//   port: 5432,
-// });
-
-// async function insertUser(name: string, email: string) {
-//   try {
-//     await client.connect();
-//     console.log('We are connected! :) ');
-//     const query = 'INSERT INTO users (username, email) VALUES ($1, $2) RETURNING *';
-//     const values = [name, email];
-
-//     const result = await client.query(query, values);
-//     console.log('Inserted user:', result.rows[0], result);
-//   } catch (err) {
-//     console.error('ERROR inserting user: :( ', err);
-//   } finally {
-//     await client.end();
-//     console.log('We are disconnected! :) ');
-//   }
-// }
-
-// insertUser('johny', 'johny@bravo.com');

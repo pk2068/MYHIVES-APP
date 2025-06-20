@@ -9,6 +9,15 @@ import { validate } from '../middleware/validation';
 import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos';
 import { CustomError } from '../middleware/errorHandler';
 import '../types/custom-request';
+import {
+  createMajorInspection,
+  checkLocationOwnership,
+  getMajorInspections,
+  getMajorInspectionById,
+  updateMajorInspection,
+  deleteMajorInspection,
+} from '../controllers/majorInspectionContoller';
+import { get } from 'http';
 
 const majorInspectionRouter = Router();
 
@@ -27,68 +36,87 @@ const updateMajorInspectionSchema = Joi.object<UpdateMajorInspectionDto>({
 });
 
 const majorInspectionParamsSchema = Joi.object({
-  locationId: Joi.string().guid({ version: ['uuidv4'] }).required(),
-  majorInspectionId: Joi.string().guid({ version: ['uuidv4'] }).required(),
+  locationId: Joi.string()
+    .guid({ version: ['uuidv4'] })
+    .required(),
+  majorInspectionId: Joi.string()
+    .guid({ version: ['uuidv4'] })
+    .required(),
 });
 
 // Middleware to check if the :locationId in the URL param belongs to the authenticated user
-const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { locationId } = req.params;
-    const userId = req.user!.id;
+// const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { locationId } = req.params;
+//     const userId = req.user!.id;
 
-    const location = await LocationService.getLocationById(locationId, userId);
-    if (!location) {
-      const error: CustomError = new Error('Location not found or not owned by user');
-      error.statusCode = 404;
-      throw error;
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
+//     const location = await LocationService.getLocationById(locationId, userId);
+//     if (!location) {
+//       const error: CustomError = new Error('Location not found or not owned by user');
+//       error.statusCode = 404;
+//       throw error;
+//     }
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(
   '/locations/:locationId/major-inspections',
   isAuthenticated,
   validate({
-    params: Joi.object({ locationId: Joi.string().guid({ version: ['uuidv4'] }).required() }),
-    body: createMajorInspectionSchema
+    params: Joi.object({
+      locationId: Joi.string()
+        .guid({ version: ['uuidv4'] })
+        .required(),
+    }),
+    body: createMajorInspectionSchema,
   }),
   checkLocationOwnership, // Ensure the location belongs to the user
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId } = req.params;
-      const userId = req.user!.id;
-      // Merge locationId from params into the DTO if it's not already in the body
-      const inspectionData: CreateMajorInspectionDto = { ...req.body, locationId };
+  createMajorInspection
+  // async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const { locationId } = req.params;
 
-      const newMajorInspection = await MajorInspectionService.createMajorInspection(userId, inspectionData);
-      res.status(201).json(newMajorInspection);
-    } catch (error) {
-      next(error);
-    }
-  }
+  //     // Merge locationId from params into the DTO if it's not already in the body
+  //     const inspectionData: CreateMajorInspectionDto = { ...req.body, locationId };
+
+  //     const newMajorInspection = await MajorInspectionService.createMajorInspection(locationId, inspectionData);
+  //     res.status(201).json(newMajorInspection);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 );
 
 // GET /api/locations/:locationId/major-inspections - Get all major inspections for a specific location
 majorInspectionRouter.get(
   '/locations/:locationId/major-inspections',
   isAuthenticated,
-  validate({ params: Joi.object({ locationId: Joi.string().guid({ version: ['uuidv4'] }).required() }) }),
+  validate({
+    params: Joi.object({
+      locationId: Joi.string()
+        .guid({ version: ['uuidv4'] })
+        .required(),
+    }),
+  }),
   checkLocationOwnership,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId } = req.params;
-      // const userId = req.user!.id;
-      const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId);
-      res.status(200).json(majorInspections);
-    } catch (error) {
-      next(error);
-    }
-  }
+  getMajorInspections
+  // async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const { locationId } = req.params;
+  //     // const userId = req.user!.id;
+  //     const majorInspections =
+  //       await MajorInspectionService.getMajorInspectionsByLocationId(
+  //         locationId
+  //       );
+  //     res.status(200).json(majorInspections);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 );
 
 // GET /api/locations/:locationId/major-inspections/:majorInspectionId - Get a specific major inspection
@@ -96,56 +124,44 @@ majorInspectionRouter.get(
   '/locations/:locationId/major-inspections/:majorInspectionId',
   isAuthenticated,
   validate({ params: majorInspectionParamsSchema }),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId, majorInspectionId } = req.params;
-      const userId = req.user!.id;
+  checkLocationOwnership,
+  getMajorInspectionById
+  // async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const { locationId, majorInspectionId } = req.params;
+  //     const userId = req.user!.id;
 
-      const majorInspection = await MajorInspectionService.getMajorInspectionById(
-        majorInspectionId,
-        locationId,
-        userId
-      );
+  //     const majorInspection =
+  //       await MajorInspectionService.getMajorInspectionById(
+  //         majorInspectionId,
+  //         locationId,
+  //         userId
+  //       );
 
-      if (!majorInspection) {
-        const error: CustomError = new Error('Major Inspection not found or not owned by user via this location');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json(majorInspection);
-    } catch (error) {
-      next(error);
-    }
-  }
+  //     if (!majorInspection) {
+  //       const error: CustomError = new Error(
+  //         "Major Inspection not found or not owned by user via this location"
+  //       );
+  //       error.statusCode = 404;
+  //       throw error;
+  //     }
+  //     res.status(200).json(majorInspection);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 );
 
 // PUT /api/locations/:locationId/major-inspections/:majorInspectionId - Update a specific major inspection
 majorInspectionRouter.put(
   '/locations/:locationId/major-inspections/:majorInspectionId',
   isAuthenticated,
-  validate({ params: majorInspectionParamsSchema, body: updateMajorInspectionSchema }),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId, majorInspectionId } = req.params;
-      const userId = req.user!.id;
-      const updateData: UpdateMajorInspectionDto = req.body;
-
-      const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(
-        majorInspectionId,
-        locationId,        
-        updateData
-      );
-
-      if (!updatedMajorInspection) {
-        const error: CustomError = new Error('Major Inspection not found or not owned by user via this location');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json(updatedMajorInspection);
-    } catch (error) {
-      next(error);
-    }
-  }
+  validate({
+    params: majorInspectionParamsSchema,
+    body: updateMajorInspectionSchema,
+  }),
+  checkLocationOwnership,
+  updateMajorInspection
 );
 
 // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId - Delete a specific major inspection
@@ -158,10 +174,7 @@ majorInspectionRouter.delete(
       const { locationId, majorInspectionId } = req.params;
       const userId = req.user!.id;
 
-      const success = await MajorInspectionService.deleteMajorInspection(
-        majorInspectionId,
-        locationId
-      );
+      const success = await MajorInspectionService.deleteMajorInspection(majorInspectionId, locationId);
 
       if (!success) {
         const error: CustomError = new Error('Major Inspection not found or not owned by user via this location');
