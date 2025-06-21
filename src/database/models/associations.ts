@@ -1,7 +1,7 @@
-import { User } from './User';
-import { Location } from './Location';
-import { MajorInspection } from './MajorInspection';
-import { HiveInspection } from './HiveInspection';
+import { User } from './User.js';
+import { Location } from './Location.js';
+import { MajorInspection } from './MajorInspection.js';
+import { HiveInspection } from './HiveInspection.js';
 
 export const associateModels = () => {
   // User has many Locations

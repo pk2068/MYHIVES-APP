@@ -2,12 +2,12 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { HiveInspectionService } from '../services/hiveInspectionService';
-import { MajorInspectionService } from '../services/majorInspectionService'; // Needed for ownership checks
-import { isAuthenticated } from '../middleware/auth';
-import { validate } from '../middleware/validation';
-import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos';
-import { CustomError } from '../middleware/errorHandler';
+import { HiveInspectionService } from '../services/hiveInspectionService.js';
+import { MajorInspectionService } from '../services/majorInspectionService.js'; // Needed for ownership checks
+import { isAuthenticated } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
+import { CustomError } from '../middleware/errorHandler.js';
 import '../types/custom-request';
 
 // Assuming these enums are defined in your models/types
@@ -16,7 +16,7 @@ import {
   QueenStatus,
   TreatmentApplied,
   QueenCellStatus,
-} from '../types/models';
+} from '../types/models.js';
 
 const hiveInspectionRouter = Router();
 

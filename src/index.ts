@@ -4,14 +4,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import config from './config/index';
-import errorHandler, {CustomError} from './middleware/errorHandler'; // Import the error handler
+import config from './config/index.js';
+import errorHandler, {CustomError} from './middleware/errorHandler.js'; // Import the error handler
 
 // You'll import your routes here as you create them
- import authRoutes from './routes/authRoutes';
- import locationRoutes from './routes/locationRoutes';
- import majorInspectionRoutes from './routes/majorInspectionRoutes';
-import hiveInspectionRoutes from './routes/hiveInspectionRoutes';
+ import authRoutes from './routes/authRoutes.js';
+ import locationRoutes from './routes/locationRoutes.js';
+ import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
+import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
 
 const app: Application = express();
 

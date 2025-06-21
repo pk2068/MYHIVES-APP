@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
-import { CustomError } from "./errorHandler";
+import { CustomError } from "./errorHandler.js";
 // import {
 //   validationResult,
 //   body,
@@ -13,7 +13,7 @@ import {
   QueenStatus,
   TreatmentApplied,
   QueenCellStatus,
-} from "../types/models";
+} from "../types/models.js";
 
 // Type definition for a validation schema map
 type SchemaMap = {

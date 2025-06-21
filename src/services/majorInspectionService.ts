@@ -1,9 +1,9 @@
 // src/services/majorInspectionService.ts
 
-import { MajorInspection } from '../database/models/MajorInspection';
-import { MajorInspection as MajorInspectionInterface } from '../types/models';
+import { MajorInspection } from '../database/models/MajorInspection.js'  ;
+import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
 //import {MajorInspectionCreationAttributes} from '../database/models/MajorInspection'; // Import the creation attributes type
-import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos'; // <-- IMPORT THE NEW DTO
+import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
 
 
 export class MajorInspectionService {

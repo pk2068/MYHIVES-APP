@@ -1,7 +1,7 @@
 // src/database/models/User.ts
 
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-import { User as UserInterface } from '../../types/models'; // Corrected the path
+import { User as UserInterface } from '../../types/models.js'; // Corrected the path
 
 // Define a type for the attributes that are allowed for creation
 export interface UserCreationAttributes extends Optional<UserInterface, 'id' | 'createdAt' | 'updatedAt'> {}

@@ -1,8 +1,8 @@
 // src/services/hiveInspectionService.ts
 
-import { HiveInspection } from '../database/models/HiveInspection';
-import { HiveInspection as HiveInspectionInterface } from '../types/models';
-import { HiveInspectionCreationAttributes } from '../database/models/HiveInspection'; // Import the creation attributes type
+import { HiveInspection } from '../database/models/HiveInspection.js';
+import { HiveInspection as HiveInspectionInterface } from '../types/models.js';
+import { HiveInspectionCreationAttributes } from '../database/models/HiveInspection.js'; // Import the creation attributes type
 
 export class HiveInspectionService {
   public static async createHiveInspection(

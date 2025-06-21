@@ -1,12 +1,13 @@
 // src/controllers/hiveInspectionController.ts
 
-import { Request, Response, NextFunction } from 'express';
-import { HiveInspectionService } from '../services/hiveInspectionService';
-import { MajorInspectionService } from '../services/majorInspectionService'; // Needed for ownership check
-import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos';
-import { CustomRequest } from '../types/custom-request'; // Assuming you have a CustomRequest type for req.user
+import {  Response, NextFunction } from 'express';
+import { CustomRequest } from '../types/custom-request.js';
+import { HiveInspectionService } from '../services/hiveInspectionService.js';
+import { MajorInspectionService } from '../services/majorInspectionService.js'; // Needed for ownership check
+import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
+
 //import { ApiError } from '../utils/ApiError';
-import { CustomError } from '../middleware/errorHandler';
+import { CustomError } from '../middleware/errorHandler.js';
 import httpStatus from 'http-status';
 
 export class HiveInspectionController {

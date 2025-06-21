@@ -1,11 +1,11 @@
 // src/controllers/majorInspectionController.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { CustomError } from '../middleware/errorHandler';
-import { MajorInspectionService } from '../services/majorInspectionService';
-import { LocationService } from '../services/locationService'; // To check location ownership
-import { MajorInspection as MajorInspectionInterface } from '../types/models';
-import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos';
+import { CustomError } from '../middleware/errorHandler.js';
+import { MajorInspectionService } from '../services/majorInspectionService.js';
+import { LocationService } from '../services/locationService.js'; // To check location ownership
+import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
+import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
 
 // Middleware to ensure location belongs to the authenticated user
 const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,9 +1,9 @@
 // src/services/locationService.ts
 
-import { Location } from '../database/models/Location';
-import { Location as LocationInterface } from '../types/models'; // Import the interface
-import {LocationCreationAttributes} from '../database/models/Location'; // Import the creation attributes type
-import { CreateLocationDto } from '../types/dtos'; // <-- IMPORT THE NEW DTO
+import { Location } from '../database/models/Location.js';
+import { Location as LocationInterface } from '../types/models.js'; // Import the interface
+//import {LocationCreationAttributes} from '../database/models/Location.js'; // Import the creation attributes type
+import { CreateLocationDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
 
 export class LocationService {
   /**

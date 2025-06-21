@@ -2,11 +2,11 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { LocationService } from '../services/locationService';
-import { isAuthenticated } from '../middleware/auth';
-import { validate } from '../middleware/validation';
-import { CreateLocationDto, UpdateLocationDto } from '../types/dtos';
-import { CustomError } from '../middleware/errorHandler';
+import { LocationService } from '../services/locationService.js';
+import { isAuthenticated } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
+import { CustomError } from '../middleware/errorHandler.js';
 import '../types/custom-request';
 
 const locationRouter = Router();

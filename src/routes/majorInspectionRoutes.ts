@@ -2,12 +2,12 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { MajorInspectionService } from '../services/majorInspectionService';
-import { LocationService } from '../services/locationService';
-import { isAuthenticated } from '../middleware/auth';
-import { validate } from '../middleware/validation';
-import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos';
-import { CustomError } from '../middleware/errorHandler';
+import { MajorInspectionService } from '../services/majorInspectionService.js';
+//import { LocationService } from '../services/locationService.js';
+import { isAuthenticated } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
+import { CustomError } from '../middleware/errorHandler.js';
 import '../types/custom-request';
 import {
   createMajorInspection,
@@ -16,7 +16,7 @@ import {
   getMajorInspectionById,
   updateMajorInspection,
   deleteMajorInspection,
-} from '../controllers/majorInspectionContoller';
+} from '../controllers/majorInspectionContoller.js';
 import { get } from 'http';
 
 const majorInspectionRouter = Router();

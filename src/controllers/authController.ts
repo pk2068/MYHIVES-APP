@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwt';
-import { CustomError } from '../middleware/errorHandler';
-import { UserService } from '../services/userService'; // New service
+import { generateToken } from '../utils/jwt.js';
+import { CustomError } from '../middleware/errorHandler.js';
+import { UserService } from '../services/userService.js'; // New service
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -3,10 +3,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import Joi from 'joi'; // Import Joi
-import { validate } from '../middleware/validation'; // Import your Joi-based validate
-import { RegisterUserDto, LoginUserDto } from '../types/dtos'; // Assuming these DTOs exist
-import { UserService } from '../services/userService';
-import { CustomError } from '../middleware/errorHandler'; // Use CustomError
+import { validate } from '../middleware/validation.js'; // Import your Joi-based validate
+import { RegisterUserDto, LoginUserDto } from '../types/dtos.js'; // Assuming these DTOs exist
+import { UserService } from '../services/userService.js';
+import { CustomError } from '../middleware/errorHandler.js'; // Use CustomError
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import '../types/custom-request'; // To extend Request object with user
@@ -14,7 +14,7 @@ import '../types/custom-request'; // To extend Request object with user
 const authRouter = Router();
 
 // Assuming isAuthenticated from src/middlewares/isAuthenticated.ts
-import { isAuthenticated } from '../middleware/auth';
+import { isAuthenticated } from '../middleware/auth.js';
 const registerSchema = Joi.object<RegisterUserDto>({
   username: Joi.string().trim().required().messages({
     'string.empty': 'Username is required',

@@ -1,6 +1,6 @@
 
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-import { MajorInspection as MajorInspectionInterface } from '../../types/models';
+import { MajorInspection as MajorInspectionInterface } from '../../types/models.js';
 
 export interface MajorInspectionCreationAttributes extends Optional<MajorInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 

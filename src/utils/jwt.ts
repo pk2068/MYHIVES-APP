@@ -1,7 +1,7 @@
 // src/utils/jwt.ts
 
 import jwt from 'jsonwebtoken';
-import config from '../config'; // Import your application configuration
+import config from '../config/index.js'; // Import your application configuration
 
 interface JwtPayload {
   userId: string;

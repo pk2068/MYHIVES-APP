@@ -1,7 +1,7 @@
 // src/server.ts
 
-import app from './index';
-import config from './config/index';
+import app from './index.js';
+import config from './config/index.js';
 // import { connectDB } from './database'; // You'll create this function later
 
 const startServer = async () => {

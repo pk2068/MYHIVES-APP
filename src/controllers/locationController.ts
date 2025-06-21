@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { CustomError } from '../middleware/errorHandler';
-import { LocationService } from '../services/locationService'; // Import the service
-import { Location as LocationInterface } from '../types/models'; // Import the interface
+import { CustomError } from '../middleware/errorHandler.js';
+import { LocationService } from '../services/locationService.js'; // Import the service
+import { Location as LocationInterface } from '../types/models.js'; // Import the interface
 // import { Location as LocationInterface } from '../types/models'; // No longer needed for this specific line
-import { CreateLocationDto } from '../types/dtos'; // <-- IMPORT THE NEW DTO
+import { CreateLocationDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
 
 export const createLocation = async (req: Request, res: Response, next: NextFunction) => {
   try {

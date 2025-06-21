@@ -1,6 +1,6 @@
 
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-import { Location as LocationInterface } from '../../types/models';
+import { Location as LocationInterface } from '../../types/models.js';
 
 export interface LocationCreationAttributes extends Optional<LocationInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 

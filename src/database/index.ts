@@ -1,11 +1,11 @@
 
 import { Sequelize } from 'sequelize';
-import config from '../config';
-import { associateModels } from './models/associations'; // To be created
-import { User } from './models/User'; // To be created
-import { Location } from './models/Location'; // To be created
-import { MajorInspection } from './models/MajorInspection'; // To be created
-import { HiveInspection } from './models/HiveInspection'; // To be created
+import config from '../config/index.js';
+import { associateModels } from './models/associations.js'; // To be created
+import { User } from './models/User.js'; // To be created
+import { Location } from './models/Location.js'; // To be created
+import { MajorInspection } from './models/MajorInspection.js'; // To be created
+import { HiveInspection } from './models/HiveInspection.js'; // To be created
 
 // Initialize Sequelize with your database connection string
 const sequelize = new Sequelize(config.databaseUrl, {

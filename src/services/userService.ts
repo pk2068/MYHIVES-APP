@@ -1,6 +1,6 @@
-import { User } from '../database/models/User';
-import { User as UserInterface } from '../types/models';
-import { UserCreationAttributes } from '../database/models/User'; // <-- IMPORTANT: Import UserCreationAttributes
+import { User } from '../database/models/User.js';
+import { User as UserInterface } from '../types/models.js';
+import { UserCreationAttributes } from '../database/models/User.js'; // <-- IMPORTANT: Import UserCreationAttributes
 
 
 export class UserService {

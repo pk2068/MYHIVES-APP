@@ -6,7 +6,7 @@ import {
   TreatmentApplied,
   QueenCellStatus,
   BeehiveConfiguration,
-} from '../../types/models';
+} from '../../types/models.js';
 
 export interface HiveInspectionCreationAttributes extends Optional<HiveInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 

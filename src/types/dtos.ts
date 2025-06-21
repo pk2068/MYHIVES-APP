@@ -1,4 +1,4 @@
-import { BeehiveConfiguration, ColonyHealthStatus, QueenCellStatus, QueenStatus, TreatmentApplied } from "./models";
+import { BeehiveConfiguration, ColonyHealthStatus, QueenCellStatus, QueenStatus, TreatmentApplied } from "./models.js";
 
 // DTO for user registration (excluding fields like ID, timestamps, OAuth IDs)
 export interface RegisterUserDto {
