@@ -9,7 +9,7 @@ import { UserService } from '../services/userService.js';
 import { CustomError } from '../middleware/errorHandler.js'; // Use CustomError
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import '../types/custom-request'; // To extend Request object with user
+//import {CustomRequest} from '../types/custom-request.js'; // To extend Request object with user
 
 const authRouter = Router();
 

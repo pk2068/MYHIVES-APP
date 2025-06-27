@@ -1,5 +1,17 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+
+// Get the current file's path
+const __filename = fileURLToPath(import.meta.url);
+
+console.log('Current file path:', __filename);
+console.log(import.meta.url)
+
+// Get the current directory's path
+const __dirname = path.dirname(__filename);
+
 
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });

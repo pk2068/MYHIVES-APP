@@ -7,7 +7,7 @@ import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
 import { CustomError } from '../middleware/errorHandler.js';
-import '../types/custom-request';
+//import {CustomRequest} from '../types/custom-request.js';
 
 const locationRouter = Router();
 

@@ -8,7 +8,7 @@ import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
 import { CustomError } from '../middleware/errorHandler.js';
-import '../types/custom-request';
+//import {CustomRequest} from '../types/custom-request.js';
 
 // Assuming these enums are defined in your models/types
 import {
