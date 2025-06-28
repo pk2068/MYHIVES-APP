@@ -1,14 +1,15 @@
 // src/server.ts
 
-import app from './index.js';
+import app from './appExpressInstance.js';
 import config from './config/index.js';
-// import { connectDB } from './database'; // You'll create this function later
+import { connectDB } from './database/connect.js'; // You'll create this function later
+
 
 const startServer = async () => {
   try {
     // 1. Connect to the database
      console.log('Attempting to connect to the database...');
-    // await connectDB();
+     await connectDB();
      console.log('Database connected successfully.');
 
     // 2. Start the Express server

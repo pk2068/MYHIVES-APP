@@ -27,11 +27,12 @@ interface IConfig {
     linkedinClientId: string;
     linkedinClientSecret: string;
     frontendUrl: string; // For CORS and OAuth redirects
+    
   }
 
 // Map environment variables to the IConfig interface
 const config: IConfig = {
-    port: parseInt(process.env.PORT || '3000', 10),
+  port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   databaseUrl: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/beehive_db',
   jwtSecret: process.env.JWT_SECRET || 'supersecretjwtkeythatshouldbeverylongandrandom',
@@ -40,6 +41,8 @@ const config: IConfig = {
   linkedinClientId: process.env.LINKEDIN_CLIENT_ID || '',
   linkedinClientSecret: process.env.LINKEDIN_CLIENT_SECRET || '',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173', // My React default port
+
+  
 };
 
 // Basic validation for critical environment variables

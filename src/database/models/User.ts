@@ -70,8 +70,8 @@ export class User extends Model<UserInterface, UserCreationAttributes> implement
       {
         tableName: 'users',
         sequelize, // Pass the sequelize instance
-        timestamps: true, // Use the global setting from index.ts, or override here
-        underscored: true, // Use the global setting from index.ts, or override here
+        timestamps: true, 
+        underscored: true,
       }
     );
   }

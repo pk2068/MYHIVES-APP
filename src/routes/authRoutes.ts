@@ -63,7 +63,7 @@ authRouter.post(
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = await UserService.createUser({ username, email, password: hashedPassword });
 
-      const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET!, { expiresIn: '1d' });
+      const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
       res.status(201).json({ message: 'User registered successfully', user: newUser, token });
     } catch (error) {
