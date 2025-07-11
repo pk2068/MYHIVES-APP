@@ -43,7 +43,7 @@
     "@types/joi": "^17.2.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^22.15.31",
+    "@types/node": "^22.16.2",
     "@types/passport": "^1.0.17",
     "@types/pg": "^8.15.4",
     "@types/sequelize": "^4.28.20",

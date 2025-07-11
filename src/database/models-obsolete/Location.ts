@@ -5,8 +5,8 @@ import { Location as LocationInterface } from '../../types/models.js';
 export interface LocationCreationAttributes extends Optional<LocationInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class Location extends Model<LocationInterface, LocationCreationAttributes> implements LocationInterface {
-  public id!: string;
-  public userId!: string; // Foreign key
+  public user_id!: string;
+  public user_id!: string; // Foreign key
   public name!: string;
   public address!: string;
   public latitude!: number;
@@ -19,13 +19,13 @@ export class Location extends Model<LocationInterface, LocationCreationAttribute
   public static initialize(sequelize: Sequelize) {
     Location.init(
       {
-        id: {
+        user_id: {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
           allowNull: false,
         },
-        userId: {
+        user_id: {
           type: DataTypes.UUID,
           allowNull: false,
           references: {

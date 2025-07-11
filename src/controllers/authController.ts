@@ -23,18 +23,18 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const newUser = await UserService.createUser({
       username,
       email,
-      password: hashedPassword,
+      password_hash: hashedPassword,
     });
 
     // Generate token (optional, could just return success message)
-    const token = generateToken({ userId: newUser.id });
+    const token = generateToken({ userId: newUser.user_id });
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully!',
       token,
       user: {
-        id: newUser.id,
+        id: newUser.user_id,
         username: newUser.username,
         email: newUser.email,
       },
@@ -49,14 +49,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = req.body;
 
     const user = await UserService.findUserByEmail(email);
-    if (!user || !user.password) { // Check for user existence and if they have a password (for traditional login)
+    if (!user || !user.password_hash) { // Check for user existence and if they have a password (for traditional login)
       const error = new Error('Invalid credentials.') as CustomError;
       error.statusCode = 401; // Unauthorized
       throw error;
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       const error = new Error('Invalid credentials.') as CustomError;
       error.statusCode = 401;
@@ -64,14 +64,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     // Generate token
-    const token = generateToken({ userId: user.id });
+    const token = generateToken({ userId: user.user_id });
 
     res.status(200).json({
       success: true,
       message: 'Logged in successfully!',
       token,
       user: {
-        id: user.id,
+        id: user.user_id,
         username: user.username,
         email: user.email,
       },
@@ -98,7 +98,7 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     // Return user data (excluding password)
-    const { password, ...userData } = user;
+    const { password_hash: password, ...userData } = user;
     res.status(200).json({ success: true, user: userData });
   } catch (error) {
     next(error);
@@ -142,7 +142,7 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
         throw error;
     }
 
-    const token = generateToken({ userId: authenticatedUser.id });
+    const token = generateToken({ userId: authenticatedUser.user_id });
 
     // Redirect to frontend with token (or send token directly, depending on frontend flow)
     // In a real scenario, you'd use a redirect to your frontend with the token
@@ -168,7 +168,7 @@ export const linkedinCallback = async (req: Request, res: Response, next: NextFu
         throw error;
     }
 
-    const token = generateToken({ userId: authenticatedUser.id });
+    const token = generateToken({ userId: authenticatedUser.user_id });
     res.status(200).json({ success: true, message: 'LinkedIn login successful', token });
   } catch (error) {
     next(error);

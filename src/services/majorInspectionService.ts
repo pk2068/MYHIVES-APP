@@ -1,6 +1,6 @@
 // src/services/majorInspectionService.ts
 
-import { MajorInspection } from '../database/models/MajorInspection.js'  ;
+import { MajorInspection } from '../database/models-obsolete/MajorInspection.js'  ;
 import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
 //import {MajorInspectionCreationAttributes} from '../database/models/MajorInspection'; // Import the creation attributes type
 import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
@@ -46,7 +46,7 @@ export class MajorInspectionService {
   public static async getMajorInspectionsByLocationId(
     locationId: string
   ): Promise<MajorInspectionInterface[]> {
-    const majorInspections = await MajorInspection.findAll({ where: { locationId }, order: [['inspectionDate', 'DESC']] });
+    const majorInspections = await MajorInspection.findAll({ where: { location_id: locationId }, order: [['inspectionDate', 'DESC']] });
     return majorInspections.map(mi => mi.toJSON());
   }
 
@@ -56,7 +56,7 @@ export class MajorInspectionService {
     userId: string // Check ownership by userId
   ): Promise<MajorInspectionInterface | null> {
     const majorInspection = await MajorInspection.findOne({
-      where: { id, locationId },
+      where: { user_id: id, location_id: locationId },
       include: [
         {
           association: 'location', // Make sure this matches your association name in the MajorInspection model
@@ -83,7 +83,7 @@ export class MajorInspectionService {
 
 
     const [numberOfAffectedRows, affectedRows] = await MajorInspection.update(newUpdateDataForUpdate, {
-      where: { id, locationId },
+      where: { user_id: id, location_id: locationId },
       returning: true,
     });
 
@@ -98,7 +98,7 @@ export class MajorInspectionService {
     locationId: string
   ): Promise<boolean> {
     const deletedRows = await MajorInspection.destroy({
-      where: { id, locationId },
+      where: { user_id: id, location_id: locationId },
     });
     return deletedRows > 0;
   }

@@ -37,9 +37,10 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Advanced Options */
-    "skipLibCheck": true // Skip type checking of declaration files
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"], // Include all TypeScript files in src
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/sumarize-src.ts"], // Include all TypeScript files in src
   "exclude": ["node_modules", "dist"] // Exclude node_modules and the output directory
 }
 // {

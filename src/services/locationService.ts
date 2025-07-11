@@ -1,6 +1,6 @@
 // src/services/locationService.ts
 
-import { Location } from '../database/models/Location.js';
+import { Location } from '../database/models-obsolete/Location.js';
 import { Location as LocationInterface } from '../types/models.js'; // Import the interface
 //import {LocationCreationAttributes} from '../database/models/Location.js'; // Import the creation attributes type
 import { CreateLocationDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
@@ -15,7 +15,7 @@ export class LocationService {
   public static async createLocation(
     userId: string, 
     locationData: CreateLocationDto ): Promise<LocationInterface> {
-    const newLocation = await Location.create({ ...locationData, userId });
+    const newLocation = await Location.create({ ...locationData, user_id: userId });
     return newLocation.toJSON(); // Return plain JSON object
   }
 
@@ -25,7 +25,7 @@ export class LocationService {
    * @returns An array of locations.
    */
   public static async getLocationsByUserId(userId: string): Promise<LocationInterface[]> {
-    const locations = await Location.findAll({ where: { userId } });
+    const locations = await Location.findAll({ where: { user_id: userId } });
     return locations.map(loc => loc.toJSON());
   }
 
@@ -36,7 +36,7 @@ export class LocationService {
    * @returns The location or null if not found or not owned by user.
    */
   public static async getLocationById(id: string, userId: string): Promise<LocationInterface | null> {
-    const location = await Location.findOne({ where: { id, userId } });
+    const location = await Location.findOne({ where: { user_id: id, user_id: userId } });
     return location ? location.toJSON() : null;
   }
 
@@ -49,7 +49,7 @@ export class LocationService {
    */
   public static async updateLocation(id: string, userId: string, updateData: Partial<LocationInterface>): Promise<LocationInterface | null> {
     const [numberOfAffectedRows, affectedRows] = await Location.update(updateData, {
-      where: { id, userId },
+      where: { user_id: id, user_id: userId },
       returning: true, // Return the updated record(s)
     });
 
@@ -67,7 +67,7 @@ export class LocationService {
    */
   public static async deleteLocation(id: string, userId: string): Promise<boolean> {
     const deletedRows = await Location.destroy({
-      where: { id, userId },
+      where: { user_id: id, user_id: userId },
     });
     return deletedRows > 0;
   }

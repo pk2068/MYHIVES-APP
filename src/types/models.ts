@@ -2,23 +2,24 @@
 
 // Basic types for common fields
 export interface BaseModel {
-    id: string; // Assuming UUIDs for IDs
+    //user_id: string; // Assuming UUIDs for IDs
     createdAt: Date;
     updatedAt: Date;
   }
   
   // User Model
   export interface User extends BaseModel {
+    user_id : string; // UUID for user_id    
     googleId?: string | null;
     linkedinId?: string | null;
     username?: string | null;
     email: string;
-    password?: string | null; // Hashed password
+    password_hash?: string | null; // Hashed password
   }
   
   // Location Model
   export interface Location extends BaseModel {
-    userId: string;
+    user_id: string; // Foreign key to User
     name: string;
     address: string;
     latitude: number;
@@ -28,7 +29,7 @@ export interface BaseModel {
   
   // MajorInspection Model
   export interface MajorInspection extends BaseModel {
-    locationId: string;
+    location_id: string;
     inspectionDate: Date; // Date only, but TS Date type is fine
     generalNotes?: string | null;
   }

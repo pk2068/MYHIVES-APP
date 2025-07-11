@@ -1,6 +1,7 @@
 import {
-	Model, Table, Column, DataType, Index, Sequelize, ForeignKey 
+	Model, Table, Column, DataType, Index, Sequelize, HasMany
 } from "sequelize-typescript";
+import { locations } from "./locations.js";
 
 export interface usersAttributes {
     user_id?: string;
@@ -69,4 +70,8 @@ export class users extends Model<usersAttributes, usersAttributes> implements us
     })
     	updated_at?: Date;
 
+
+	// Association with locations model
+	@HasMany(() => locations, { foreignKey: 'user_id' })
+    locations?: locations[]; // This property would hold an array of associated locations
 }

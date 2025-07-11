@@ -5,8 +5,8 @@ import { MajorInspection as MajorInspectionInterface } from '../../types/models.
 export interface MajorInspectionCreationAttributes extends Optional<MajorInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class MajorInspection extends Model<MajorInspectionInterface, MajorInspectionCreationAttributes> implements MajorInspectionInterface {
-  public id!: string;
-  public locationId!: string; // Foreign key
+  public user_id!: string;
+  public location_id!: string; // Foreign key
   public inspectionDate!: Date;
   public notes?: string | null;
 
@@ -16,13 +16,13 @@ export class MajorInspection extends Model<MajorInspectionInterface, MajorInspec
   public static initialize(sequelize: Sequelize) {
     MajorInspection.init(
       {
-        id: {
+        user_id: {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
           allowNull: false,
         },
-        locationId: {
+        location_id: {
           type: DataTypes.UUID,
           allowNull: false,
           references: {

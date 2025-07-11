@@ -8,12 +8,12 @@ export interface UserCreationAttributes extends Optional<UserInterface, 'id' | '
 
 // Extend the Sequelize Model for your User model
 export class User extends Model<UserInterface, UserCreationAttributes> implements UserInterface {
-  public id!: string;
+  public user_id!: string;
   public googleId?: string | null;
   public linkedinId?: string | null;
   public username?: string | null;
   public email!: string;
-  public password?: string | null;
+  public password_hash?: string | null;
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -23,7 +23,7 @@ export class User extends Model<UserInterface, UserCreationAttributes> implement
   public static initialize(sequelize: Sequelize) {
     User.init(
       {
-        id: {
+        user_id: {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
@@ -52,7 +52,7 @@ export class User extends Model<UserInterface, UserCreationAttributes> implement
             isEmail: true,
           },
         },
-        password: {
+        password_hash: {
           type: DataTypes.STRING, // Hashed password
           allowNull: true,
         },

@@ -1,8 +1,8 @@
 // src/services/hiveInspectionService.ts
 
-import { HiveInspection } from '../database/models/HiveInspection.js';
+import { HiveInspection } from '../database/models-obsolete/HiveInspection.js';
 import { HiveInspection as HiveInspectionInterface } from '../types/models.js';
-import { HiveInspectionCreationAttributes } from '../database/models/HiveInspection.js'; // Import the creation attributes type
+import { HiveInspectionCreationAttributes } from '../database/models-obsolete/HiveInspection.js'; // Import the creation attributes type
 
 export class HiveInspectionService {
   public static async createHiveInspection(
@@ -24,7 +24,7 @@ export class HiveInspectionService {
     id: string,
     majorInspectionId: string
   ): Promise<HiveInspectionInterface | null> {
-    const hiveInspection = await HiveInspection.findOne({ where: { id, majorInspectionId } });
+    const hiveInspection = await HiveInspection.findOne({ where: { user_id: id, majorInspectionId } });
     return hiveInspection ? hiveInspection.toJSON() : null;
   }
 
@@ -34,7 +34,7 @@ export class HiveInspectionService {
     updateData: Partial<HiveInspectionInterface>
   ): Promise<HiveInspectionInterface | null> {
     const [numberOfAffectedRows, affectedRows] = await HiveInspection.update(updateData, {
-      where: { id, majorInspectionId },
+      where: { user_id: id, majorInspectionId },
       returning: true,
     });
 
@@ -49,7 +49,7 @@ export class HiveInspectionService {
     majorInspectionId: string
   ): Promise<boolean> {
     const deletedRows = await HiveInspection.destroy({
-      where: { id, majorInspectionId },
+      where: { user_id: id, majorInspectionId },
     });
     return deletedRows > 0;
   }

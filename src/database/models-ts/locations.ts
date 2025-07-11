@@ -1,6 +1,8 @@
 import {
-	Model, Table, Column, DataType, Index, Sequelize, ForeignKey 
+	Model, Table, Column, DataType, Index, Sequelize, ForeignKey,  BelongsTo
 } from "sequelize-typescript";
+import { users } from './users'; // Assuming path to users model
+
 
 export interface locationsAttributes {
     location_id?: string;
@@ -29,6 +31,7 @@ export class locations extends Model<locationsAttributes, locationsAttributes> i
     })
     	location_id?: string;
 
+	@ForeignKey(() => users)
     @Column({
     	type: DataType.UUID 
     })
@@ -82,5 +85,10 @@ export class locations extends Model<locationsAttributes, locationsAttributes> i
     	defaultValue: Sequelize.literal("CURRENT_TIMESTAMP") 
     })
     	updated_at?: Date;
+
+	// Association with users model
+
+    @BelongsTo(() => users)
+    user?: users; // This property would hold the associated user object
 
 }

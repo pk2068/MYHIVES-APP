@@ -11,7 +11,7 @@ import {
 export interface HiveInspectionCreationAttributes extends Optional<HiveInspectionInterface, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class HiveInspection extends Model<HiveInspectionInterface, HiveInspectionCreationAttributes> implements HiveInspectionInterface {
-  public id!: string;
+  public user_id!: string;
   public majorInspectionId!: string; // Foreign key
   public hiveNumber!: string;
   public inspectionHour!: string;
@@ -39,7 +39,7 @@ export class HiveInspection extends Model<HiveInspectionInterface, HiveInspectio
   public static initialize(sequelize: Sequelize) {
     HiveInspection.init(
       {
-        id: {
+        user_id: {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,

@@ -1,11 +1,16 @@
 
 import { Sequelize } from 'sequelize';
 import config from '../config/index.js';
-import { associateModels } from './models/associations.js'; // To be created
-import { User } from './models/User.js'; // To be created
-import { Location } from './models/Location.js'; // To be created
-import { MajorInspection } from './models/MajorInspection.js'; // To be created
-import { HiveInspection } from './models/HiveInspection.js'; // To be created
+import { associateModels } from './models-obsolete/associations.js'; // To be created
+import { User } from './models-obsolete/User.js'; // To be created
+import { users} from './models-ts/users.js'; // To be created
+import { locations } from './models-ts/locations.js'; // To be created
+import { hive_inspections } from './models-ts/hive_inspections.js';
+import { major_inspections } from './models-ts/major_inspections.js';
+
+import { Location } from './models-obsolete/Location.js'; // To be created
+import { MajorInspection } from './models-obsolete/MajorInspection.js'; // To be created
+import { HiveInspection } from './models-obsolete/HiveInspection.js'; // To be created
 
 
 const DB_DIALECT = process.env.DB_DIALECT as 'postgres'; // Cast to ensure correct type

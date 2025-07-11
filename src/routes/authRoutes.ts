@@ -61,9 +61,9 @@ authRouter.post(
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await UserService.createUser({ username, email, password: hashedPassword });
+      const newUser = await UserService.createUser({ username, email, password_hash: hashedPassword });
 
-      const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+      const token = jwt.sign({ id: newUser.user_id, email: newUser.email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
       res.status(201).json({ message: 'User registered successfully', user: newUser, token });
     } catch (error) {
@@ -80,20 +80,20 @@ authRouter.post(
       const { email, password } = req.body;
 
       const user = await UserService.findUserByEmail(email);
-      if (!user || !user.password) {
+      if (!user || !user.password_hash) {
         const error: CustomError = new Error('Invalid credentials');
         error.statusCode = 401; // Unauthorized
         throw error;
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         const error: CustomError = new Error('Invalid credentials');
         error.statusCode = 401; // Unauthorized
         throw error;
       }
 
-      const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '1d' });
+      const token = jwt.sign({ id: user.user_id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '1d' });
 
       res.status(200).json({ message: 'Logged in successfully', user: user, token });
     } catch (error) {

@@ -15,7 +15,7 @@ export class HiveInspectionController {
   public static async createHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { locationId, majorInspectionId } = req.params;
-      const userId = req.user!.id; // Authenticated user ID
+      const userId = req.user!.user_id; // Authenticated user ID
 
       // 1. Verify ownership of the Major Inspection to the user and location
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
@@ -41,7 +41,7 @@ export class HiveInspectionController {
   public static async getHiveInspectionsByMajorInspectionId(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { locationId, majorInspectionId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.user!.user_id;
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
@@ -63,7 +63,7 @@ export class HiveInspectionController {
   public static async getHiveInspectionById(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { locationId, majorInspectionId, hiveInspectionId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.user!.user_id;
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
@@ -90,7 +90,7 @@ export class HiveInspectionController {
   public static async updateHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { locationId, majorInspectionId, hiveInspectionId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.user!.user_id;
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
@@ -120,7 +120,7 @@ export class HiveInspectionController {
   public static async deleteHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { locationId, majorInspectionId, hiveInspectionId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.user!.user_id;
 
       // Verify ownership of the Major Inspection
       const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
