@@ -3,8 +3,8 @@
 // Basic types for common fields
 export interface BaseModel {
     //user_id: string; // Assuming UUIDs for IDs
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
   }
   
   // User Model

@@ -1,7 +1,7 @@
 import {
 	Model, Table, Column, DataType, Index, Sequelize, ForeignKey,  BelongsTo
 } from "sequelize-typescript";
-import { users } from './users'; // Assuming path to users model
+import { users } from './users.js'; 
 
 
 export interface locationsAttributes {

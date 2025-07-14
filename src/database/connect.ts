@@ -1,16 +1,16 @@
 
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import config from '../config/index.js';
-import { associateModels } from './models-obsolete/associations.js'; // To be created
-import { User } from './models-obsolete/User.js'; // To be created
-import { users} from './models-ts/users.js'; // To be created
+//import { associateModels } from './models-obsolete/associations.js'; // obsolete associations
+//import { User } from './models-obsolete/User.js'; // To be created
+import { users} from './models-ts/users.js'; // To be created 
 import { locations } from './models-ts/locations.js'; // To be created
 import { hive_inspections } from './models-ts/hive_inspections.js';
 import { major_inspections } from './models-ts/major_inspections.js';
 
-import { Location } from './models-obsolete/Location.js'; // To be created
-import { MajorInspection } from './models-obsolete/MajorInspection.js'; // To be created
-import { HiveInspection } from './models-obsolete/HiveInspection.js'; // To be created
+// import { Location } from './models-obsolete/Location.js'; // To be created
+// import { MajorInspection } from './models-obsolete/MajorInspection.js'; // To be created
+// import { HiveInspection } from './models-obsolete/HiveInspection.js'; // To be created
 
 
 const DB_DIALECT = process.env.DB_DIALECT as 'postgres'; // Cast to ensure correct type
@@ -30,7 +30,6 @@ if (!DB_DIALECT || !DB_HOST || !DB_USER || !DB_NAME) {
 // Construct the database connection string
 const databaseUrl = `${DB_DIALECT}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 
-
 // Initialize Sequelize with your database connection string
 export const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres', // Specify PostgreSQL dialect
@@ -43,9 +42,10 @@ export const sequelize = new Sequelize(databaseUrl, {
     // },
   },
   define: {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: false, // Automatically add createdAt and updatedAt fields
     underscored: true, // Use snake_case for column names (e.g., created_at)
   },
+  models: [users, locations, hive_inspections, major_inspections], // Register your models
 });
 
 export const connectDB = async () => {
@@ -54,14 +54,6 @@ export const connectDB = async () => {
     await sequelize.authenticate();
     console.log('PostgreSQL connection has been established successfully.');
 
-    // Initialize models
-    User.initialize(sequelize);
-    Location.initialize(sequelize);
-    MajorInspection.initialize(sequelize);
-    HiveInspection.initialize(sequelize);
-
-    // Set up associations between models
-    associateModels();
 
     // Sync all models with the database.
     // In production, you'd typically use migrations (e.g., `sequelize-cli`)
