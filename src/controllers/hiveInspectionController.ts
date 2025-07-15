@@ -1,10 +1,12 @@
 // src/controllers/hiveInspectionController.ts
 
-import {  Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { CustomRequest } from '../types/custom-request.js';
 import { HiveInspectionService } from '../services/hiveInspectionService.js';
 import { MajorInspectionService } from '../services/majorInspectionService.js'; // Needed for ownership check
-import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
+import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';
+
+//import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
 
 //import { ApiError } from '../utils/ApiError';
 import { CustomError } from '../middleware/errorHandler.js';
@@ -26,7 +28,7 @@ export class HiveInspectionController {
       }
 
       // 2. Validate request body against DTO (Joi validation middleware should ideally do this before this point)
-      const hiveData: CreateHiveInspectionDto = { ...req.body, majorInspectionId: majorInspectionId }; // Ensure majorInspectionId from param is used
+      const hiveData: hive_inspectionsAttributes = { ...req.body, majorInspectionId: majorInspectionId }; // Ensure majorInspectionId from param is used
 
       // 3. Create the Hive Inspection
       const newHiveInspection = await HiveInspectionService.createHiveInspection(majorInspectionId, hiveData);
@@ -100,7 +102,7 @@ export class HiveInspectionController {
         throw _err;
       }
 
-      const updateData: UpdateHiveInspectionDto = req.body; // Joi validation should ensure valid partial data
+      const updateData: hive_inspectionsAttributes = req.body; // Joi validation should ensure valid partial data
 
       const updatedHiveInspection = await HiveInspectionService.updateHiveInspection(hiveInspectionId, majorInspectionId, updateData);
 
@@ -123,7 +125,7 @@ export class HiveInspectionController {
       const userId = req.user!.user_id;
 
       // Verify ownership of the Major Inspection
-      const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
+      const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
       if (!majorInspection) {
         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;

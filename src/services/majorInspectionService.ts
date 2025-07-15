@@ -1,66 +1,46 @@
 // src/services/majorInspectionService.ts
 
-import { MajorInspection } from '../database/models-obsolete/MajorInspection.js'  ;
-import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
+//import { MajorInspection } from '../database/models-obsolete/MajorInspection.js'  ;
+import { major_inspections } from '../database/models-ts/major_inspections.js'; // Updated to use the new TypeScript model
+import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js'; // Importing the type for major inspection attributes
+import { locations } from '../database/models-ts/locations.js';
+//import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
 //import {MajorInspectionCreationAttributes} from '../database/models/MajorInspection'; // Import the creation attributes type
-import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
-
+//import { CreateMajorInspectionDto, UpdateHiveInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js'; // <-- IMPORT THE NEW DTO
 
 export class MajorInspectionService {
-  public static async createMajorInspection(
-    userId: string,
-    inspectionData: CreateMajorInspectionDto
-  ): Promise<MajorInspectionInterface> {
-
+  public static async createMajorInspection(location_id: string, inspectionData: major_inspectionsAttributes): Promise<major_inspectionsAttributes> {
     // Convert inspectionDate string from DTO to a Date object
-    const newInspectionDate = new Date(inspectionData.inspectionDate);
+    const newInspectionDate = new Date(inspectionData.inspection_date);
 
     // Create the object to be passed to Sequelize.create()
     const inspectionDataForCreation = {
       ...inspectionData,
-      inspectionDate: newInspectionDate, // Use the converted Date object
-      userId: userId, // Assuming userId is passed from the controller and is the correct foreign key
-                      // If your MajorInspection model links to Location, then it should be locationId here
-                      // and `locationId` needs to be part of the `CreateMajorInspectionDto`.
-                      // BASED ON YOUR LATEST MAJORINSPECTIONDTO, `locationId` is in the DTO,
-                      // SO THE FIRST ARGUMENT TO THIS SERVICE FUNCTION SHOULD BE `locationId: string`.
-                      // Let's correct this based on the common flow for major inspections:
-                      // A major inspection belongs to a specific location, and that location belongs to a user.
-                      // So the `createMajorInspection` service function will likely take `userId` AND `locationId`
-                      // if you need to verify ownership of the location before creating the inspection.
-
+      location_id: location_id, // Ensure the location_id is set correctly
     };
-    const newMajorInspection = await MajorInspection.create({
-      // // Use the converted date
-      // inspectionDate: newInspectionDate,
-      // // Pass other data from the DTO
-      // generalNotes: inspectionData.generalNotes,
-      // locationId: inspectionData.locationId, // locationId comes from the DTO
-      // userId: userId, // userId comes from the first argument (req.user!.id)
-      ...inspectionDataForCreation
+    const newMajorInspection = await major_inspections.create({
+      ...inspectionData,
     });
 
-     return newMajorInspection.toJSON();
+    return newMajorInspection.toJSON();
   }
 
-  public static async getMajorInspectionsByLocationId(
-    locationId: string
-  ): Promise<MajorInspectionInterface[]> {
-    const majorInspections = await MajorInspection.findAll({ where: { location_id: locationId }, order: [['inspectionDate', 'DESC']] });
-    return majorInspections.map(mi => mi.toJSON());
+  public static async getMajorInspectionsByLocationId(locationId: string): Promise<major_inspectionsAttributes[]> {
+    const majorInspections = await major_inspections.findAll({ where: { location_id: locationId }, order: [['inspection_date', 'DESC']] });
+    return majorInspections.map((mi) => mi.toJSON());
   }
 
   public static async getMajorInspectionById(
-    id: string,
-    locationId: string,
-    userId: string // Check ownership by userId
-  ): Promise<MajorInspectionInterface | null> {
-    const majorInspection = await MajorInspection.findOne({
-      where: { user_id: id, location_id: locationId },
+    userId: string, // Check ownership by userId
+    majorInspectionId: string,
+    locationId: string
+  ): Promise<major_inspectionsAttributes | null> {
+    const majorInspection = await major_inspections.findOne({
+      where: { major_inspection_id: majorInspectionId, location_id: locationId },
       include: [
         {
           association: 'location', // Make sure this matches your association name in the MajorInspection model
-          where: { userId },
+          where: { location_id: locationId, user_id: userId }, // Ensure the location belongs to the user
           required: true,
         },
       ],
@@ -69,21 +49,13 @@ export class MajorInspectionService {
   }
 
   public static async updateMajorInspection(
-    id: string,
     locationId: string,
-    updateData: UpdateMajorInspectionDto
-     // Partial<MajorInspectionInterface>
-  ): Promise<MajorInspectionInterface | null> {
-
-    // create new date variable and the create new object with that variable and then this object will be passed to the update method
-    let newDate = updateData.inspectionDate ? new Date(updateData.inspectionDate) : new Date();
-    let newUpdateDataForUpdate  = { ...updateData, 
-      inspectionDate: newDate // Use the converted Date object
-     };
-
-
-    const [numberOfAffectedRows, affectedRows] = await MajorInspection.update(newUpdateDataForUpdate, {
-      where: { user_id: id, location_id: locationId },
+    majorInspectionId: string,
+    updateData: major_inspectionsAttributes
+    // Partial<MajorInspectionInterface>
+  ): Promise<major_inspectionsAttributes | null> {
+    const [numberOfAffectedRows, affectedRows] = await major_inspections.update(updateData, {
+      where: { location_id: locationId, major_inspection_id: majorInspectionId },
       returning: true,
     });
 
@@ -93,13 +65,38 @@ export class MajorInspectionService {
     return affectedRows[0].toJSON();
   }
 
-  public static async deleteMajorInspection(
-    id: string,
-    locationId: string
-  ): Promise<boolean> {
-    const deletedRows = await MajorInspection.destroy({
-      where: { user_id: id, location_id: locationId },
+  public static async deleteMajorInspection(userId: string, locationId: string, majorInspectionId: string): Promise<boolean> {
+    // Step 1: Find the major inspection ID that matches all criteria
+    const majorInspectionToDelete = await major_inspections.findOne({
+      attributes: ['major_inspection_id'], // Only select the ID to minimize data transfer
+      where: {
+        major_inspection_id: majorInspectionId,
+      },
+      include: [
+        {
+          model: locations,
+          as: 'location', // Ensure this matches your association alias
+          where: {
+            location_id: locationId,
+            user_id: userId, // Ensure the location belongs to the user
+          },
+          required: true, // This acts as an INNER JOIN, ensuring all conditions must be met
+        },
+      ],
     });
+
+    if (!majorInspectionToDelete) {
+      // No matching major inspection found for the given user, location, and majorInspectionId
+      return false;
+    }
+
+    // Step 2: Delete the identified major inspection
+    const deletedRows = await major_inspections.destroy({
+      where: {
+        major_inspection_id: majorInspectionToDelete.major_inspection_id,
+      },
+    });
+
     return deletedRows > 0;
   }
 }

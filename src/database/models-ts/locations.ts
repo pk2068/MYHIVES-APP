@@ -1,7 +1,10 @@
 import {
-	Model, Table, Column, DataType, Index, Sequelize, ForeignKey,  BelongsTo
+	Model, Table, Column, DataType, Index, Sequelize, ForeignKey,  BelongsTo, HasMany
 } from "sequelize-typescript";
 import { users } from './users.js'; 
+import { hives } from './hives.js'; // Import hives model
+import { major_inspections } from './major_inspections.js'; // Import major_inspections model
+
 
 
 export interface locationsAttributes {
@@ -90,5 +93,19 @@ export class locations extends Model<locationsAttributes, locationsAttributes> i
 
     @BelongsTo(() => users)
     user?: users; // This property would hold the associated user object
+
+	// --- Associations for Hives ---
+    @HasMany(() => hives, {
+        foreignKey: 'location_id', // The foreign key in the 'hives' table that links back to 'locations'
+        as: 'hives' // Alias for when you include hives with a location
+    })
+    hives?: hives[]; // Property to hold an array of associated hives
+
+    // --- Associations for Major Inspections ---
+    @HasMany(() => major_inspections, {
+        foreignKey: 'location_id', // The foreign key in the 'major_inspections' table that links back to 'locations'
+        as: 'majorInspections' // Alias for when you include major inspections with a location
+    })
+    majorInspections?: major_inspections[]; // Property to hold an array of associated major inspections
 
 }

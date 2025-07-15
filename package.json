@@ -11,6 +11,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
+    "rebuild": "npm run clean && cls && node -e \"console.log('\\n\\n\\n\\n')\" &&  echo %time% &&npm run build",
     "clean": "rimraf dist",
     "start": "node --enable-source-maps dist/server.js",
     "restart": "npm run clean && npm run build && npm run start",

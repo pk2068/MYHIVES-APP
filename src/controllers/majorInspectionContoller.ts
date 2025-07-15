@@ -4,8 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../middleware/errorHandler.js';
 import { MajorInspectionService } from '../services/majorInspectionService.js';
 import { LocationService } from '../services/locationService.js'; // To check location ownership
-import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
-import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
+// import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
+// import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
+import { major_inspectionsAttributes } from 'database/models-ts/major_inspections.js';
 
 // Middleware to ensure location belongs to the authenticated user
 const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
@@ -29,7 +30,7 @@ export const createMajorInspection = async (req: Request, res: Response, next: N
   try {
     const { locationId } = req.params;
     //const inspectionData: Partial<MajorInspectionInterface> = req.body;
-    const inspectionData: CreateMajorInspectionDto = req.body;
+    const inspectionData: major_inspectionsAttributes = req.body;
 
     const newMajorInspection = await MajorInspectionService.createMajorInspection(locationId, inspectionData);
 
@@ -63,7 +64,7 @@ export const getMajorInspectionById = async (req: Request, res: Response, next: 
     const { majorInspectionId, locationId } = req.params;
     const userId = req.user!.id;
 
-    const majorInspection = await MajorInspectionService.getMajorInspectionById(majorInspectionId, locationId, userId);
+    const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
     if (!majorInspection) {
       const error = new Error('Major inspection not found.') as CustomError;
@@ -83,9 +84,9 @@ export const getMajorInspectionById = async (req: Request, res: Response, next: 
 export const updateMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorInspectionId, locationId } = req.params;
-    const updateData: UpdateMajorInspectionDto = req.body;
+    const updateData: major_inspectionsAttributes = req.body;
 
-    const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(majorInspectionId, locationId, updateData);
+    const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(locationId, majorInspectionId, updateData);
 
     if (!updatedMajorInspection) {
       const error = new Error('Major inspection not found.') as CustomError;
@@ -106,8 +107,9 @@ export const updateMajorInspection = async (req: Request, res: Response, next: N
 export const deleteMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorInspectionId, locationId } = req.params;
+    const userId = req.user!.id;
 
-    const deleted = await MajorInspectionService.deleteMajorInspection(majorInspectionId, locationId);
+    const deleted = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
 
     if (!deleted) {
       const error = new Error('Major inspection not found.') as CustomError;

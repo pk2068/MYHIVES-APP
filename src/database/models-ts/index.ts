@@ -1,6 +1,4 @@
 export * from "./hives.js";
-export * from "./usersold.js";
-export * from "./location_stands_old.js";
 export * from "./users.js";
 export * from "./locations.js";
 export * from "./major_inspections.js";

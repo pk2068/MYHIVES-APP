@@ -27,7 +27,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     });
 
     // Generate token (optional, could just return success message)
-    const token = generateToken({ userId: newUser.user_id });
+    const token = generateToken({ userId: newUser.user_id! });
 
     res.status(201).json({
       success: true,
@@ -64,7 +64,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     // Generate token
-    const token = generateToken({ userId: user.user_id });
+    const token = generateToken({ userId: user.user_id! });
 
     res.status(200).json({
       success: true,
@@ -142,7 +142,7 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
         throw error;
     }
 
-    const token = generateToken({ userId: authenticatedUser.user_id });
+    const token = generateToken({ userId: authenticatedUser.user_id! });
 
     // Redirect to frontend with token (or send token directly, depending on frontend flow)
     // In a real scenario, you'd use a redirect to your frontend with the token
@@ -168,7 +168,7 @@ export const linkedinCallback = async (req: Request, res: Response, next: NextFu
         throw error;
     }
 
-    const token = generateToken({ userId: authenticatedUser.user_id });
+    const token = generateToken({ userId: authenticatedUser.user_id! });
     res.status(200).json({ success: true, message: 'LinkedIn login successful', token });
   } catch (error) {
     next(error);
