@@ -1,17 +1,16 @@
-
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
 import config from './config/index.js';
-import errorHandler, {CustomError} from './middleware/errorHandler.js'; // Import the error handler
+import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Import the error handler
 
 // You'll import your routes here as you create them
- import authRoutes from './routes/authRoutes.js';
- import locationRoutes from './routes/locationRoutes.js';
- import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
-import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import locationRoutes from './routes/locationRoutes.js';
+//  import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
+// import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
 
 const app: Application = express();
 
@@ -20,11 +19,13 @@ console.log('BeeHive API configuration is starting...');
 // ... (existing middleware like cors, helmet, morgan, express.json, express.urlencoded) ...
 // Enable CORS - allows requests from your frontend domain
 // In production, tighten this to specific origins
-app.use(cors({
-  origin: config.frontendUrl, // Allow requests from your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true, // Allow cookies to be sent
-}));
+app.use(
+  cors({
+    origin: config.frontendUrl, // Allow requests from your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true, // Allow cookies to be sent
+  })
+);
 
 console.log(`CORS enabled for origin: ${config.frontendUrl}`);
 
@@ -54,16 +55,16 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', message: 'BeeHive API is running!' });
 });
 
-console.log('Health check route added');  
+console.log('Health check route added');
 
 // Mount your API routes here
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/locations', locationRoutes);
 // For nested routes, you might pass sequelize instances or use controllers directly
-app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
-app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
+// app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
+// app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
 
-console.log('API routes mounted');  
+console.log('API routes mounted');
 // --- Error Handling Middleware ---
 
 // Catch 404 Not Found errors
@@ -79,4 +80,3 @@ app.use(errorHandler); // This MUST be the last middleware in your chain
 console.log('Error handler middleware added');
 
 export default app;
-

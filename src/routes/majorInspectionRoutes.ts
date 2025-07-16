@@ -9,14 +9,7 @@ import { validate } from '../middleware/validation.js';
 import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
 import { CustomError } from '../middleware/errorHandler.js';
 //import {CustomRequest} from '../types/custom-request.js';
-import {
-  createMajorInspection,
-  checkLocationOwnership,
-  getMajorInspections,
-  getMajorInspectionById,
-  updateMajorInspection,
-  deleteMajorInspection,
-} from '../controllers/majorInspectionContoller.js';
+import { createMajorInspection, checkLocationOwnership, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
 import { get } from 'http';
 
 const majorInspectionRouter = Router();
@@ -172,9 +165,9 @@ majorInspectionRouter.delete(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { locationId, majorInspectionId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.currentUser!.id;
 
-      const success = await MajorInspectionService.deleteMajorInspection(majorInspectionId, locationId);
+      const success = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
 
       if (!success) {
         const error: CustomError = new Error('Major Inspection not found or not owned by user via this location');

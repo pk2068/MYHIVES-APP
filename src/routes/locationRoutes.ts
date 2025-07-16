@@ -5,31 +5,34 @@ import Joi from 'joi';
 import { LocationService } from '../services/locationService.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
-import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
+// import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
+import { locationsAttributes } from 'database/models-ts/locations.js';
 import { CustomError } from '../middleware/errorHandler.js';
 //import {CustomRequest} from '../types/custom-request.js';
 
 const locationRouter = Router();
 
 // --- Joi Schemas for Location ---
-const createLocationSchema = Joi.object<CreateLocationDto>({
+const createLocationSchema = Joi.object<locationsAttributes>({
   name: Joi.string().trim().min(3).max(100).required(),
   address: Joi.string().trim().min(5).max(255).required(),
   latitude: Joi.number().min(-90).max(90).required(),
   longitude: Joi.number().min(-180).max(180).required(),
-  description: Joi.string().trim().max(500).allow(null, ''),
+  notes: Joi.string().trim().max(500).allow(null, ''),
 });
 
-const updateLocationSchema = Joi.object<UpdateLocationDto>({
+const updateLocationSchema = Joi.object<locationsAttributes>({
   name: Joi.string().trim().min(3).max(100).optional(),
   address: Joi.string().trim().min(5).max(255).optional(),
   latitude: Joi.number().min(-90).max(90).optional(),
   longitude: Joi.number().min(-180).max(180).optional(),
-  description: Joi.string().trim().max(500).allow(null, '').optional(),
+  notes: Joi.string().trim().max(500).allow(null, '').optional(),
 });
 
 const locationIdParamSchema = Joi.object({
-  locationId: Joi.string().guid({ version: ['uuidv4'] }).required(), // Validate as UUID
+  locationId: Joi.string()
+    .guid({ version: ['uuidv4'] })
+    .required(), // Validate as UUID
 });
 
 // POST /api/locations - Create a new location
@@ -39,8 +42,8 @@ locationRouter.post(
   validate({ body: createLocationSchema }), // <--- Body validation
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user!.id;
-      const locationData: CreateLocationDto = req.body;
+      const userId = req.currentUser!.id;
+      const locationData: locationsAttributes = req.body;
       const newLocation = await LocationService.createLocation(userId, locationData);
       res.status(201).json(newLocation);
     } catch (error) {
@@ -57,7 +60,7 @@ locationRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { locationId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.currentUser!.id;
       const location = await LocationService.getLocationById(locationId, userId);
 
       if (!location) {
@@ -80,8 +83,8 @@ locationRouter.put(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { locationId } = req.params;
-      const userId = req.user!.id;
-      const updateData: UpdateLocationDto = req.body;
+      const userId = req.currentUser!.id;
+      const updateData: locationsAttributes = req.body;
 
       const updatedLocation = await LocationService.updateLocation(locationId, userId, updateData);
 
@@ -105,7 +108,7 @@ locationRouter.delete(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { locationId } = req.params;
-      const userId = req.user!.id;
+      const userId = req.currentUser!.id;
 
       const success = await LocationService.deleteLocation(locationId, userId);
 

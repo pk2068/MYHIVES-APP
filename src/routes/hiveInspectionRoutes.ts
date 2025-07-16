@@ -114,7 +114,7 @@ const hiveInspectionParamsSchema = Joi.object({
 const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorInspectionId, locationId } = req.params;
-    const userId = req.user!.id;
+    const userId = req.currentUser!.id;
 
     // IMPORTANT: You need to implement this method in your MajorInspectionService.
     // It should fetch the major inspection and ensure its associated location's userId matches the current user.

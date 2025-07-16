@@ -11,7 +11,7 @@ import { major_inspectionsAttributes } from 'database/models-ts/major_inspection
 // Middleware to ensure location belongs to the authenticated user
 const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.currentUser!.id;
     const { locationId } = req.params;
 
     const location = await LocationService.getLocationById(locationId, userId);
@@ -62,7 +62,7 @@ export const getMajorInspections = async (req: Request, res: Response, next: Nex
 export const getMajorInspectionById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorInspectionId, locationId } = req.params;
-    const userId = req.user!.id;
+    const userId = req.currentUser!.id;
 
     const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
@@ -107,7 +107,7 @@ export const updateMajorInspection = async (req: Request, res: Response, next: N
 export const deleteMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { majorInspectionId, locationId } = req.params;
-    const userId = req.user!.id;
+    const userId = req.currentUser!.id;
 
     const deleted = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
 

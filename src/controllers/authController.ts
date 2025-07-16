@@ -49,7 +49,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = req.body;
 
     const user = await UserService.findUserByEmail(email);
-    if (!user || !user.password_hash) { // Check for user existence and if they have a password (for traditional login)
+    if (!user || !user.password_hash) {
+      // Check for user existence and if they have a password (for traditional login)
       const error = new Error('Invalid credentials.') as CustomError;
       error.statusCode = 401; // Unauthorized
       throw error;
@@ -84,13 +85,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // req.user is set by the `authenticate` middleware
-    if (!req.user || !req.user.id) {
+    if (!req.currentUser || !req.currentUser.id) {
       const error = new Error('User not authenticated.') as CustomError;
       error.statusCode = 401;
       throw error;
     }
 
-    const user = await UserService.findUserById(req.user.id);
+    const user = await UserService.findUserById(req.currentUser.id);
     if (!user) {
       const error = new Error('User not found.') as CustomError;
       error.statusCode = 404;
@@ -119,10 +120,10 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     // If Passport.js has successfully authenticated, req.user will contain the user data.
     // If not, this simple controller won't work correctly.
     // Assuming req.user contains the authenticated user from Passport.js or a mock:
-    if (!req.user || !req.user.id) {
-        const error = new Error('Google authentication failed.') as CustomError;
-        error.statusCode = 401;
-        throw error;
+    if (!req.currentUser || !req.currentUser.id) {
+      const error = new Error('Google authentication failed.') as CustomError;
+      error.statusCode = 401;
+      throw error;
     }
 
     // For a real app, you'd use a more robust OAuth flow (e.g., Passport.js)
@@ -135,11 +136,11 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
     // A real Google strategy would call done(null, userObject) if successful.
     // Then req.user would be populated.
     // We're skipping the Passport setup here for brevity.
-    const authenticatedUser = await UserService.findUserById(req.user.id); // Assuming req.user.id is populated by passport
+    const authenticatedUser = await UserService.findUserById(req.currentUser.id); // Assuming req.user.id is populated by passport
     if (!authenticatedUser) {
-        const error = new Error('User not found after Google authentication.') as CustomError;
-        error.statusCode = 404;
-        throw error;
+      const error = new Error('User not found after Google authentication.') as CustomError;
+      error.statusCode = 404;
+      throw error;
     }
 
     const token = generateToken({ userId: authenticatedUser.user_id! });
@@ -155,17 +156,17 @@ export const googleCallback = async (req: Request, res: Response, next: NextFunc
 
 export const linkedinCallback = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user || !req.user.id) {
+    if (!req.currentUser || !req.currentUser.id) {
       const error = new Error('LinkedIn authentication failed.') as CustomError;
       error.statusCode = 401;
       throw error;
     }
 
-    const authenticatedUser = await UserService.findUserById(req.user.id);
+    const authenticatedUser = await UserService.findUserById(req.currentUser.id);
     if (!authenticatedUser) {
-        const error = new Error('User not found after LinkedIn authentication.') as CustomError;
-        error.statusCode = 404;
-        throw error;
+      const error = new Error('User not found after LinkedIn authentication.') as CustomError;
+      error.statusCode = 404;
+      throw error;
     }
 
     const token = generateToken({ userId: authenticatedUser.user_id! });
