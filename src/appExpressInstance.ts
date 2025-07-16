@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import 'reflect-metadata';
 
 import config from './config/index.js';
 import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Import the error handler

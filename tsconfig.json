@@ -6,6 +6,8 @@
     "module": "NodeNext", // Crucial for Node.js ESM resolution
     "rootDir": "./src", // Your source code lives here
     "outDir": "./dist", // Compiled JavaScript will go here
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
 
     /* Module Resolution */
     "moduleResolution": "NodeNext", // Use Node.js's ESM resolution algorithm

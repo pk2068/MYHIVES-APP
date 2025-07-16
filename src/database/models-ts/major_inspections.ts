@@ -31,8 +31,8 @@ export class major_inspections extends Model<major_inspectionsAttributes, major_
   })
   location_id!: string;
 
-  @BelongsTo(() => locations) // This establishes the BelongsTo relationship with locations
-  location?: locations; // Property to hold the associated location
+  // @BelongsTo(() => locations) // This establishes the BelongsTo relationship with locations
+  // location?: locations; // Property to hold the associated location
 
   @Column({
     type: DataType.STRING,
@@ -59,10 +59,12 @@ export class major_inspections extends Model<major_inspectionsAttributes, major_
   })
   updated_at?: Date;
 
+  /*
   // --- Associations for Hive Inspections ---
   @HasMany(() => hive_inspections, {
     foreignKey: 'major_inspection_id', // The foreign key in the 'hive_inspections' table that links back to 'major_inspections'
     as: 'hiveInspections', // Alias for when you include hive inspections with a major inspection
   })
   hiveInspections?: hive_inspections;
+  */
 }

@@ -51,12 +51,6 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
   })
   major_inspection_id!: string;
 
-  @BelongsTo(() => major_inspections, {
-    foreignKey: 'major_inspection_id',
-    as: 'majorInspection', // This alias is consistent with what you used in HiveInspectionService
-  })
-  majorInspection?: major_inspections; // Property to hold the associated major inspection
-
   @ForeignKey(() => hives) // Indicates that hive_id is a foreign key
   @Column({
     type: DataType.UUID,
@@ -202,4 +196,10 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
   })
   updated_at?: Date;
+
+  // @BelongsTo(() => major_inspections, {
+  //   foreignKey: 'major_inspection_id',
+  //   as: 'majorInspection', // This alias is consistent with what you used in HiveInspectionService
+  // })
+  // majorInspection?: major_inspections; // Property to hold the associated major inspection
 }
