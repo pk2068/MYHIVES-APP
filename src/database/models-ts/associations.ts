@@ -22,17 +22,17 @@ export function associateModels() {
   });
   major_inspections.belongsTo(locations, {
     foreignKey: 'location_id',
-    as: 'majorInspectionlocation',
+    as: 'majorInspection_location',
   });
 
   // Location to Hives (one-to-many)
   locations.hasMany(hives, {
     foreignKey: 'location_id',
-    as: 'hives',
+    as: 'locations_hives',
   });
   hives.belongsTo(locations, {
     foreignKey: 'location_id',
-    as: 'hiveLocation',
+    as: 'hives_location',
   });
 
   // MajorInspection to HiveInspection (one-to-many)
@@ -42,16 +42,17 @@ export function associateModels() {
   });
   hive_inspections.belongsTo(major_inspections, {
     foreignKey: 'major_inspection_id',
-    as: 'majorInspection',
+    as: 'hiveInspections_majorInspection',
   });
 
   // Hive to HiveInspection (one-to-many)
   hives.hasMany(hive_inspections, {
     foreignKey: 'hive_id',
-    as: 'hiveInspections',
+    as: 'hives_hiveInspections',
   });
+
   hive_inspections.belongsTo(hives, {
     foreignKey: 'hive_id',
-    as: 'hive',
+    as: 'hiveInspections_hive',
   });
 }

@@ -66,10 +66,10 @@ export class hives extends Model<hivesAttributes, hivesAttributes> implements hi
   })
   updated_at?: Date;
 
-  // --- Associations for Hive Inspections ---
-  @HasMany(() => hive_inspections, {
-    foreignKey: 'hive_id', // The foreign key in the 'hive_inspections' table that links back to 'hives'
-    as: 'hiveInspections', // Alias for when you include hive inspections with a hive
-  })
-  hiveInspections?: hive_inspections[]; // Property to hold an array of associated hive inspections
+  //   // --- Associations for Hive Inspections ---
+  //   @HasMany(() => hive_inspections, {
+  //     foreignKey: 'hive_id', // The foreign key in the 'hive_inspections' table that links back to 'hives'
+  //     as: 'hiveInspections', // Alias for when you include hive inspections with a hive
+  //   })
+  //   hiveInspections?: hive_inspections[]; // Property to hold an array of associated hive inspections
 }

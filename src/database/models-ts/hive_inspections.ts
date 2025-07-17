@@ -57,11 +57,11 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
   })
   hive_id!: string;
 
-  @BelongsTo(() => hives, {
-    foreignKey: 'hive_id',
-    as: 'hive', // Alias for when you include the hive with a hive inspection
-  })
-  hive?: hives; // Property to hold the associated hive
+  //   @BelongsTo(() => hives, {
+  //     foreignKey: 'hive_id',
+  //     as: 'hive', // Alias for when you include the hive with a hive inspection
+  //   })
+  //   hive?: hives; // Property to hold the associated hive
 
   @Column({
     type: DataType.STRING,
