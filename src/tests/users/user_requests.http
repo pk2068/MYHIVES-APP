@@ -1,0 +1,56 @@
+### Register a New User
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Register a User with Existing Email (Expected: 409 Conflict)
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "anotheruser",
+  "email": "test@example.com",
+  "password": "anotherpassword"
+}
+
+### Login with Valid Credentials
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Login with Invalid Password (Expected: 401 Unauthorized)
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "wrongpassword"
+}
+
+### Login with Non-Existent Email (Expected: 401 Unauthorized)
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "anypassword"
+}
+
+### Get Current User (without token - Expected: 401 Unauthorized)
+GET http://localhost:3000/api/v1/auth/me
+Accept: application/json
+
+### Get Current User (with valid token)
+# Replace {{authToken}} with the token received from a successful login request
+GET http://localhost:3000/api/v1/auth/me
+Accept: application/json
+Authorization: Bearer {{authToken}}

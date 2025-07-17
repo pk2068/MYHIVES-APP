@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import Joi from "joi";
-import { CustomError } from "./errorHandler.js";
+import { Request, Response, NextFunction } from 'express';
+import Joi from 'joi';
+import { CustomError } from './errorHandler.js';
 // import {
 //   validationResult,
 //   body,
@@ -8,12 +8,7 @@ import { CustomError } from "./errorHandler.js";
 //   ValidationChain,
 // } from "express-validator"; // Import ValidationChain
 
-import {
-  ColonyHealthStatus,
-  QueenStatus,
-  TreatmentApplied,
-  QueenCellStatus,
-} from "../types/models.js";
+import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/models.js';
 
 // Type definition for a validation schema map
 type SchemaMap = {
@@ -27,6 +22,7 @@ type SchemaMap = {
  * @param schemas An object containing Joi schemas for body, params, and/or query.
  */
 export const validate = (schemas: SchemaMap) => {
+  console.log('Validation middleware initialized with schemas:', schemas);
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       if (schemas.body) {
@@ -34,9 +30,7 @@ export const validate = (schemas: SchemaMap) => {
           abortEarly: false,
         }); // abortEarly: false to get all errors
         if (error) {
-          const validationError = new Error(
-            error.details.map((d) => d.message).join(", ")
-          ) as CustomError;
+          const validationError = new Error(error.details.map((d) => d.message).join(', ')) as CustomError;
           validationError.statusCode = 400; // Bad Request
           validationError.data = error.details; // Include details for frontend parsing
           throw validationError;
@@ -48,9 +42,7 @@ export const validate = (schemas: SchemaMap) => {
           abortEarly: false,
         });
         if (error) {
-          const validationError = new Error(
-            error.details.map((d) => d.message).join(", ")
-          ) as CustomError;
+          const validationError = new Error(error.details.map((d) => d.message).join(', ')) as CustomError;
           validationError.statusCode = 400;
           validationError.data = error.details;
           throw validationError;
@@ -62,9 +54,7 @@ export const validate = (schemas: SchemaMap) => {
           abortEarly: false,
         });
         if (error) {
-          const validationError = new Error(
-            error.details.map((d) => d.message).join(", ")
-          ) as CustomError;
+          const validationError = new Error(error.details.map((d) => d.message).join(', ')) as CustomError;
           validationError.statusCode = 400;
           validationError.data = error.details;
           throw validationError;
@@ -84,7 +74,7 @@ export const locationSchema = Joi.object({
   address: Joi.string().trim().min(5).max(255).required(),
   latitude: Joi.number().min(-90).max(90).required(),
   longitude: Joi.number().min(-180).max(180).required(),
-  description: Joi.string().trim().max(500).allow(null, ""),
+  description: Joi.string().trim().max(500).allow(null, ''),
 });
 
 export const createHiveInspectionSchema = Joi.object({
