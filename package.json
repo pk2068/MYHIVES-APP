@@ -14,7 +14,7 @@
     "rebuild": "npm run clean && cls && node -e \"console.log('\\n\\n\\n\\n\\n\\n\\n\\n')\" &&  echo %time% &&npm run build",
     "clean": "rimraf dist",
     "start": "node --enable-source-maps dist/server.js",
-    "restart": "npm run clean && npm run build && npm run start",
+    "restart": "npm run rebuild && npm run start",
     "dev2": "npm run clean && npm run build && concurrently \"tsc --watch\" \"nodemon --exec 'node --enable-source-maps' dist/server.js\"",
     "dev": "npm run clean && npm run build && concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

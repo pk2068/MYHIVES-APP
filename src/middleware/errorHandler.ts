@@ -9,8 +9,13 @@ export interface CustomError extends Error {
 }
 
 const errorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error Handler  occurred:', {
+    message: err.message,
+    statusCode: err.statusCode,
+    stack: err.stack,
+  });
   // Determine status code: prioritize error's statusCode, then check Express's res.statusCode, fallback to 500
-  const statusCode = err.statusCode || res.statusCode === 200 ? 500 : res.statusCode;
+  const statusCode = err.statusCode || 500;
 
   res.status(statusCode).json({
     success: false,

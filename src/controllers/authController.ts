@@ -83,6 +83,29 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // In a stateless JWT system, the server doesn't need to do much for logout.
+    // The client simply discards the token.
+    // However, it's good practice to send a success message.
+    // If you implemented a token blacklist/revocation (more complex), this is where you'd do it.
+
+    // If using HTTP-only cookies for tokens, you'd clear the cookie here.
+    // For example:
+    res.clearCookie('jwt'); // Assuming your JWT is in a cookie named 'jwt'
+
+    // You might also want to do some logging for audit purposes
+    console.log(`User ${req.currentUser?.id || 'unknown'} logged out.`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // req.user is set by the `authenticate` middleware

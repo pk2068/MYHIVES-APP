@@ -6,7 +6,7 @@ import Joi from 'joi'; // Import Joi
 import { validate } from '../middleware/validation.js'; // Import your Joi-based validate
 import { RegisterUserDto, LoginUserDto } from '../types/dtos.js'; // Assuming these DTOs exist
 //import { CustomError } from '../middleware/errorHandler.js'; // Use CustomError
-import { login, register, getMe } from '../controllers/authController.js'; // Import your auth controller
+import { login, register, getMe, logout } from '../controllers/authController.js'; // Import your auth controller
 
 import { isAuthenticated } from '../middleware/auth.js';
 import { getMajorInspectionById } from 'controllers/majorInspectionContoller.js';
@@ -58,6 +58,13 @@ authRouter.post(
 );
 
 authRouter.get('/me', isAuthenticated, getMe);
+
+authRouter.post(
+  '/logout',
+  isAuthenticated, // Optional: You might want to ensure only authenticated users can "logout"
+  // Or, if you simply want to provide a path to clear client-side token, it can be without auth.
+  logout
+);
 
 // ... (other auth routes like /logout, /me, Google/LinkedIn OAuth)
 

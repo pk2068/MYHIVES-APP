@@ -58,8 +58,10 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
     next();
   } catch (error: any) {
+    console.error('Authentication error:', error);
     const err = error as CustomError;
     err.statusCode = err.statusCode || 401;
+    console.error(`Error status code: ${err.statusCode}, message: ${err.message}`);
     next(err);
   }
 };

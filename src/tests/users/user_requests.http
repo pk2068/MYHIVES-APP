@@ -53,4 +53,11 @@ Accept: application/json
 # Replace {{authToken}} with the token received from a successful login request
 GET http://localhost:3000/api/v1/auth/me
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOTk5NjA5OC02MjE2LTRmYWYtODJjOS04MWFjMjE5MjlhMjEiLCJpYXQiOjE3NTI4NDczMjIsImV4cCI6MTc1Mjg1MDkyMn0.JIwbQnTNSwlIJO_kCJ6SwZc-6PwClXL_BavH2_Uq8YU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOTk5NjA5OC02MjE2LTRmYWYtODJjOS04MWFjMjE5MjlhMjEiLCJpYXQiOjE3NTI4NjUzOTQsImV4cCI6MTc1Mjg2NTUxNH0._q91sc2cqtMDBMu4qRmjnUpbrR05Lc1fuEcxWC4j3OY
+
+### Logout User
+# This request is mainly for demonstration/logging purposes on the server.
+# The real logout happens on the client by deleting the token.
+POST http://localhost:3000/api/v1/auth/logout
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOTk5NjA5OC02MjE2LTRmYWYtODJjOS04MWFjMjE5MjlhMjEiLCJpYXQiOjE3NTI4NjUzOTQsImV4cCI6MTc1Mjg2NTUxNH0._q91sc2cqtMDBMu4qRmjnUpbrR05Lc1fuEcxWC4j3OY

@@ -71,7 +71,7 @@ console.log('API routes mounted');
 // Catch 404 Not Found errors
 app.use((req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`Not Found - ${req.originalUrl}`) as CustomError; // Cast to CustomError
-  error.statusCode = 414; // Set 404 status
+  error.statusCode = 404; // Set 404 status
   next(error); // Pass the error to the next middleware (our errorHandler)
 });
 console.log('404 Not Found handler added');
