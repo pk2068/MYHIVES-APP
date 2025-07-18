@@ -35,7 +35,9 @@ import { CustomError } from './errorHandler.js'; // Import the CustomError inter
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Authentication middleware called');
     const authHeader = req.headers.authorization;
+    console.log('Token received:', req.headers.authorization);
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       const error = new Error('No token provided or invalid token format.') as CustomError;
@@ -48,6 +50,7 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     // Ensure 'verifyToken' is imported correctly and handles token verification,
     // returning an object with 'userId' or throwing an error.
     const decoded = verifyToken(token);
+    console.log('Decoded token:', decoded);
 
     // This line requires your 'express.d.ts' or 'custom-request.d.ts'
     // to extend the Request interface with a 'user' property.

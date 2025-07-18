@@ -87,7 +87,8 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
   try {
     // req.user is set by the `authenticate` middleware
     if (!req.currentUser || !req.currentUser.id) {
-      const error = new Error('User not authenticated.') as CustomError;
+      console.error('No currentUser found in request:', req.currentUser);
+      const error = new Error('User not authenticated. - no currentUser') as CustomError;
       error.statusCode = 401;
       throw error;
     }

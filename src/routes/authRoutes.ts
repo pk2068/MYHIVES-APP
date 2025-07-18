@@ -7,7 +7,7 @@ import { validate } from '../middleware/validation.js'; // Import your Joi-based
 import { RegisterUserDto, LoginUserDto } from '../types/dtos.js'; // Assuming these DTOs exist
 //import { CustomError } from '../middleware/errorHandler.js'; // Use CustomError
 import { login, register, getMe } from '../controllers/authController.js'; // Import your auth controller
-// Assuming isAuthenticated from src/middlewares/isAuthenticated.ts
+
 import { isAuthenticated } from '../middleware/auth.js';
 import { getMajorInspectionById } from 'controllers/majorInspectionContoller.js';
 
@@ -57,7 +57,7 @@ authRouter.post(
   login // Call the controller function here
 );
 
-authRouter.get('/me', getMe);
+authRouter.get('/me', isAuthenticated, getMe);
 
 // ... (other auth routes like /logout, /me, Google/LinkedIn OAuth)
 
