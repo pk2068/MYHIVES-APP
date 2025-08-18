@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/jwt.js';
 import { CustomError } from '../middleware/errorHandler.js';
 import { UserService } from '../services/userService.js'; // New service
+import config from '../config/index.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   console.log('Registering user:', req.body);
@@ -27,13 +28,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       password_hash: hashedPassword,
     });
 
-    // Generate token (optional, could just return success message)
-    const token = generateToken({ userId: newUser.user_id! });
+    // // Generate token (optional, could just return success message)
+    // const token = generateToken({ userId: newUser.user_id! });
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully!',
-      token,
+      message: 'User registered successfully! Please log in.',
       user: {
         id: newUser.user_id,
         username: newUser.username,
@@ -68,6 +68,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     // Generate token
     const token = generateToken({ userId: user.user_id! });
 
+    res.cookie('jwtcookie', token, {
+      httpOnly: true,
+      secure: config.nodeEnv === 'production',
+      maxAge: 1000 * 3600 * 24 * 7, // 7 days in milliseconds
+    });
+
     res.status(200).json({
       success: true,
       message: 'Logged in successfully!',
@@ -88,11 +94,10 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     // In a stateless JWT system, the server doesn't need to do much for logout.
     // The client simply discards the token.
     // However, it's good practice to send a success message.
-    // If you implemented a token blacklist/revocation (more complex), this is where you'd do it.
 
     // If using HTTP-only cookies for tokens, you'd clear the cookie here.
     // For example:
-    res.clearCookie('jwt'); // Assuming your JWT is in a cookie named 'jwt'
+    res.clearCookie('jwtcookie'); // Assuming your JWT is in a cookie named 'jwtcookie'
 
     // You might also want to do some logging for audit purposes
     console.log(`User ${req.currentUser?.id || 'unknown'} logged out.`);
@@ -108,6 +113,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('getMe called');
     // req.user is set by the `authenticate` middleware
     if (!req.currentUser || !req.currentUser.id) {
       console.error('No currentUser found in request:', req.currentUser);
@@ -116,12 +122,16 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
       throw error;
     }
 
+    console.log('Current user ID:', req.currentUser.id);
+
     const user = await UserService.findUserById(req.currentUser.id);
     if (!user) {
       const error = new Error('User not found.') as CustomError;
       error.statusCode = 404;
       throw error;
     }
+
+    console.log('User found:', user);
 
     // Return user data (excluding password)
     const { password_hash: password, ...userData } = user;

@@ -4,6 +4,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import 'reflect-metadata';
 
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
 import config from './config/index.js';
 import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Import the error handler
 
@@ -14,6 +17,36 @@ import locationRoutes from './routes/locationRoutes.js';
 // import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
 
 const app: Application = express();
+const apiRouter = express.Router(); // Create a new router instance
+
+// Swagger definition — customize this info for your API
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'My Hive Inspections API ',
+    version: '1.0.0',
+    description: 'API documentation for managing beehives inspections',
+  },
+  servers: [
+    {
+      url: `http://localhost:${config.port || 3000}`,
+      description: 'Development server',
+    },
+  ],
+};
+// Options for swagger-jsdoc
+const options = {
+  swaggerDefinition,
+  // Path to the API docs - adjust this to where your route files with JSDoc comments are
+  apis: ['./src/routes/*.ts'],
+};
+
+// Generate the swagger specification
+const swaggerSpec = swaggerJSDoc(options);
+
+// Serve the Swagger API documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+console.log('Swagger UI mounted at /api-docs');
 
 console.log('BeeHive API configuration is starting...');
 // --- Middleware ---
@@ -49,9 +82,12 @@ app.use(express.urlencoded({ extended: true }));
 
 console.log('Express JSON and URL-encoded body parsers enabled');
 
+// Mount your API router on the main app
+app.use('/api/v1', apiRouter);
+
 // --- Routes ---
 // Basic health check route
-app.get('/api/v1/health', (req: Request, res: Response) => {
+apiRouter.get('/health', (req: Request, res: Response) => {
   console.log('🚑 Health check endpoint hit');
   res.status(200).json({ status: 'ok', message: 'BeeHive API is running!' });
 });
@@ -59,8 +95,8 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 console.log('Health check route added');
 
 // Mount your API routes here
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/locations', locationRoutes);
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/locations', locationRoutes);
 // For nested routes, you might pass sequelize instances or use controllers directly
 // app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
 // app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);

@@ -41,9 +41,9 @@ export const getLocations = async (req: Request, res: Response, next: NextFuncti
 export const getLocationById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.currentUser!.id;
-    const { id } = req.params;
+    const { locationId } = req.params;
 
-    const location = await LocationService.getLocationById(id, userId);
+    const location = await LocationService.getLocationById(locationId, userId);
 
     if (!location) {
       const error = new Error('Location not found or unauthorized.') as CustomError;
@@ -63,10 +63,10 @@ export const getLocationById = async (req: Request, res: Response, next: NextFun
 export const updateLocation = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.currentUser!.id;
-    const { id } = req.params;
+    const { locationId } = req.params;
     const updateData: Partial<locationsAttributes> = req.body;
 
-    const updatedLocation = await LocationService.updateLocation(id, userId, updateData);
+    const updatedLocation = await LocationService.updateLocation(locationId, userId, updateData);
 
     if (!updatedLocation) {
       const error = new Error('Location not found or unauthorized.') as CustomError;
@@ -87,9 +87,9 @@ export const updateLocation = async (req: Request, res: Response, next: NextFunc
 export const deleteLocation = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.currentUser!.id;
-    const { id } = req.params;
+    const { locationId } = req.params;
 
-    const deleted = await LocationService.deleteLocation(id, userId);
+    const deleted = await LocationService.deleteLocation(locationId, userId);
 
     if (!deleted) {
       const error = new Error('Location not found or unauthorized.') as CustomError;

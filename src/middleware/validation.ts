@@ -22,7 +22,7 @@ type SchemaMap = {
  * @param schemas An object containing Joi schemas for body, params, and/or query.
  */
 export const validate = (schemas: SchemaMap) => {
-  console.log('Validation middleware initialized with schemas:', schemas);
+  // console.log('Validation middleware initialized with schemas:', schemas);
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       if (schemas.body) {

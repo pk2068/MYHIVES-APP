@@ -13,7 +13,7 @@ import { associateModels } from './models-ts/associations.js'; // Adjust path if
 // import { MajorInspection } from './models-obsolete/MajorInspection.js'; // To be created
 // import { HiveInspection } from './models-obsolete/HiveInspection.js'; // To be created
 
-console.log('Connecting to PostgreSQL database... ', process.env);
+console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);
 
 const DB_DIALECT = process.env.DB_DIALECT as 'postgres'; // Cast to ensure correct type
 const DB_HOST = process.env.DB_HOST as string;
@@ -36,7 +36,8 @@ console.log('Database connection string:', databaseUrl);
 // Initialize Sequelize with your database connection string
 export const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres', // Specify PostgreSQL dialect
-  logging: config.nodeEnv === 'development' ? console.log : false, // Log SQL queries in dev mode
+  //logging: config.nodeEnv === 'development' ? console.log : false, // Log SQL queries in dev mode
+  logging: false,
   dialectOptions: {
     // You might need these options for production deployments like Heroku or Render
     // ssl: {

@@ -5,6 +5,8 @@ import Joi from 'joi';
 import { LocationService } from '../services/locationService.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { createLocation, getLocations, getLocationById, updateLocation, deleteLocation, getMapData } from '../controllers/locationController.js'; // <-- Import the controller functions
+
 // import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
 import { locationsAttributes } from 'database/models-ts/locations.js';
 import { CustomError } from '../middleware/errorHandler.js';
@@ -19,6 +21,7 @@ const createLocationSchema = Joi.object<locationsAttributes>({
   latitude: Joi.number().min(-90).max(90).required(),
   longitude: Joi.number().min(-180).max(180).required(),
   notes: Joi.string().trim().max(500).allow(null, ''),
+  country: Joi.string().trim().max(100).allow(null, ''),
 });
 
 const updateLocationSchema = Joi.object<locationsAttributes>({
@@ -40,16 +43,14 @@ locationRouter.post(
   '/',
   isAuthenticated,
   validate({ body: createLocationSchema }), // <--- Body validation
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.currentUser!.id;
-      const locationData: locationsAttributes = req.body;
-      const newLocation = await LocationService.createLocation(userId, locationData);
-      res.status(201).json(newLocation);
-    } catch (error) {
-      next(error);
-    }
-  }
+  createLocation
+);
+
+// GET /api/locations - Get all locations for the authenticated user
+locationRouter.get(
+  '/',
+  isAuthenticated,
+  getLocations // <-- Correctly use the controller function
 );
 
 // GET /api/locations/:locationId - Get a specific location by ID
@@ -57,22 +58,7 @@ locationRouter.get(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema }), // <--- Params validation
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId } = req.params;
-      const userId = req.currentUser!.id;
-      const location = await LocationService.getLocationById(locationId, userId);
-
-      if (!location) {
-        const error: CustomError = new Error('Location not found or not owned by user');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json(location);
-    } catch (error) {
-      next(error);
-    }
-  }
+  getLocationById
 );
 
 // PUT /api/locations/:locationId - Update a specific location by ID
@@ -80,24 +66,7 @@ locationRouter.put(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema, body: updateLocationSchema }), // <--- Both params and body validation
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId } = req.params;
-      const userId = req.currentUser!.id;
-      const updateData: locationsAttributes = req.body;
-
-      const updatedLocation = await LocationService.updateLocation(locationId, userId, updateData);
-
-      if (!updatedLocation) {
-        const error: CustomError = new Error('Location not found or not owned by user');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json(updatedLocation);
-    } catch (error) {
-      next(error);
-    }
-  }
+  updateLocation
 );
 
 // DELETE /api/locations/:locationId - Delete a specific location by ID
@@ -105,23 +74,10 @@ locationRouter.delete(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema }), // <--- Params validation
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { locationId } = req.params;
-      const userId = req.currentUser!.id;
-
-      const success = await LocationService.deleteLocation(locationId, userId);
-
-      if (!success) {
-        const error: CustomError = new Error('Location not found or not owned by user');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(204).send();
-    } catch (error) {
-      next(error);
-    }
-  }
+  deleteLocation
 );
+
+// GET /api/locations/map - Get map data
+locationRouter.get('/map', isAuthenticated, getMapData);
 
 export default locationRouter;
