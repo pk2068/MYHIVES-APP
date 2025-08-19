@@ -3,50 +3,18 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import 'reflect-metadata';
-
-import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-
 import config from './config/index.js';
 import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Import the error handler
 
 // You'll import your routes here as you create them
 import authRoutes from './routes/authRoutes.js';
 import locationRoutes from './routes/locationRoutes.js';
+//import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 //  import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 // import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
 
 const app: Application = express();
 const apiRouter = express.Router(); // Create a new router instance
-
-// Swagger definition — customize this info for your API
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'My Hive Inspections API ',
-    version: '1.0.0',
-    description: 'API documentation for managing beehives inspections',
-  },
-  servers: [
-    {
-      url: `http://localhost:${config.port || 3000}`,
-      description: 'Development server',
-    },
-  ],
-};
-// Options for swagger-jsdoc
-const options = {
-  swaggerDefinition,
-  // Path to the API docs - adjust this to where your route files with JSDoc comments are
-  apis: ['./src/routes/*.ts'],
-};
-
-// Generate the swagger specification
-const swaggerSpec = swaggerJSDoc(options);
-
-// Serve the Swagger API documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-console.log('Swagger UI mounted at /api-docs');
 
 console.log('BeeHive API configuration is starting...');
 // --- Middleware ---
@@ -96,10 +64,19 @@ console.log('Health check route added');
 
 // Mount your API routes here
 apiRouter.use('/auth', authRoutes);
-apiRouter.use('/locations', locationRoutes);
+
 // For nested routes, you might pass sequelize instances or use controllers directly
-// app.use('/api/v1/locations/:locationId/major-inspections', majorInspectionRoutes);
+//app.use('/locations/:locationId/major-inspections', majorInspectionRoutes);
+// apiRouter.use(
+//   '/locations/:locationId/major-inspections',
+//   (req, res, next) => {
+//     console.log('*** Mounting major inspection routes for location:');
+//     next();
+//   },
+//   majorInspectionRoutes
+// );
 // app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
+apiRouter.use('/locations', locationRoutes);
 
 console.log('API routes mounted');
 // --- Error Handling Middleware ---

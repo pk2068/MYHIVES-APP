@@ -2,15 +2,17 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { LocationService } from '../services/locationService.js';
+//import { LocationService } from '../services/locationService.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import { createLocation, getLocations, getLocationById, updateLocation, deleteLocation, getMapData } from '../controllers/locationController.js'; // <-- Import the controller functions
 
 // import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
-import { locationsAttributes } from 'database/models-ts/locations.js';
+import { locationsAttributes } from '../database/models-ts/locations.js';
 import { CustomError } from '../middleware/errorHandler.js';
 //import {CustomRequest} from '../types/custom-request.js';
+import majorInspectionRouter from './majorInspectionRoutes.js';
+import hiveInspectionRouter from './hiveInspectionRoutes.js';
 
 const locationRouter = Router();
 
@@ -30,6 +32,7 @@ const updateLocationSchema = Joi.object<locationsAttributes>({
   latitude: Joi.number().min(-90).max(90).optional(),
   longitude: Joi.number().min(-180).max(180).optional(),
   notes: Joi.string().trim().max(500).allow(null, '').optional(),
+  country: Joi.string().trim().max(100).allow(null, '').optional(),
 });
 
 const locationIdParamSchema = Joi.object({
@@ -38,6 +41,9 @@ const locationIdParamSchema = Joi.object({
     .required(), // Validate as UUID
 });
 
+// Mount nested major inspection routes
+locationRouter.use('/:locationId/major-inspections', majorInspectionRouter);
+
 // POST /api/locations - Create a new location
 locationRouter.post(
   '/',
@@ -45,6 +51,9 @@ locationRouter.post(
   validate({ body: createLocationSchema }), // <--- Body validation
   createLocation
 );
+
+// GET /api/locations/map - Get map data
+locationRouter.get('/map', isAuthenticated, getMapData);
 
 // GET /api/locations - Get all locations for the authenticated user
 locationRouter.get(
@@ -77,7 +86,7 @@ locationRouter.delete(
   deleteLocation
 );
 
-// GET /api/locations/map - Get map data
-locationRouter.get('/map', isAuthenticated, getMapData);
+// // Mount nested major inspection routes
+// locationRouter.use('/:locationId/major-inspections', majorInspectionRouter);
 
 export default locationRouter;

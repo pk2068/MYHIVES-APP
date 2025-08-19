@@ -10,6 +10,7 @@ import { locations } from '../database/models-ts/locations.js';
 
 export class MajorInspectionService {
   public static async createMajorInspection(location_id: string, inspectionData: major_inspectionsAttributes): Promise<major_inspectionsAttributes> {
+    console.log('Creating major inspection with data:', location_id, inspectionData);
     // Convert inspectionDate string from DTO to a Date object
     const newInspectionDate = new Date(inspectionData.inspection_date);
 
@@ -19,7 +20,7 @@ export class MajorInspectionService {
       location_id: location_id, // Ensure the location_id is set correctly
     };
     const newMajorInspection = await major_inspections.create({
-      ...inspectionData,
+      ...inspectionDataForCreation,
     });
 
     return newMajorInspection.toJSON();

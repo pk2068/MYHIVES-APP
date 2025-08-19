@@ -9,7 +9,7 @@ import { RegisterUserDto, LoginUserDto } from '../types/dtos.js'; // Assuming th
 import { login, register, getMe, logout } from '../controllers/authController.js'; // Import your auth controller
 
 import { isAuthenticated } from '../middleware/auth.js';
-import { getMajorInspectionById } from 'controllers/majorInspectionContoller.js';
+//import { getMajorInspectionById } from 'controllers/majorInspectionContoller.js';
 
 const authRouter = Router();
 

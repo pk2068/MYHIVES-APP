@@ -11,6 +11,7 @@ import { major_inspectionsAttributes } from 'database/models-ts/major_inspection
 // Middleware to ensure location belongs to the authenticated user
 const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Checking location ownership...');
     const userId = req.currentUser!.id;
     const { locationId } = req.params;
 
@@ -28,6 +29,7 @@ const checkLocationOwnership = async (req: Request, res: Response, next: NextFun
 
 export const createMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Creating major inspection...ABCD', req.params, req.body);
     const { locationId } = req.params;
     //const inspectionData: Partial<MajorInspectionInterface> = req.body;
     const inspectionData: major_inspectionsAttributes = req.body;
@@ -46,6 +48,7 @@ export const createMajorInspection = async (req: Request, res: Response, next: N
 
 export const getMajorInspections = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Fetching major inspections...');
     const { locationId } = req.params;
 
     const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId);
