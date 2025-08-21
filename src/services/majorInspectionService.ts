@@ -17,8 +17,11 @@ export class MajorInspectionService {
     // Create the object to be passed to Sequelize.create()
     const inspectionDataForCreation = {
       ...inspectionData,
+      //inspection_date: new Date(inspectionData.inspection_date),
       location_id: location_id, // Ensure the location_id is set correctly
     };
+
+    console.log('Inspection data for creation via sequelize:', inspectionDataForCreation);
     const newMajorInspection = await major_inspections.create({
       ...inspectionDataForCreation,
     });
@@ -27,7 +30,10 @@ export class MajorInspectionService {
   }
 
   public static async getMajorInspectionsByLocationId(locationId: string): Promise<major_inspectionsAttributes[]> {
-    const majorInspections = await major_inspections.findAll({ where: { location_id: locationId }, order: [['inspection_date', 'DESC']] });
+    const majorInspections = await major_inspections.findAll({
+      where: { location_id: locationId },
+      order: [['inspection_date', 'DESC']],
+    });
     return majorInspections.map((mi) => mi.toJSON());
   }
 
@@ -36,11 +42,13 @@ export class MajorInspectionService {
     majorInspectionId: string,
     locationId: string
   ): Promise<major_inspectionsAttributes | null> {
+    console.log('Fetching major inspection by ID...', majorInspectionId, locationId, userId);
     const majorInspection = await major_inspections.findOne({
       where: { major_inspection_id: majorInspectionId, location_id: locationId },
       include: [
         {
-          association: 'location', // Make sure this matches your association name in the MajorInspection model
+          association: 'majorInspection_location', // Make sure this matches your association name in the MajorInspection model
+
           where: { location_id: locationId, user_id: userId }, // Ensure the location belongs to the user
           required: true,
         },
@@ -55,6 +63,7 @@ export class MajorInspectionService {
     updateData: major_inspectionsAttributes
     // Partial<MajorInspectionInterface>
   ): Promise<major_inspectionsAttributes | null> {
+    console.log('Updating major inspection service..', majorInspectionId, locationId, updateData);
     const [numberOfAffectedRows, affectedRows] = await major_inspections.update(updateData, {
       where: { location_id: locationId, major_inspection_id: majorInspectionId },
       returning: true,
@@ -67,6 +76,7 @@ export class MajorInspectionService {
   }
 
   public static async deleteMajorInspection(userId: string, locationId: string, majorInspectionId: string): Promise<boolean> {
+    console.log('Deleting major inspection service..', majorInspectionId, locationId, userId);
     // Step 1: Find the major inspection ID that matches all criteria
     const majorInspectionToDelete = await major_inspections.findOne({
       attributes: ['major_inspection_id'], // Only select the ID to minimize data transfer
@@ -76,7 +86,9 @@ export class MajorInspectionService {
       include: [
         {
           model: locations,
-          as: 'location', // Ensure this matches your association alias
+          //as: 'location', // Ensure this matches your association alias
+          as: 'majorInspection_location',
+          attributes: [],
           where: {
             location_id: locationId,
             user_id: userId, // Ensure the location belongs to the user
@@ -94,7 +106,7 @@ export class MajorInspectionService {
     // Step 2: Delete the identified major inspection
     const deletedRows = await major_inspections.destroy({
       where: {
-        major_inspection_id: majorInspectionToDelete.major_inspection_id,
+        major_inspection_id: majorInspectionToDelete.toJSON().major_inspection_id,
       },
     });
 
