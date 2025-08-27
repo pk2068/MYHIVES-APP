@@ -8,24 +8,24 @@ import { LocationService } from '../services/locationService.js'; // To check lo
 // import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
 import { major_inspectionsAttributes } from 'database/models-ts/major_inspections.js';
 
-// Middleware to ensure location belongs to the authenticated user
-const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log('Checking location ownership...', req.params, req.body, req.currentUser);
-    const userId = req.currentUser!.id;
-    const { locationId } = req.params;
+// // Middleware to ensure location belongs to the authenticated user
+// const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     console.log('Checking location ownership...', req.params, req.body, req.currentUser);
+//     const userId = req.currentUser!.id;
+//     const { locationId } = req.params;
 
-    const location = await LocationService.getLocationById(locationId, userId);
-    if (!location) {
-      const error = new Error('Location not found or unauthorized.') as CustomError;
-      error.statusCode = 403; // Forbidden
-      throw error;
-    }
-    next(); // Location is owned by the user, proceed
-  } catch (error) {
-    next(error);
-  }
-};
+//     const location = await LocationService.getLocationById(locationId, userId);
+//     if (!location) {
+//       const error = new Error('Location not found or unauthorized.') as CustomError;
+//       error.statusCode = 403; // Forbidden
+//       throw error;
+//     }
+//     next(); // Location is owned by the user, proceed
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const createMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -70,7 +70,7 @@ export const getMajorInspectionById = async (req: Request, res: Response, next: 
     const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
     if (!majorInspection) {
-      const error = new Error('Major inspection not found.') as CustomError;
+      const error = new Error('cMajor inspection not found.') as CustomError;
       error.statusCode = 404;
       throw error;
     }
@@ -93,7 +93,7 @@ export const updateMajorInspection = async (req: Request, res: Response, next: N
     const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(locationId, majorInspectionId, updateData);
 
     if (!updatedMajorInspection) {
-      const error = new Error('Major inspection not found.') as CustomError;
+      const error = new Error('cMajor inspection not found.') as CustomError;
       error.statusCode = 404;
       throw error;
     }
@@ -116,7 +116,7 @@ export const deleteMajorInspection = async (req: Request, res: Response, next: N
     const deleted = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
 
     if (!deleted) {
-      const error = new Error('Major inspection not found.') as CustomError;
+      const error = new Error('cMajor inspection not found.') as CustomError;
       error.statusCode = 404;
       throw error;
     }
@@ -130,4 +130,4 @@ export const deleteMajorInspection = async (req: Request, res: Response, next: N
   }
 };
 
-export { checkLocationOwnership }; // Export for use in routes
+//export { checkLocationOwnership }; // Export for use in routes

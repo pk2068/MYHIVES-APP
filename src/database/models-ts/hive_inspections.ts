@@ -17,7 +17,7 @@ export interface hive_inspectionsAttributes {
   drone_comb_frames_count?: number;
   drone_comb_percentage?: string;
   sugar_feed_added?: boolean;
-  sugar_feed_quantity_kg?: string;
+  sugar_feed_quantity_kg?: number;
   brood_chambers_count: number;
   supers_count: number;
   queen_excluder_present?: boolean;
@@ -123,7 +123,7 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
     allowNull: true,
     type: DataType.DECIMAL(8, 2),
   })
-  sugar_feed_quantity_kg?: string;
+  sugar_feed_quantity_kg?: number;
 
   @Column({
     type: DataType.INTEGER,

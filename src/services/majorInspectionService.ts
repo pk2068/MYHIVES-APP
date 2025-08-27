@@ -38,11 +38,21 @@ export class MajorInspectionService {
   }
 
   public static async getMajorInspectionById(
+    // ZAKAJ MI TO 2x klice z razlicnim vrstnim redom argumentov???????????
     userId: string, // Check ownership by userId
     majorInspectionId: string,
     locationId: string
   ): Promise<major_inspectionsAttributes | null> {
-    console.log('Fetching major inspection by ID...', majorInspectionId, locationId, userId);
+    console.log(`Fetching major inspection by ID...\nmajorInspectionId: ${majorInspectionId}\nlocationId: ${locationId}\nuserId: ${userId}`);
+
+    try {
+      const majorInspection = await major_inspections.findOne({
+        where: { major_inspection_id: majorInspectionId, location_id: locationId },
+      });
+    } catch (error) {
+      console.error('TEST Error fetching major inspection by ID:', error);
+    }
+
     const majorInspection = await major_inspections.findOne({
       where: { major_inspection_id: majorInspectionId, location_id: locationId },
       include: [

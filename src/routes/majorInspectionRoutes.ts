@@ -2,19 +2,14 @@
 
 import { NextFunction, Response, Request, Router } from 'express';
 import Joi from 'joi';
-// import { MajorInspectionService } from '../services/majorInspectionService.js';
-// import { LocationService } from '../services/locationService.js';
+
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
-import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
-// import { CustomError } from '../middleware/errorHandler.js';
-//import {CustomRequest} from '../types/custom-request.js';
-import { createMajorInspection, checkLocationOwnership, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
-import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js';
-import { MajorInspectionService } from '../services/majorInspectionService.js';
-//import { get } from 'http';
 
-console.log('FOOBAR');
+import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
+import { checkLocationOwnership } from '../middleware/ownership.js';
+import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js';
+import hiveInspectionRouter from './hiveInspectionRoutes.js';
 
 const majorInspectionRouter = Router({ mergeParams: true });
 
@@ -42,11 +37,17 @@ const majorInspectionParamsSchema = Joi.object({
 });
 
 const loggging = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('Logging major inspections requests ...', req.params, req.body);
+  // console.log('Logging major inspections requests ...', req.params, req.body);
   next();
 };
 
 majorInspectionRouter.use(loggging);
+
+// Mount nested major inspection routes
+// majorInspectionRouter.use('/:majorInspectionId/hive-inspections', (req, res, next) => {
+//   next();
+// });
+majorInspectionRouter.use('/:majorInspectionId/hive-inspections', hiveInspectionRouter);
 
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(

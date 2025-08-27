@@ -7,13 +7,13 @@ import { hive_inspectionsAttributes } from '../database/models-ts/hive_inspectio
 //import { HiveInspectionCreationAttributes } from '../database/models-obsolete/HiveInspection.js'; // Import the creation attributes type
 
 export class HiveInspectionService {
-  public static async createHiveInspection(majorInspectionId: string, hiveInspectionData: hive_inspectionsAttributes): Promise<hive_inspectionsAttributes> {
-    const newHiveInspection = await hive_inspections.create({ ...hiveInspectionData, major_inspection_id: majorInspectionId });
+  public static async createHiveInspection(hiveInspectionData: hive_inspectionsAttributes): Promise<hive_inspectionsAttributes> {
+    const newHiveInspection = await hive_inspections.create({ ...hiveInspectionData });
     return newHiveInspection.toJSON();
   }
 
   public static async getHiveInspectionsByMajorInspectionId(majorInspectionId: string): Promise<hive_inspectionsAttributes[]> {
-    const hiveInspections = await hive_inspections.findAll({ where: { major_inspection_id: majorInspectionId }, order: [['createdAt', 'ASC']] });
+    const hiveInspections = await hive_inspections.findAll({ where: { major_inspection_id: majorInspectionId }, order: [['created_at', 'ASC']] });
     return hiveInspections.map((hi) => hi.toJSON());
   }
 

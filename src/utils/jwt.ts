@@ -16,7 +16,7 @@ interface JwtPayload {
  */
 export const generateToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, config.jwtSecret, {
-    expiresIn: '72h', // Token expires in 3 days
+    expiresIn: '192h', // Token expires in 8 days
   });
 };
 

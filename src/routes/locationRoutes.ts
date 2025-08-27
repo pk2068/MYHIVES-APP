@@ -7,12 +7,9 @@ import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import { createLocation, getLocations, getLocationById, updateLocation, deleteLocation, getMapData } from '../controllers/locationController.js'; // <-- Import the controller functions
 
-// import { CreateLocationDto, UpdateLocationDto } from '../types/dtos.js';
 import { locationsAttributes } from '../database/models-ts/locations.js';
-import { CustomError } from '../middleware/errorHandler.js';
-//import {CustomRequest} from '../types/custom-request.js';
+
 import majorInspectionRouter from './majorInspectionRoutes.js';
-import hiveInspectionRouter from './hiveInspectionRoutes.js';
 
 const locationRouter = Router();
 
