@@ -10,6 +10,7 @@ import { createLocation, getLocations, getLocationById, updateLocation, deleteLo
 import { locationsAttributes } from '../database/models-ts/locations.js';
 
 import majorInspectionRouter from './majorInspectionRoutes.js';
+import hiveRouter from './hiveRoutes.js';
 
 const locationRouter = Router();
 
@@ -40,6 +41,7 @@ const locationIdParamSchema = Joi.object({
 
 // Mount nested major inspection routes
 locationRouter.use('/:locationId/major-inspections', majorInspectionRouter);
+locationRouter.use('/:locationId/hives', hiveRouter);
 
 // POST /api/locations - Create a new location
 locationRouter.post(
