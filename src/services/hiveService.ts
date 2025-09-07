@@ -42,6 +42,8 @@ export class HiveService {
    * @returns A promise that resolves to the newly created hive object.
    */
   public static async createHive(locationId: string, hiveData: hivesAttributes): Promise<hivesAttributes> {
+    console.log('Service Creating hive...', locationId, hiveData);
+
     const newHive = await hives.create({
       ...hiveData,
       location_id: locationId,
@@ -83,6 +85,7 @@ export class HiveService {
    * @returns A promise that resolves to a boolean indicating success.
    */
   public static async deleteHive(locationId: string, hiveId: string): Promise<boolean> {
+    console.log('Service (deleteHive) Deleting hive...', locationId, hiveId);
     // Find the hive first with the ownership checks
     const hiveToDelete = await hives.findOne({
       attributes: ['hive_id'],
@@ -90,11 +93,14 @@ export class HiveService {
         hive_id: hiveId,
         location_id: locationId,
       },
+      raw: true,
     });
 
     if (!hiveToDelete) {
       return false;
     }
+
+    console.log('Service (deleteHive) Found hive to delete:', hiveToDelete);
 
     const deletedRows = await hives.destroy({
       where: {

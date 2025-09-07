@@ -6,7 +6,9 @@ import { hivesAttributes } from '../database/models-ts/hives.js';
 // Get all hives
 export const getAllHives = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const location_id = req.params.location;
+    console.log('Controller : Fetching hives...', req.params);
+
+    const location_id = req.params.locationId;
     const hives = await HiveService.getHivesByLocationId(location_id);
 
     res.status(200).json({
@@ -23,7 +25,9 @@ export const getAllHives = async (req: Request, res: Response, next: NextFunctio
 // Get hive by ID
 const getHiveById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const location_id = req.params.location_id;
+    console.log('Controller : Fetching hive...', req.params);
+
+    const location_id = req.params.locationId;
     const hive_id = req.params.hive_id;
 
     const hive = await HiveService.getHiveById(location_id, hive_id);
@@ -46,8 +50,11 @@ const getHiveById = async (req: Request, res: Response, next: NextFunction) => {
 // Create a new hive
 const createHive = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const location_id = req.params.location_id;
+    console.log('Creating hive...', req.params.locationId, req.body);
+    const location_id = req.params.locationId;
     const hiveData = req.body;
+
+    console.log('Hive data:', hiveData);
 
     const newHive = await HiveService.createHive(location_id, hiveData);
 
@@ -60,7 +67,7 @@ const createHive = async (req: Request, res: Response, next: NextFunction) => {
 // Update a hive
 const updateHive = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const location_id = req.params.location_id;
+    const location_id = req.params.locationId;
     const hive_id = req.params.hive_id;
     const updatedHiveData = req.body;
 
@@ -84,8 +91,10 @@ const updateHive = async (req: Request, res: Response, next: NextFunction) => {
 // Delete a hive
 const deleteHive = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const location_id = req.params.location_id;
+    const location_id = req.params.locationId;
     const hive_id = req.params.hive_id;
+
+    console.log('Controller : Deleting hive...', req.params);
 
     const deleted = await HiveService.deleteHive(location_id, hive_id);
     if (!deleted) {
