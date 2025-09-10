@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:3000/api/v1
+
+// Replace these with your actual values
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
+@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
+@hiveId = 01127c49-7230-4405-9ef3-bba06e71a968
+
+// --- Helper Request: Create a Hive (if you need one) ---
+// @name createHive
+POST {{baseUrl}}/locations/{{locationId}}/hives
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "hive_name": "My SIXTH Hive",
+  "description": "Newly established hive with a strong queen.",
+  "is_active": true
+}
+
+###
+
+// --- 1. GET all Hives for a Location ---
+// @name getAllHives
+GET {{baseUrl}}/locations/{{locationId}}/hives
+Authorization: Bearer {{token}}
+
+###
+
+// --- 2. GET a single Hive by ID ---
+// @name getHiveById
+GET {{baseUrl}}/locations/{{locationId}}/hives/{{hiveId}}
+Authorization: Bearer {{token}}
+
+###
+
+// --- 3. Update an existing Hive ---
+// @name updateHive
+PUT {{baseUrl}}/locations/{{locationId}}/hives/{{hiveId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "hive_name": "My Updated Hive Name",
+  "description": "Updated notes after a routine check."
+}
+
+###
+
+// --- 4. DELETE a Hive ---
+// @name deleteHive
+DELETE {{baseUrl}}/locations/{{locationId}}/hives/{{hiveId}}
+Authorization: Bearer {{token}}

@@ -12,22 +12,23 @@ import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.
 import { CustomError } from '../middleware/errorHandler.js';
 import httpStatus from 'http-status';
 import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js';
+import { UniqueConstraintError } from 'sequelize';
 
 export class HiveInspectionController {
   // POST /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections
   public static async createHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     console.log('Controller: Creating hive inspection');
     try {
-      const { locationId, majorInspectionId } = req.params;
-      const userId = req.currentUser!.id; // Authenticated user ID
+      const { majorInspectionId } = req.params;
+      //const userId = req.currentUser!.id; // Authenticated user ID
 
       // Access the object directly from res.locals, no new DB query needed
-      console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspection);
+
       const majorInspection = res.locals.majorInspectionOwned as major_inspectionsAttributes;
       //const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
       if (!majorInspection) {
-        const _err = new Error('hicMajor inspection not found or not owned by user in this location.') as CustomError;
-        _err.statusCode = httpStatus.NOT_FOUND;
+        const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
+        _err.statusCode = httpStatus.FORBIDDEN;
         throw _err;
       }
       console.log('Controller: Major inspection ownership verified:', majorInspection);
@@ -42,29 +43,35 @@ export class HiveInspectionController {
 
       res.status(httpStatus.CREATED).send(newHiveInspection);
     } catch (error) {
-      next(error);
+      if (error instanceof UniqueConstraintError) {
+        // <-- Check for the specific error
+        // A specific hive should only be inspected once per major inspection event
+        const _err = new Error('A hive inspection for this hive already exists in this major inspection.') as CustomError;
+        _err.statusCode = httpStatus.CONFLICT; // Return 409 Conflict
+        next(_err);
+      } else {
+        next(error);
+      }
     }
   }
 
   // GET /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections
   public static async getHiveInspectionsByMajorInspectionId(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-    console.log('-------------------+++++++++++++++++++++++++++++----------------');
     try {
       const { locationId, majorInspectionId } = req.params;
       const userId = req.currentUser!.id;
 
       // Access the object directly from res.locals, no new DB query needed
-      console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspection);
+
       const majorInspection = res.locals.majorInspectionOwned as major_inspectionsAttributes;
       //const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
       if (!majorInspection) {
-        const _err = new Error('hicMajor inspection Not found or not owned by user in this location.') as CustomError;
-        _err.statusCode = httpStatus.NOT_FOUND;
+        const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
+        _err.statusCode = httpStatus.FORBIDDEN;
         throw _err;
       }
 
-      console.log('A1 ++++++ :', majorInspection);
       const hiveInspections = await HiveInspectionService.getHiveInspectionsByMajorInspectionId(majorInspectionId);
 
       res.status(httpStatus.OK).send(hiveInspections);
@@ -80,11 +87,11 @@ export class HiveInspectionController {
       const userId = req.currentUser!.id;
 
       // Access the object directly from res.locals, no new DB query needed
-      console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspection);
+
       const majorInspection = res.locals.majorInspectionOwned as major_inspectionsAttributes;
       if (!majorInspection) {
         const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
-        _err.statusCode = httpStatus.NOT_FOUND;
+        _err.statusCode = httpStatus.FORBIDDEN;
         throw _err;
       }
 
@@ -108,17 +115,21 @@ export class HiveInspectionController {
       const userId = req.currentUser!.id;
 
       // Access the object directly from res.locals, no new DB query needed
-      console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspection);
+
       const majorInspection = res.locals.majorInspectionOwned as major_inspectionsAttributes;
       if (!majorInspection) {
-        const _err = new Error('hicMajor inspection not found or not owned by user in this location.') as CustomError;
-        _err.statusCode = httpStatus.NOT_FOUND;
+        const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
+        _err.statusCode = httpStatus.FORBIDDEN;
         throw _err;
       }
 
       const updateData: hive_inspectionsAttributes = req.body; // Joi validation should ensure valid partial data
 
+      console.log('------------------ Controller: Updating hive inspection with data:', updateData);
+
       const updatedHiveInspection = await HiveInspectionService.updateHiveInspection(hiveInspectionId, majorInspectionId, updateData);
+
+      console.log('------------------ Controller: Updated hive inspection:', updatedHiveInspection);
 
       if (!updatedHiveInspection) {
         const _err = new Error('Hive inspection not found or could not be updated.') as CustomError;

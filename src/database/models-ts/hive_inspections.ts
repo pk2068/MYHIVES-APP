@@ -1,4 +1,4 @@
-import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'sequelize-typescript';
 
 import { hives } from './hives.js'; // Import hives model
 import { major_inspections } from './major_inspections.js'; // Import major_inspections model
@@ -11,11 +11,11 @@ export interface hive_inspectionsAttributes {
   colony_health_status_id: number;
   num_chambers: number;
   brood_frames_count?: number;
-  brood_percentage?: string;
+  brood_percentage?: number; // no longer string
   queen_status_id: number;
-  approx_honey_weight_kg?: string;
+  approx_honey_weight_kg?: number;
   drone_comb_frames_count?: number;
-  drone_comb_percentage?: string;
+  drone_comb_percentage?: number; // no longer string
   sugar_feed_added?: boolean;
   sugar_feed_quantity_kg?: number;
   brood_chambers_count: number;
@@ -86,9 +86,9 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
 
   @Column({
     allowNull: true,
-    type: DataType.DECIMAL(5, 2),
+    type: DataType.INTEGER,
   })
-  brood_percentage?: string;
+  brood_percentage?: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -99,7 +99,7 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
     allowNull: true,
     type: DataType.DECIMAL(8, 2),
   })
-  approx_honey_weight_kg?: string;
+  approx_honey_weight_kg?: number;
 
   @Column({
     allowNull: true,
@@ -109,9 +109,9 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
 
   @Column({
     allowNull: true,
-    type: DataType.DECIMAL(5, 2),
+    type: DataType.DECIMAL(3, 0),
   })
-  drone_comb_percentage?: string;
+  drone_comb_percentage?: number;
 
   @Column({
     type: DataType.BOOLEAN,

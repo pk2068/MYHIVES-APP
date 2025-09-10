@@ -1,0 +1,77 @@
+@baseUrl = http://localhost:3000/api/v1
+
+// Replace these with your actual values
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
+
+
+### Login with Valid Credentials
+# @name authenticate
+# This request authenticates a user and retrieves a JWT token.
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email" : "joseperez5@gmail.com",    
+    "password" : "Cada_73NUN5"
+}
+
+###
+# @name createLocation
+# Creates a new location.
+@token2 = {{authenticate.response.body.token}}
+POST {{baseUrl}}/locations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Apiary 1",
+  "address": "123 Main St, Anytown",
+  "latitude": 46.0569,
+  "longitude": 14.5058,
+  "notes": "Main apiary location.",
+  "country": "Slovenia"
+}
+
+###
+# Get all locations for the authenticated user.
+# @name getLocations
+GET {{baseUrl}}/locations
+Authorization: Bearer {{authenticate.response.body.token}}
+
+###
+# Get map data for all beehive locations.
+# @name getMapData
+GET {{baseUrl}}/locations/map
+Authorization: Bearer {{token2}}
+
+###
+# Get a specific location by ID.
+#
+# To run this, first run the `createLocation` request and copy the `location_id` from the response.
+# @locationId = <paste_location_id_here>
+@locationId = {{createLocation.response.body.data.location_id}}
+# Use the commented line below if you prefer to set the ID manually
+# @locationId =
+GET {{baseUrl}}/locations/{{locationId}}
+Authorization: Bearer {{token}}
+
+###
+# Update a specific location by ID.
+#
+# To run this, you must first have a valid `locationId` from the `createLocation` request.
+PUT {{baseUrl}}/locations/{{locationId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Main Apiary - Updated",
+  "notes": "Updated notes for the main apiary."
+}
+
+###
+# Delete a specific location by ID.
+#
+# To run this, you must have a valid `locationId` that has not already been deleted.
+#DELETE {{baseUrl}}/locations/{{locationId}}
+DELETE {{baseUrl}}/locations/2af520b3-c43a-47a8-9372-f1a3e819513b
+Authorization: Bearer {{token}}

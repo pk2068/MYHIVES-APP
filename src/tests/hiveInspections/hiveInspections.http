@@ -1,0 +1,102 @@
+###
+# Hive Inspections API Tests
+#
+# This file assumes you have already run the `major-inspections.http` tests and have a valid token, hive ID, and major inspection ID.
+# The Hive API tests might be useful for getting the hive_id.
+#
+@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
+@baseUrl = http://localhost:3000/api/v1/locations/{{locationId}}
+# @token = <paste_your_token_here>
+# @majorInspectionId = <paste_your_major_inspection_id_here>
+# @hiveId = <paste_your_hive_id_here> 
+# @token =
+@majorInspectionId = 3dd79818-4e59-49d7-bb82-a65b0145d87c
+
+@hiveId = ec5ffc71-b700-4837-acdf-4dfa5b1b73e3
+
+
+
+### Login with Valid Credentials
+# @name authenticate
+# This request authenticates a user and retrieves a JWT token.
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+    "email" : "joseperez5@gmail.com",    
+    "password" : "Cada_73NUN5"
+}
+
+### get token
+@token = {{authenticate.response.body.token}}
+
+###
+# Create a new hive inspection for a major inspection.
+# @name createHiveInspection
+POST {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "hive_id": "bfdd1ef0-0cc1-4886-9ba9-572e60a70ef0",
+  "inspection_time": "14:41",
+  "colony_health_status_id": 1,
+  "num_chambers": 3,
+  "brood_chambers_count": 2,
+  "supers_count": 1,
+  "brood_frames_count": 15,
+  "brood_percentage": 79,
+  "queen_status_id": 2,
+  "approx_honey_weight_kg": 10,
+  "drone_comb_frames_count": 2,
+  "drone_comb_percentage": 5.0,
+  "sugar_feed_added": false,
+  "sugar_feed_quantity_kg": null,
+  "queen_excluder_present": true,
+  "num_varroa_mites_found": 5,
+  "varroa_treatment_id": 1,
+  "varroa_treatment_dosage": "100ml",
+  "raising_new_queen": false,
+  "queen_cell_age_days": null,
+  "queen_cell_status_id": null,
+  "other_notes": "The colony seems strong and healthy. Found a few varroa mites, will continue to monitor."
+}
+
+###
+# Get all hive inspections for a major inspection.
+# @name getHiveInspections
+GET {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections
+Authorization: Bearer {{token}}
+
+###
+# Get a specific hive inspection.
+#
+# To run this, first run the `createHiveInspection` request and copy the `hive_inspection_id`.
+# @hiveInspectionId = <paste_hive_inspection_id_here>
+@hiveInspectionId = {{createHiveInspection.response.body.hive_inspection_id}}
+GET {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections/{{hiveInspectionId}}
+Authorization: Bearer {{token}}
+
+###
+# Update a specific hive inspection.
+#
+# To run this, you must have a valid `hiveInspectionId`.
+PUT {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections/{{hiveInspectionId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brood_percentage": 33.9,
+  "approx_honey_weight_kg": 25,
+  "num_chambers": 8,
+  "drone_comb_frames_count": 3,  
+  "colony_health_status_id": 3,
+  "other_notes": "Updated notes: The colony is doing well, but I noticed a few varroa mites."
+}
+
+###
+# Delete a specific hive inspection.
+#
+# To run this, you must have a valid `hiveInspectionId` that has not already been deleted.
+DELETE {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections/{{hiveInspectionId}}
+Authorization: Bearer {{token}}

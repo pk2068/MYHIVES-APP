@@ -23,8 +23,8 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "password123"
+    "email" : "joseperez5@gmail.com",    
+    "password" : "Cada_73NUN5"
 }
 
 ### Login with Invalid Password (Expected: 401 Unauthorized)
@@ -41,8 +41,8 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "nonexistent@example.com",
-  "password": "anypassword"
+    "email" : "joseperez55@gmail.com",
+    "password" : "Cada_73NUN5"
 }
 
 ### Get Current User (without token - Expected: 401 Unauthorized)

@@ -33,15 +33,16 @@ const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response,
     // IMPORTANT: You need to implement this method in your MajorInspectionService.
     // It should fetch the major inspection and ensure its associated location's userId matches the current user.
     //const majorInspectionOwned = await MajorInspectionService.getMajorInspectionByIdAndVerifyUser(
-    console.log(
-      '\t\t @Ownership/checkMajorInspectionOwnershipForHive Checking major inspection ownership for hive inspections...',
-      '\nmajorInspectionId:',
-      majorInspectionId,
-      '\nlocationId:',
-      locationId,
-      '\nuserId:',
-      userId
-    );
+    // console.log(
+    //   '\t\t @Ownership/checkMajorInspectionOwnershipForHive Checking major inspection ownership for hive inspections...',
+    //   '\nmajorInspectionId:',
+    //   majorInspectionId,
+    //   '\nlocationId:',
+    //   locationId,
+    //   '\nuserId:',
+    //   userId
+    // );
+
     const majorInspectionOwned = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
     if (!majorInspectionOwned) {
@@ -52,7 +53,7 @@ const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response,
 
     // Store the fetched object on res.locals for subsequent handlers
     res.locals.majorInspectionOwned = majorInspectionOwned;
-    console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspectionOwned);
+    //console.log('%%% Major Inspection ownership verified for hive:', res.locals.majorInspectionOwned);
 
     next();
   } catch (error) {

@@ -1,0 +1,57 @@
+###
+# Major Inspections API Tests
+#
+# This file assumes you have already run the `locations.http` tests and have a valid token and location ID.
+#
+@baseUrl = http://localhost:3000/api/v1
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
+# @locationId = <paste_your_location_id_here>
+
+@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
+
+###
+# Create a new major inspection for a specific location.
+# @name createMajorInspection
+POST {{baseUrl}}/locations/{{locationId}}/major-inspections
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "inspection_date": "2024-09-08T10:00:00.000Z",
+  "general_notes": "This is temporary test foobar record."
+}
+
+###
+# Get all major inspections for a specific location.
+# @name getMajorInspections
+GET {{baseUrl}}/locations/{{locationId}}/major-inspections
+Authorization: Bearer {{token}}
+
+###
+# Get a specific major inspection by ID.
+#
+# To run this, first run the `createMajorInspection` request and copy the `major_inspection_id`.
+# @majorInspectionId = <paste_major_inspection_id_here>
+@majorInspectionId = {{createMajorInspection.response.body.data.major_inspection_id}}
+GET {{baseUrl}}/locations/{{locationId}}/major-inspections/{{majorInspectionId}}
+Authorization: Bearer {{token}}
+
+###
+# Update a specific major inspection.
+#
+# To run this, you must have a valid `majorInspectionId`.
+PUT {{baseUrl}}/locations/{{locationId}}/major-inspections/{{majorInspectionId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "general_notes": "Updated notes: Queen seems healthy."
+}
+
+###
+# Delete a specific major inspection.
+#
+# To run this, you must have a valid `majorInspectionId` that has not already been deleted.
+DELETE {{baseUrl}}/locations/{{locationId}}/major-inspections/{{majorInspectionId}}
+#DELETE {{baseUrl}}/locations/{{locationId}}/major-inspections/dee8f057-9efb-463b-93da-76ccfad03a54
+Authorization: Bearer {{token}}
