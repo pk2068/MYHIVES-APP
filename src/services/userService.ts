@@ -1,55 +1,61 @@
-// import { User } from '../database/models-obsolete/User.js';
-import { users } from '../database/models-ts/users.js'; // Updated to use the new TypeScript model
-import { usersAttributes } from '../database/models-ts/users.js'; // Importing the type for user creation attributes
-//import { User as UserInterface } from '../types/models.js';
-//import { UserCreationAttributes } from '../database/models-obsolete/User.js'; // <-- IMPORTANT: Import UserCreationAttributes
+//import { usersAttributes } from '../database/models-ts/users.js'; // Importing the type for user creation attributes
+import { IUserRepository } from '../repositories/implementations/IUserRepository.js'; // The contract
+import { UserRetrievedDTO, UserCreationDTO, UserUpdateDTO } from '../types/DTO/per-controller/user-dto.js'; // The data shapes
+import { CustomError } from '../middleware/errorHandler.js';
+import httpStatus from 'http-status';
 
-
+// This class handles business logic (e.g., uniqueness check, error handling). No direct access to DB, just through repository.
 export class UserService {
-  public static async findUserByEmail(email: string): Promise<usersAttributes | null> {
-    const _user = await users.findOne({ where: { email : email } });
-    return _user ? _user.toJSON() : null;
+  private readonly userRepository: IUserRepository;
+  constructor(userRepository: IUserRepository) {
+    this.userRepository = userRepository;
   }
 
-  public static async findUserById(id: string): Promise<usersAttributes | null> {
-    const _user = await users.findByPk(id);
-    return _user ? _user.toJSON() : null;
+  public async findUserByEmail(email: string): Promise<UserRetrievedDTO | null> {
+    return this.userRepository.readByEmail(email);
   }
 
-  public static async createUser(userData: usersAttributes): Promise<usersAttributes> {
-    const newUser = await users.create(userData);
-    return newUser.toJSON();
+  public async findUserById(id: string): Promise<UserRetrievedDTO | null> {
+    return this.userRepository.readById(id);
   }
 
-  public static async findOrCreateOAuthUser(
-    email: string,
-    providerId: string,
-    provider: 'google' | 'linkedin',
-    username?: string
-  ): Promise<usersAttributes> {
-    let user = await users.findOne({
-      where: { email },
-    });
-
-    if (user) {
-      // Update provider ID if not already set
-      if (provider === 'google' && !user.google_id) {
-        user.google_id = providerId;
-        await user.save();
-      } else if (provider === 'linkedin' && !user.linkedin_id) {
-        user.linkedin_id = providerId;
-        await user.save();
-      }
-      return user.toJSON();
-    } else {
-      // Create new user
-      const newUser = await users.create({
-        email,
-        username: username || email.split('@')[0], // Basic username from email if not provided
-        google_id: provider === 'google' ? providerId : undefined,
-        linkedin_id: provider === 'linkedin' ? providerId : undefined,
-      });
-      return newUser.toJSON();
+  public async createUser(userData: UserCreationDTO): Promise<UserRetrievedDTO> {
+    // Check if user already exists (Business Logic)
+    const existingUser = await this.userRepository.readByEmail(userData.email);
+    if (existingUser) {
+      // Throw a specific error that the Controller/ErrorHandler can catch
+      const error = new Error('User with this email already exists.') as CustomError;
+      error.statusCode = httpStatus.CONFLICT; // 409
+      throw error;
     }
+
+    // Delegate the creation to the repository (Data Access)
+    return this.userRepository.create(userData);
+  }
+
+  public async updateUser(id: string, userData: Partial<UserUpdateDTO>): Promise<UserRetrievedDTO> {
+    // Check if user exists
+    const existingUser = await this.userRepository.readById(id);
+    if (!existingUser) {
+      const error = new Error('User not found.') as CustomError;
+      error.statusCode = httpStatus.NOT_FOUND; // 404
+      throw error;
+    }
+
+    // Delegate the update to the repository (Data Access)
+    const [updatedCount, updatedUsers] = await this.userRepository.update(id, userData);
+
+    if (updatedCount > 1) {
+      const error = new Error(`Failed to update user with ID ${id}.`) as CustomError;
+      error.statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+      throw error;
+    }
+    if (updatedCount === 0) {
+      const error = new Error(`User with ID ${id} not found.`) as CustomError;
+      error.statusCode = httpStatus.NOT_FOUND;
+      throw error;
+    }
+
+    return updatedUsers[0]; // decide for later if you want to return array or single object
   }
 }

@@ -8,7 +8,7 @@ import { CustomError } from './errorHandler.js';
 //   ValidationChain,
 // } from "express-validator"; // Import ValidationChain
 
-import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/models.js';
+import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/foobar.js';
 
 // Type definition for a validation schema map
 type SchemaMap = {

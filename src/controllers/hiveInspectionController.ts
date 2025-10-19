@@ -1,7 +1,7 @@
 // src/controllers/hiveInspectionController.ts
 
 import { Response, NextFunction } from 'express';
-import { CustomRequest } from '../types/custom-request.js';
+import { CustomRequest } from '../types/DTO/per-controller/custom-request.js';
 import { HiveInspectionService } from '../services/hiveInspectionService.js';
 import { MajorInspectionService } from '../services/majorInspectionService.js'; // Needed for ownership check
 import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';

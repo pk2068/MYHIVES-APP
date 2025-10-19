@@ -86,7 +86,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "brood_percentage": 33.9,
+  "brood_percentage": 33,
   "approx_honey_weight_kg": 25,
   "num_chambers": 8,
   "drone_comb_frames_count": 3,  
