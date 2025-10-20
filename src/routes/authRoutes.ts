@@ -4,7 +4,7 @@ import { Router } from 'express';
 
 import Joi from 'joi'; // Import Joi
 import { validate } from '../middleware/validation.js'; // Import your Joi-based validate
-import { UserRepository } from '../repositories/implementations/IUserRepository.js';
+import { UserRepository } from '../repositories/implementations/UserRepository.js';
 import { UserService } from '../services/userService.js';
 //import { RegisterUserDto } from '../types/DTO/per-controller/dtos.js'; // Assuming these DTOs exist
 import { RegisterUserIncomingDTO } from '../types/DTO/per-controller/response-types/userControlDTOs.js';

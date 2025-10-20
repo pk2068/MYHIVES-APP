@@ -64,18 +64,6 @@ console.log('Health check route added');
 
 // Mount your API routes here
 apiRouter.use('/auth', authRoutes);
-
-// For nested routes, you might pass sequelize instances or use controllers directly
-//app.use('/locations/:locationId/major-inspections', majorInspectionRoutes);
-// apiRouter.use(
-//   '/locations/:locationId/major-inspections',
-//   (req, res, next) => {
-//     console.log('*** Mounting major inspection routes for location:');
-//     next();
-//   },
-//   majorInspectionRoutes
-// );
-// app.use('/api/v1/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections', hiveInspectionRoutes);
 apiRouter.use('/locations', locationRoutes);
 
 console.log('API routes mounted');
