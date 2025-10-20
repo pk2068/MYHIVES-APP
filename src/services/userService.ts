@@ -1,5 +1,5 @@
 //import { usersAttributes } from '../database/models-ts/users.js'; // Importing the type for user creation attributes
-import { IUserRepository } from '../repositories/implementations/UserRepository.js'; // The contract
+import { IUserRepository } from '../repositories/interfaces/IUserRepository.js'; // The contract
 import { UserRetrievedDTO, UserCreationDTO, UserUpdateDTO } from '../types/DTO/per-controller/user-dto.js'; // The data shapes
 import { CustomError } from '../middleware/errorHandler.js';
 import httpStatus from 'http-status';
