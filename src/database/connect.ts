@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
+//import { Sequelize } from 'sequelize';
 import config from '../config/index.js';
 //import { associateModels } from './models-obsolete/associations.js'; // obsolete associations
 //import { User } from './models-obsolete/User.js'; // To be created
@@ -33,24 +34,53 @@ if (!DB_DIALECT || !DB_HOST || !DB_USER || !DB_NAME) {
 const databaseUrl = `${DB_DIALECT}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 console.log('Database connection string:', databaseUrl);
 
-// Initialize Sequelize with your database connection string
-export const sequelize = new Sequelize(databaseUrl, {
-  dialect: 'postgres', // Specify PostgreSQL dialect
-  //logging: config.nodeEnv === 'development' ? console.log : false, // Log SQL queries in dev mode
-  logging: false,
+// Initialize Sequelize with your database connection string<br>
+const sequelize = new Sequelize({
+  database: DB_NAME,
+  username: DB_USER,
+  password: DB_PASSWORD,
+  host: DB_HOST,
+  port: DB_PORT,
+  dialect: DB_DIALECT,
+  logging: false, // Enable logging to see SQL queries
+  models: [users, locations, hive_inspections, major_inspections, hives], // Add all models here
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+  // Required for proper PostgreSQL UUID handling
   dialectOptions: {
-    // You might need these options for production deployments like Heroku or Render
-    // ssl: {
-    //   require: true,
-    //   rejectUnauthorized: false, // For self-signed certificates or services like Heroku
-    // },
+    useUTC: false,
   },
-  define: {
-    timestamps: false, // Automatically add createdAt and updatedAt fields
-    underscored: true, // Use snake_case for column names (e.g., created_at)
-  },
-  models: [users, locations, hive_inspections, major_inspections, hives], // Register your models
+  timezone: '+00:00', // Set timezone to UTC for consistency
 });
+
+// Initialize Sequelize with your database connection string
+// export const sequelize = new Sequelize({
+//   //dialect: DB_DIALECT, // Specify PostgreSQL dialect
+//   //host: DB_HOST,
+//   //port: DB_PORT,
+//   database: DB_NAME,
+//   username: DB_USER,
+//   password: DB_PASSWORD,
+
+//   //logging: config.nodeEnv === 'development' ? console.log : false, // Log SQL queries in dev mode
+//   logging: false,
+//   dialectOptions: {
+//     // You might need these options for production deployments like Heroku or Render
+//     // ssl: {
+//     //   require: true,
+//     //   rejectUnauthorized: false, // For self-signed certificates or services like Heroku
+//     // },
+//   },
+//   define: {
+//     timestamps: false, // Automatically add createdAt and updatedAt fields
+//     underscored: true, // Use snake_case for column names (e.g., created_at)
+//   },
+//   models: [users, locations, hive_inspections, major_inspections, hives], // Register your models
+// });
 
 export const connectDB = async () => {
   try {
