@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "jest"], // Now safe to add jest here
+    "outDir": "./dist-tests",
+    "rootDir": ".",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.test.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

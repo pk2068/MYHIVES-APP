@@ -20,6 +20,7 @@
     },
     //"allowImportingTsExtensions": true, // Allow .ts extensions in imports during development
     "resolveJsonModule": true, // Allow importing .json files
+    "isolatedModules": true,
 
     /* Emit */
     "noEmitOnError": true, // Don't emit output if there are errors
@@ -40,7 +41,8 @@
 
     /* Advanced Options */
     "skipLibCheck": true, // Skip type checking of declaration files
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/types"] // Add custom types
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/summarize-src.ts"], // Include all TypeScript files in src
   "exclude": ["node_modules", "dist"] // Exclude node_modules and the output directory

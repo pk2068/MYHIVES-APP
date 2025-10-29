@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SRC_DIR = __dirname;
-const OUTPUT_FILE = path.join(__dirname, 'src-summary2.txt');
+const OUTPUT_FILE = path.join(__dirname, 'src-summary3.txt');
 
 function walkDir(dir: string, fileList: string[] = []) {
   fs.readdirSync(dir).forEach((file) => {
