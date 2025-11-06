@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { HiveInspectionService } from '../services/hiveInspectionService.js';
+import { HiveInspectionService } from '../services/hive-inspection-service.js';
 import { hive_inspectionsAttributes } from '../database/models-ts/hive_inspections.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';

@@ -2,11 +2,11 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../middleware/errorHandler.js';
-import { MajorInspectionService } from '../services/majorInspectionService.js';
-import { LocationService } from '../services/locationService.js'; // To check location ownership
+import { MajorInspectionService } from '../services/major-inspection-service.js';
+import { LocationService } from '../services/location-service.js'; // To check location ownership
 // import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
 // import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
-import { major_inspectionsAttributes } from 'database/models-ts/major_inspections.js';
+import { major_inspectionsAttributes } from 'database/models-ts/major-inspections.js';
 
 // // Middleware to ensure location belongs to the authenticated user
 // const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {

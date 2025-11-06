@@ -1,7 +1,7 @@
 // Import the interface and DTOs to ensure the mock signature is correct
 //import { IUserRepository } from '../../../src/repositories/interfaces/IUserRepository.js';
-import { IUserRepository } from '../../../src/repositories/interfaces/IUserRepository.js';
-import { UserRetrievedDTO, UserCreationDTO, UserUpdateDTO } from '../../../src/types/DTO/per-controller/user-dto.js';
+import { IUserRepository } from '../../../src/repositories/interfaces/i-user-repository.js';
+import { UserRetrievedDTO, UserCreationDTO, UserUpdateDTO } from '../../../src/services/dto/user-service.dto.js';
 import { jest } from '@jest/globals';
 
 // Define the shape of a mock user for testing purposes

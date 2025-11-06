@@ -17,3 +17,13 @@ export interface UpdateLocationDto {
   longitude?: number;
   description?: string | null;
 }
+
+// DTO for retrieving a Location
+export interface LocationRetrievedDto {
+  location_id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  description?: string | null;
+}

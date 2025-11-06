@@ -2,8 +2,8 @@
 
 import { Response, NextFunction } from 'express';
 import { CustomRequest } from '../types/DTO/per-controller/custom-request.js';
-import { HiveInspectionService } from '../services/hiveInspectionService.js';
-import { MajorInspectionService } from '../services/majorInspectionService.js'; // Needed for ownership check
+import { HiveInspectionService } from '../services/hive-inspection-service.js';
+import { MajorInspectionService } from '../services/major-inspection-service.js'; // Needed for ownership check
 import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';
 
 //import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
@@ -11,7 +11,7 @@ import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.
 //import { ApiError } from '../utils/ApiError';
 import { CustomError } from '../middleware/errorHandler.js';
 import httpStatus from 'http-status';
-import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js';
+import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
 import { UniqueConstraintError } from 'sequelize';
 
 export class HiveInspectionController {

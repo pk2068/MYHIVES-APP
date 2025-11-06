@@ -1,18 +1,11 @@
 import { Sequelize } from 'sequelize-typescript';
-//import { Sequelize } from 'sequelize';
 import config from '../config/index.js';
-//import { associateModels } from './models-obsolete/associations.js'; // obsolete associations
-//import { User } from './models-obsolete/User.js'; // To be created
 import { users } from './models-ts/users.js'; // To be created
 import { locations } from './models-ts/locations.js'; // To be created
 import { hive_inspections } from './models-ts/hive_inspections.js';
-import { major_inspections } from './models-ts/major_inspections.js';
+import { major_inspections } from './models-ts/major-inspections.js';
 import { hives } from './models-ts/hives.js'; // To be created
 import { associateModels } from './models-ts/associations.js'; // Adjust path if you placed it elsewhere, e.g., './models-obsolete/associations.js'
-
-// import { Location } from './models-obsolete/Location.js'; // To be created
-// import { MajorInspection } from './models-obsolete/MajorInspection.js'; // To be created
-// import { HiveInspection } from './models-obsolete/HiveInspection.js'; // To be created
 
 console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);
 
@@ -57,31 +50,6 @@ const sequelize = new Sequelize({
   timezone: '+00:00', // Set timezone to UTC for consistency
 });
 
-// Initialize Sequelize with your database connection string
-// export const sequelize = new Sequelize({
-//   //dialect: DB_DIALECT, // Specify PostgreSQL dialect
-//   //host: DB_HOST,
-//   //port: DB_PORT,
-//   database: DB_NAME,
-//   username: DB_USER,
-//   password: DB_PASSWORD,
-
-//   //logging: config.nodeEnv === 'development' ? console.log : false, // Log SQL queries in dev mode
-//   logging: false,
-//   dialectOptions: {
-//     // You might need these options for production deployments like Heroku or Render
-//     // ssl: {
-//     //   require: true,
-//     //   rejectUnauthorized: false, // For self-signed certificates or services like Heroku
-//     // },
-//   },
-//   define: {
-//     timestamps: false, // Automatically add createdAt and updatedAt fields
-//     underscored: true, // Use snake_case for column names (e.g., created_at)
-//   },
-//   models: [users, locations, hive_inspections, major_inspections, hives], // Register your models
-// });
-
 export const connectDB = async () => {
   try {
     console.log('PostgreSQL connection trying.');
@@ -110,3 +78,6 @@ export const connectDB = async () => {
     process.exit(1); // Exit process if database connection fails
   }
 };
+
+export { sequelize as sequelizeInstance };
+//export const db = sequelize;

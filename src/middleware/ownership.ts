@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { LocationService } from '../services/locationService.js'; // To check location ownership
+import { LocationService } from '../services/location-service.js'; // To check location ownership
+import { MajorInspectionService } from '../services/major-inspection-service.js';
+import httpStatus from 'http-status';
 import { CustomError } from '../middleware/errorHandler.js';
-import { MajorInspectionService } from '../services/majorInspectionService.js';
 
 // Middleware to ensure location belongs to the authenticated user
 const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
@@ -10,10 +11,10 @@ const checkLocationOwnership = async (req: Request, res: Response, next: NextFun
     const userId = req.currentUser!.id;
     const { locationId } = req.params;
 
-    const location = await LocationService.getLocationById(locationId, userId);
+    const location: boolean = await LocationService.checkLocationOwnership(locationId, userId);
     if (!location) {
       const error = new Error('Location not found or unauthorized.') as CustomError;
-      error.statusCode = 403; // Forbidden
+      error.statusCode = httpStatus.FORBIDDEN; // 403
       throw error;
     }
     next(); // Location is owned by the user, proceed
@@ -47,7 +48,7 @@ const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response,
 
     if (!majorInspectionOwned) {
       const error: CustomError = new Error('oMajor Inspection not found or not owned by user') as CustomError;
-      error.statusCode = 404;
+      error.statusCode = httpStatus.NOT_FOUND; // 404
       throw error;
     }
 

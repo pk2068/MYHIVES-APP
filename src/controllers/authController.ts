@@ -2,12 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/jwt.js';
 import { CustomError } from '../middleware/errorHandler.js';
-import { UserService } from '../services/userService.js'; // New service
+import { UserService } from '../services/user-service.js'; // New service
 
 import config from '../config/index.js';
 import httpStatus from 'http-status'; // Good practice for error codes
-import { LoginUserOutgoingDTO, RegisterUserOutgoingDTO } from 'types/DTO/per-controller/response-types/userControlDTOs.js';
-import { UserCreationDTO, UserRetrievedDTO } from 'types/DTO/per-controller/user-dto.js';
+
+import { LoginUserOutgoingDTO, UserOutgoingDTO, UpdateUserIncomingDTO } from './dto/auth-controller.dto.js';
+import { UserCreationDTO, UserUpdateDTO, UserRetrievedDTO } from '../services/dto/user-service.dto.js';
 
 export class AuthController {
   private readonly _userService: UserService;
@@ -39,7 +40,7 @@ export class AuthController {
 
       // // Generate token (optional, could just return success message)
       // const token = generateToken({ userId: newUser.user_id! });
-      const responseObj: RegisterUserOutgoingDTO = {
+      const responseObj: UserOutgoingDTO = {
         success: true,
         message: 'User registered successfully! Please log in.',
         user: {
@@ -148,6 +149,47 @@ export class AuthController {
       // Return user data (excluding password)
       const { password_hash: password, ...userData } = user;
       res.status(200).json({ success: true, user: userData });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // req.user is set by the `authenticate` middleware
+      if (!req.currentUser || !req.currentUser.id) {
+        console.error('No currentUser found in request:', req.currentUser);
+        const error = new Error('User not authenticated. - no currentUser') as CustomError;
+        error.statusCode = 401;
+        throw error;
+      }
+
+      const userId = req.currentUser!.id;
+      const updateData: UpdateUserIncomingDTO = req.body;
+      console.log('Update data received:', updateData);
+
+      const readyToUpdate: UserUpdateDTO = { ...updateData, password_hash: updateData.password ? await bcrypt.hash(updateData.password, 10) : undefined };
+
+      const user: UserRetrievedDTO = await this._userService.updateUser(userId, readyToUpdate);
+      if (!user) {
+        const error = new Error('User not found.') as CustomError;
+        error.statusCode = 404;
+        throw error;
+      }
+
+      console.log('User found:', user);
+
+      const responseObj: UserOutgoingDTO = {
+        success: true,
+        message: 'User updated successfully!',
+        user: {
+          id: user.user_id!,
+          username: user.username,
+          email: user.email,
+        },
+      };
+
+      res.status(200).json(responseObj);
     } catch (error) {
       next(error);
     }

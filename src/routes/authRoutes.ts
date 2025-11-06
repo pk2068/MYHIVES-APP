@@ -4,18 +4,14 @@ import { Router } from 'express';
 
 import Joi from 'joi'; // Import Joi
 import { validate } from '../middleware/validation.js'; // Import your Joi-based validate
-import { UserRepository } from '../repositories/implementations/UserRepository.js';
-import { UserService } from '../services/userService.js';
+import { UserRepository } from '../repositories/implementations/user-repository.js';
+import { UserService } from '../services/user-service.js';
 //import { RegisterUserDto } from '../types/DTO/per-controller/dtos.js'; // Assuming these DTOs exist
-import { RegisterUserIncomingDTO } from '../types/DTO/per-controller/response-types/userControlDTOs.js';
-import { LoginUserIncomingDTO } from '../types/DTO/per-controller/response-types/userControlDTOs.js';
-//import { CustomError } from '../middleware/errorHandler.js'; // Use CustomError
-//import { login, register, getMe, logout } from '../controllers/authController.js'; // Import your auth controller
+import { RegisterUserIncomingDTO, LoginUserIncomingDTO, UpdateUserIncomingDTO } from '../controllers/dto/auth-controller.dto.js';
 
 import { AuthController } from '../controllers/authController.js';
 
 import { isAuthenticated } from '../middleware/auth.js';
-//import { getMajorInspectionById } from 'controllers/majorInspectionContoller.js';
 
 const authRouter = Router();
 
@@ -54,6 +50,16 @@ const loginSchema = Joi.object<LoginUserIncomingDTO>({
   }),
 });
 
+const updateSchema = Joi.object<UpdateUserIncomingDTO>({
+  username: Joi.string().trim().optional(),
+  email: Joi.string().email().optional().messages({
+    'string.email': 'Email must be a valid email address',
+  }),
+  password: Joi.string().min(6).optional().messages({
+    'string.min': 'Password must be at least 6 characters long',
+  }),
+});
+
 // --- Local Authentication ---
 
 authRouter.post(
@@ -76,6 +82,8 @@ authRouter.post(
   // Or, if you simply want to provide a path to clear client-side token, it can be without auth.
   authController.logout
 );
+
+authRouter.put('/me', isAuthenticated, validate({ body: updateSchema }), authController.updateMe);
 
 // ... (other auth routes like /logout, /me, Google/LinkedIn OAuth)
 

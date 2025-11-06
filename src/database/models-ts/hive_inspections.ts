@@ -1,7 +1,7 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'sequelize-typescript';
 
 import { hives } from './hives.js'; // Import hives model
-import { major_inspections } from './major_inspections.js'; // Import major_inspections model
+import { major_inspections } from './major-inspections.js'; // Import major_inspections model
 
 export interface hive_inspectionsAttributes {
   hive_inspection_id?: string;

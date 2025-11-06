@@ -8,7 +8,7 @@ import { validate } from '../middleware/validation.js';
 
 import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
 import { checkLocationOwnership } from '../middleware/ownership.js';
-import { major_inspectionsAttributes } from '../database/models-ts/major_inspections.js';
+import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
 import hiveInspectionRouter from './hiveInspectionRoutes.js';
 
 const majorInspectionRouter = Router({ mergeParams: true });

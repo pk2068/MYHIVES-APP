@@ -5,17 +5,28 @@ import Joi from 'joi';
 //import { LocationService } from '../services/locationService.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
-import { createLocation, getLocations, getLocationById, updateLocation, deleteLocation, getMapData } from '../controllers/locationController.js'; // <-- Import the controller functions
+import { LocationController } from '../controllers/location-controller.js';
+import { LocationService } from '../services/location-service.js';
+import { LocationRepository } from '../repositories/implementations/location-repository.js';
+import { sequelizeInstance as database } from '../database/connect.js';
+import { LocationControllerUpdateInputDTO, LocationControllerCreateInputDTO } from '../controllers/dto/location-controller.dto.js';
+//import { createLocation, getLocations, getLocationById, updateLocation, deleteLocation, getMapData } from '../controllers/location-controller.js'; // <-- Import the controller functions
 
-import { locationsAttributes } from '../database/models-ts/locations.js';
+//import { locationsAttributes } from '../database/models-ts/locations.js';
 
 import majorInspectionRouter from './majorInspectionRoutes.js';
 import hiveRouter from './hiveRoutes.js';
 
 const locationRouter = Router();
 
+// --- DI SETUP ---
+const locationRepository = new LocationRepository(database); // Concrete implementation
+const locationService = new LocationService(locationRepository); // Inject Repository into Service
+const locationController = new LocationController(locationService); // Inject Service into Controller
+// --- END DI SETUP ---
+
 // --- Joi Schemas for Location ---
-const createLocationSchema = Joi.object<locationsAttributes>({
+const createLocationSchema = Joi.object<LocationControllerCreateInputDTO>({
   name: Joi.string().trim().min(3).max(100).required(),
   address: Joi.string().trim().min(5).max(255).required(),
   latitude: Joi.number().min(-90).max(90).required(),
@@ -24,7 +35,7 @@ const createLocationSchema = Joi.object<locationsAttributes>({
   country: Joi.string().trim().max(100).allow(null, ''),
 });
 
-const updateLocationSchema = Joi.object<locationsAttributes>({
+const updateLocationSchema = Joi.object<LocationControllerUpdateInputDTO>({
   name: Joi.string().trim().min(3).max(100).optional(),
   address: Joi.string().trim().min(5).max(255).optional(),
   latitude: Joi.number().min(-90).max(90).optional(),
@@ -48,25 +59,21 @@ locationRouter.post(
   '/',
   isAuthenticated,
   validate({ body: createLocationSchema }), // <--- Body validation
-  createLocation
+  locationController.createLocation
 );
 
 // GET /api/locations/map - Get map data
-locationRouter.get('/map', isAuthenticated, getMapData);
+locationRouter.get('/map', isAuthenticated, locationController.getMapData);
 
 // GET /api/locations - Get all locations for the authenticated user
-locationRouter.get(
-  '/',
-  isAuthenticated,
-  getLocations // <-- Correctly use the controller function
-);
+locationRouter.get('/', isAuthenticated, locationController.getAllLocations);
 
 // GET /api/locations/:locationId - Get a specific location by ID
 locationRouter.get(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema }), // <--- Params validation
-  getLocationById
+  locationController.getLocationById
 );
 
 // PUT /api/locations/:locationId - Update a specific location by ID
@@ -74,7 +81,7 @@ locationRouter.put(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema, body: updateLocationSchema }), // <--- Both params and body validation
-  updateLocation
+  locationController.updateLocation
 );
 
 // DELETE /api/locations/:locationId - Delete a specific location by ID
@@ -82,7 +89,7 @@ locationRouter.delete(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema }), // <--- Params validation
-  deleteLocation
+  locationController.deleteLocation
 );
 
 // // Mount nested major inspection routes

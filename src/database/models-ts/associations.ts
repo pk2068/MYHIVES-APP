@@ -1,6 +1,6 @@
 import { users } from './users.js';
 import { locations } from './locations.js';
-import { major_inspections } from './major_inspections.js';
+import { major_inspections } from './major-inspections.js';
 import { hives } from './hives.js';
 import { hive_inspections } from './hive_inspections.js';
 

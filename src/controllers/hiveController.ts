@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { HiveService } from '../services/hiveService.js';
+import { HiveService } from '../services/hive-service.js';
 import { CustomError } from '../middleware/errorHandler.js';
 import { hivesAttributes } from '../database/models-ts/hives.js';
 
