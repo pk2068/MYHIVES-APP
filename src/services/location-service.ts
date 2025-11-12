@@ -1,4 +1,3 @@
-import { locations as locationsModel, locationsAttributes } from '../database/models-ts/locations.js';
 import { ILocationRepository } from '../repositories/interfaces/i-location-repository.js';
 import { LocationServiceRetrievedDTO, LocationServiceCreateDTO, LocationServiceUpdateDTO } from './dto/location-service.dto.js';
 import { CustomError } from '../middleware/errorHandler.js';
@@ -92,8 +91,8 @@ export class LocationService {
    * @param userId The ID of the user.
    * @returns True if the location is owned by the user, false otherwise.
    */
-  public static async checkLocationOwnership(locationId: string, userId: string): Promise<boolean> {
-    const location = await locationsModel.findByPk(locationId);
+  public async checkLocationOwnership(locationId: string, userId: string): Promise<boolean> {
+    const location = await this.locationRepository.readById(locationId);
     return location ? location.user_id === userId : false;
   }
 }

@@ -1,7 +1,7 @@
-import { UserService } from '../.././../src/services/userService.ts';
+import { UserService } from '../../../src/services/user-service.ts';
 import { MockUserRepository } from '../mocks/MockUserRepository.ts'; // Assuming you put the mock in a /mocks folder
-import { IUserRepository } from '../.././../src/repositories/interfaces/IUserRepository.ts';
-import { UserCreationDTO, UserUpdateDTO, UserRetrievedDTO } from '../.././../src/services/dto/user.dto.ts';
+import { IUserRepository } from '../../../src/repositories/interfaces/i-user-repository.ts';
+import { UserCreationDTO, UserUpdateDTO, UserRetrievedDTO } from '../../../src/services/dto/user-service.dto.ts';
 import httpStatus from 'http-status';
 import { beforeEach, describe, it, expect, jest } from '@jest/globals';
 
