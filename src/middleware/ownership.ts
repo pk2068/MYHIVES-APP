@@ -3,27 +3,14 @@ import { LocationService } from '../services/location-service.js'; // To check l
 import { MajorInspectionService } from '../services/major-inspection-service.js';
 import httpStatus from 'http-status';
 import { CustomError } from '../middleware/errorHandler.js';
+import { ParamsDictionary } from 'express-serve-static-core';
+
+interface LocationParams extends ParamsDictionary {
+  locationId: string;
+}
 
 // Middleware to ensure location belongs to the authenticated user
-const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
-  //console.log('Checking location ownership...', req.params, req.body, req.currentUser);
-  try {
-    const userId = req.currentUser!.id;
-    const { locationId } = req.params;
-
-    const location: boolean = await LocationService.checkLocationOwnership(locationId, userId);
-    if (!location) {
-      const error = new Error('Location not found or unauthorized.') as CustomError;
-      error.statusCode = httpStatus.FORBIDDEN; // 403
-      throw error;
-    }
-    next(); // Location is owned by the user, proceed
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Middleware to check if the :majorInspectionId in the URL param belongs to the authenticated user
+// Goal is to check if the :majorInspectionId in the URL param belongs to the authenticated user
 // This assumes MajorInspectionService has a method to verify ownership without requiring locationId in URL
 const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response, next: NextFunction) => {
   // console.log('Checking major inspection ownership for hive inspections...', req.params, req.body, req.currentUser);
@@ -61,6 +48,45 @@ const checkMajorInspectionOwnershipForHive = async (req: Request, res: Response,
     console.error('%%% Error checking major inspection ownership for hive:', error);
     next(error);
   }
+};
+
+/**
+ * Middleware factory that accepts an instance of LocationService via Dependency Injection.
+ * It returns the actual Express middleware function which checks if the authenticated user
+ * owns the resource specified by :locationId.
+ *
+ * @param locationService An instance of the LocationService used to perform the check.
+ * @returns The Express middleware function to be used in routes.
+ */
+const checkLocationOwnership = (locationService: LocationService) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const locationId = req.params.locationId as string;
+      // req.currentUser is set by a preceding authentication middleware (like isAuthenticated)
+      const userId = req.currentUser?.id;
+
+      if (!userId) {
+        // This should be caught by isAuthenticated, but is a necessary safety check
+        const error = new Error('Authentication required for ownership check.') as CustomError;
+        error.statusCode = httpStatus.UNAUTHORIZED; // 401
+        throw error;
+      }
+
+      // Call the non-static instance method on the injected service
+      const isOwner = await locationService.checkLocationOwnership(locationId, userId);
+
+      if (!isOwner) {
+        const error = new Error('Forbidden. You do not own this location.') as CustomError;
+        error.statusCode = httpStatus.FORBIDDEN; // 403
+        throw error;
+      }
+
+      // Ownership confirmed, proceed
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 };
 
 export { checkLocationOwnership, checkMajorInspectionOwnershipForHive };

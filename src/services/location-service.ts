@@ -27,7 +27,7 @@ export class LocationService {
    * @returns An array of location DTOs.
    */
   public async getAllLocationsByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]> {
-    return this.locationRepository.readAllByUserId(userId);
+    return this.locationRepository.findAllByUserId(userId);
   }
 
   /**
@@ -37,7 +37,7 @@ export class LocationService {
    * @returns The location or null if not found or not owned by user.
    */
   public async getLocationById(locationId: string): Promise<LocationServiceRetrievedDTO | null> {
-    const _loc = await this.locationRepository.readById(locationId);
+    const _loc = await this.locationRepository.findById(locationId);
     return _loc;
   }
 
@@ -49,7 +49,7 @@ export class LocationService {
    */
   public async updateLocation(locationId: string, updateData: LocationServiceUpdateDTO): Promise<LocationServiceRetrievedDTO> {
     // Check if the location exists before updating
-    const existingLocation = await this.locationRepository.readById(locationId);
+    const existingLocation = await this.locationRepository.findById(locationId);
     if (!existingLocation) {
       const error = new Error('Location not found.') as CustomError;
       error.statusCode = httpStatus.NOT_FOUND; // 404
@@ -92,7 +92,7 @@ export class LocationService {
    * @returns True if the location is owned by the user, false otherwise.
    */
   public async checkLocationOwnership(locationId: string, userId: string): Promise<boolean> {
-    const location = await this.locationRepository.readById(locationId);
+    const location = await this.locationRepository.findById(locationId);
     return location ? location.user_id === userId : false;
   }
 }

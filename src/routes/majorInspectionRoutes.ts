@@ -3,7 +3,7 @@
 import { NextFunction, Response, Request, Router } from 'express';
 import Joi from 'joi';
 
-import { isAuthenticated } from '../middleware/auth.js';
+//import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 
 import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
@@ -40,8 +40,7 @@ const loggging = async (req: Request, res: Response, next: NextFunction) => {
   // console.log('Logging major inspections requests ...', req.params, req.body);
   next();
 };
-
-majorInspectionRouter.use(loggging);
+//majorInspectionRouter.use(loggging);
 
 // Mount nested major inspection routes
 // majorInspectionRouter.use('/:majorInspectionId/hive-inspections', (req, res, next) => {
@@ -52,7 +51,6 @@ majorInspectionRouter.use('/:majorInspectionId/hive-inspections', hiveInspection
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(
   '/',
-  isAuthenticated,
   validate({
     params: Joi.object({
       locationId: Joi.string()
@@ -66,15 +64,14 @@ majorInspectionRouter.post(
 );
 
 // GET /api/locations/:locationId/major-inspections - Get all major inspections for a specific location
-majorInspectionRouter.get('/', isAuthenticated, checkLocationOwnership, getMajorInspections);
+majorInspectionRouter.get('/', checkLocationOwnership, getMajorInspections);
 
 // GET /api/locations/:locationId/major-inspections/:majorInspectionId - Get a specific major inspection
-majorInspectionRouter.get('/:majorInspectionId', isAuthenticated, validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, getMajorInspectionById);
+majorInspectionRouter.get('/:majorInspectionId', validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, getMajorInspectionById);
 
 // PUT /api/locations/:locationId/major-inspections/:majorInspectionId - Update a specific major inspection
 majorInspectionRouter.put(
   '/:majorInspectionId',
-  isAuthenticated,
   validate({
     params: majorInspectionParamsSchema,
     body: updateMajorInspectionSchema,
@@ -84,6 +81,6 @@ majorInspectionRouter.put(
 );
 
 // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId - Delete a specific major inspection
-majorInspectionRouter.delete('/:majorInspectionId', isAuthenticated, validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, deleteMajorInspection);
+majorInspectionRouter.delete('/:majorInspectionId', validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, deleteMajorInspection);
 
 export default majorInspectionRouter;

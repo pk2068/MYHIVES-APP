@@ -7,9 +7,9 @@ import { LocationServiceCreateDTO, LocationServiceUpdateDTO, LocationServiceRetr
 export interface ILocationRepository {
   create(location: LocationServiceCreateDTO): Promise<LocationServiceRetrievedDTO>;
 
-  readById(id: string): Promise<LocationServiceRetrievedDTO | null>;
+  findById(id: string): Promise<LocationServiceRetrievedDTO | null>;
 
-  readAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]>;
+  findAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]>;
 
   update(id: string, location: LocationServiceUpdateDTO): Promise<[number, LocationServiceRetrievedDTO[]]>;
 

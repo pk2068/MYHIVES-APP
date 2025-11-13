@@ -15,12 +15,12 @@ export class LocationRepository implements ILocationRepository {
     return newLocation.toJSON() as LocationServiceRetrievedDTO;
   }
 
-  async readById(id: string): Promise<LocationServiceRetrievedDTO | null> {
+  async findById(id: string): Promise<LocationServiceRetrievedDTO | null> {
     const location = await locations.findByPk(id);
     return location ? (location.toJSON() as LocationServiceRetrievedDTO) : null;
   }
 
-  async readAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]> {
+  async findAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]> {
     const allLocations = await locations.findAll({ where: { user_id: userId } });
     return allLocations.map((location) => location.toJSON() as LocationServiceRetrievedDTO);
   }

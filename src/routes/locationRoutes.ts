@@ -16,6 +16,7 @@ import { LocationControllerUpdateInputDTO, LocationControllerCreateInputDTO } fr
 
 import majorInspectionRouter from './majorInspectionRoutes.js';
 import hiveRouter from './hiveRoutes.js';
+import { checkLocationOwnership } from 'middleware/ownership.js';
 
 const locationRouter = Router();
 
@@ -51,8 +52,8 @@ const locationIdParamSchema = Joi.object({
 });
 
 // Mount nested major inspection routes
-locationRouter.use('/:locationId/major-inspections', majorInspectionRouter);
-locationRouter.use('/:locationId/hives', hiveRouter);
+locationRouter.use('/:locationId/major-inspections', isAuthenticated, majorInspectionRouter);
+locationRouter.use('/:locationId/hives', isAuthenticated, hiveRouter);
 
 // POST /api/locations - Create a new location
 locationRouter.post(
@@ -72,6 +73,7 @@ locationRouter.get('/', isAuthenticated, locationController.getAllLocations);
 locationRouter.get(
   '/:locationId',
   isAuthenticated,
+  checkLocationOwnership(locationService),
   validate({ params: locationIdParamSchema }), // <--- Params validation
   locationController.getLocationById
 );
