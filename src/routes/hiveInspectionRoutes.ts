@@ -10,7 +10,7 @@ import { CustomError } from '../middleware/errorHandler.js';
 
 // Assuming these enums are defined in your models/types
 //import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/models.js';
-import { HiveInspectionController } from '../controllers/hiveInspectionController.js';
+import { HiveInspectionController } from '../controllers/hive-inspection-controller.js';
 
 const hiveInspectionRouter = Router({ mergeParams: true });
 

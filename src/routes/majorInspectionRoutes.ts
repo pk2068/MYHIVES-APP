@@ -6,7 +6,7 @@ import Joi from 'joi';
 //import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 
-import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/majorInspectionContoller.js';
+import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/major-inspection-contoller.js';
 import { checkLocationOwnership } from '../middleware/ownership.js';
 import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
 import hiveInspectionRouter from './hiveInspectionRoutes.js';

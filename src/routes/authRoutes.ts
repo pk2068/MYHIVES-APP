@@ -9,7 +9,7 @@ import { UserService } from '../services/user-service.js';
 //import { RegisterUserDto } from '../types/DTO/per-controller/dtos.js'; // Assuming these DTOs exist
 import { RegisterUserIncomingDTO, LoginUserIncomingDTO, UpdateUserIncomingDTO } from '../controllers/dto/auth-controller.dto.js';
 
-import { AuthController } from '../controllers/authController.js';
+import { AuthController } from '../controllers/auth-controller.js';
 
 import { isAuthenticated } from '../middleware/auth.js';
 

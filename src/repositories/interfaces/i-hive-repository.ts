@@ -22,10 +22,11 @@ export interface IHiveRepository {
 
   /**
    * Retrieves a single hive by its ID.
-   * @param hived The unique ID of the hive.
+   * @param hiveId The unique ID of the hive.
+   * @param locationId The optional unique ID of the location.
    * @returns The hive DTO or null if not found.
    */
-  findById(hiveId: string): Promise<HiveServiceRetrievedDTO | null>;
+  findById(hiveId: string, locationId?: string): Promise<HiveServiceRetrievedDTO | null>;
 
   /**
    * Retrieves all hives associated with a specific location.
@@ -37,7 +38,15 @@ export interface IHiveRepository {
   /**
    * Deletes a hive record by its ID.
    * @param hiveId The unique ID of the hive to delete.
+   * @param locationId The optional unique ID of the location.
    * @returns The number of records deleted (should be 1 or 0).
    */
-  delete(hiveId: string): Promise<number>;
+  delete(hiveId: string, locationId?: string): Promise<number>;
+
+  /**
+   * Deletes a hive record by its ID.
+   * @param locationId The unique ID of the location.
+   * @returns The number of records deleted (should be 1 or 0).
+   */
+  deleteAll(locationId: string): Promise<number>;
 }

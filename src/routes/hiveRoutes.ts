@@ -1,16 +1,24 @@
 /* define endpoints, joi schemas, and controllers for hive inspections */
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import Joi from 'joi';
 
-import hiveControler from '../controllers/hiveController.js';
-import { hivesAttributes } from '../database/models-ts/hives.js';
+import { HiveController } from '../controllers/hive-controller.js';
+import { HiveRepository } from 'repositories/implementations/hive-repository.js';
+import { HiveService } from 'services/hive-service.js';
+//import { hivesAttributes } from '../database/models-ts/hives.js';
 import { isAuthenticated } from '../middleware/auth.js';
+import { sequelizeInstance as database } from '../database/connect.js';
 import { validate } from '../middleware/validation.js';
-import { CustomError } from '../middleware/errorHandler.js';
+import { HiveControllerCreateDTO, HiveControllerCreateStrongDTO, HiveControllerUpdateDTO } from 'controllers/dto/hive-controller.dto.js';
 
 const hiveRouter = Router({ mergeParams: true });
+// --- DI SETUP ---
+const hiveRepository = new HiveRepository(database); // Concrete implementation
+const hiveService = new HiveService(hiveRepository); // Inject Repository into Service
+const hiveController = new HiveController(hiveService); // Inject Service into Controller
+// --- END DI SETUP ---
 
-const createHivesBodySchema = Joi.object<hivesAttributes>({
+const createHivesBodySchema = Joi.object<HiveControllerCreateStrongDTO>({
   // locationId: Joi.string()
   //   .guid({ version: ['uuidv4'] })
   //   .required(),
@@ -19,7 +27,7 @@ const createHivesBodySchema = Joi.object<hivesAttributes>({
   is_active: Joi.boolean().required(),
 });
 
-const updateHivesBodySchema = Joi.object<hivesAttributes>({
+const updateHivesBodySchema = Joi.object<HiveControllerUpdateDTO>({
   // locationId: Joi.string()
   //   .guid({ version: ['uuidv4'] })
   //   .optional(),
@@ -52,10 +60,10 @@ hiveRouter.get(
     next();
   },
   validate({ params: createHiveParamSchema }),
-  hiveControler.getAllHives
+  hiveController.getAllHives
 );
 //POST /api/v1/locations/:locationId/hives - Create a new hive within a specific location.
-hiveRouter.post('/', isAuthenticated, validate({ params: createHiveParamSchema, body: createHivesBodySchema }), hiveControler.createHive);
+hiveRouter.post('/', isAuthenticated, validate({ params: createHiveParamSchema, body: createHivesBodySchema }), hiveController.createHive);
 
 //GET /api/v1/locations/:locationId/hives/:hiveId - Get a specific hive.
 hiveRouter.get(
@@ -66,7 +74,7 @@ hiveRouter.get(
     next();
   },
   validate({ params: updateHiveParamSchema }),
-  hiveControler.getHiveById
+  hiveController.getHiveById
 );
 
 //PUT /api/v1/locations/:locationId/hives/:hiveId - Update a specific hive.
@@ -78,7 +86,7 @@ hiveRouter.put(
     next();
   },
   validate({ params: updateHiveParamSchema, body: updateHivesBodySchema }),
-  hiveControler.updateHive
+  hiveController.updateHive
 );
 
 //DELETE /api/v1/locations/:locationId/hives/:hiveId - Delete a specific hive.
@@ -90,7 +98,7 @@ hiveRouter.delete(
     next();
   },
   validate({ params: updateHiveParamSchema }),
-  hiveControler.deleteHive
+  hiveController.deleteHive
 );
 hiveRouter.delete(
   '/',
@@ -100,7 +108,7 @@ hiveRouter.delete(
     next();
   },
   validate({ params: createHiveParamSchema }),
-  hiveControler.deleteAllHives
+  hiveController.deleteAllHives
 );
 
 export default hiveRouter;
