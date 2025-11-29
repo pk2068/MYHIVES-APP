@@ -66,26 +66,27 @@ describe('LocationService', () => {
     it('should return an array of locations for a given user ID', async () => {
       // Arrange
       const locationList: LocationServiceRetrievedDTO[] = [mockLocation, { ...mockLocation, location_id: 'other-loc-id', name: 'Other Spot' }];
-      mockLocationRepository.readAllByUserId.mockResolvedValue(locationList);
+      //mockLocationRepository.readAllByUserId.mockResolvedValue(locationList);
+      mockLocationRepository.findAllByUserId.mockResolvedValue(locationList);
 
       // Act
       const result = await locationService.getAllLocationsByUserId(mockUserId);
 
       // Assert
-      expect(mockLocationRepository.readAllByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(mockLocationRepository.findAllByUserId).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual(locationList);
       expect(result.length).toBe(2);
     });
 
     it('should return an empty array if no locations are found for the user', async () => {
       // Arrange
-      mockLocationRepository.readAllByUserId.mockResolvedValue([]);
+      mockLocationRepository.findAllByUserId.mockResolvedValue([]);
 
       // Act
       const result = await locationService.getAllLocationsByUserId(mockUserId);
 
       // Assert
-      expect(mockLocationRepository.readAllByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(mockLocationRepository.findAllByUserId).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual([]);
       expect(result.length).toBe(0);
     });
@@ -95,25 +96,25 @@ describe('LocationService', () => {
   describe('getLocationById', () => {
     it('should return a location if found by ID', async () => {
       // Arrange
-      mockLocationRepository.readById.mockResolvedValue(mockLocation);
+      mockLocationRepository.findById.mockResolvedValue(mockLocation);
 
       // Act
       const result = await locationService.getLocationById(mockLocationId);
 
       // Assert
-      expect(mockLocationRepository.readById).toHaveBeenCalledWith(mockLocationId);
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
       expect(result).toEqual(mockLocation);
     });
 
     it('should return null if no location is found', async () => {
       // Arrange
-      mockLocationRepository.readById.mockResolvedValue(null);
+      mockLocationRepository.findById.mockResolvedValue(null);
 
       // Act
       const result = await locationService.getLocationById(mockLocationId);
 
       // Assert
-      expect(mockLocationRepository.readById).toHaveBeenCalledWith(mockLocationId);
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
       expect(result).toBeNull();
     });
   });
@@ -126,7 +127,7 @@ describe('LocationService', () => {
     it('should successfully update an existing location', async () => {
       // Arrange
       // 1. readById returns existing location
-      mockLocationRepository.readById.mockResolvedValueOnce(mockLocation);
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
       // 2. update returns success count (1 user updated)
       mockLocationRepository.update.mockResolvedValueOnce([1, [updatedLocation]]);
 
@@ -134,7 +135,7 @@ describe('LocationService', () => {
       const result = await locationService.updateLocation(mockLocationId, updateData);
 
       // Assert
-      expect(mockLocationRepository.readById).toHaveBeenCalledWith(mockLocationId);
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
       expect(mockLocationRepository.update).toHaveBeenCalledWith(mockLocationId, updateData);
       expect(result).toEqual(updatedLocation);
     });
@@ -142,7 +143,7 @@ describe('LocationService', () => {
     it('should throw NOT_FOUND error if location does not exist before update', async () => {
       // Arrange
       // 1. readById returns null (location not found)
-      mockLocationRepository.readById.mockResolvedValueOnce(null);
+      mockLocationRepository.findById.mockResolvedValueOnce(null);
 
       // Act & Assert
       await expect(locationService.updateLocation(mockLocationId, updateData)).rejects.toMatchObject({
@@ -156,7 +157,7 @@ describe('LocationService', () => {
     it('should throw INTERNAL_SERVER_ERROR if repository updates > 1 location', async () => {
       // Arrange
       // 1. readById returns existing location
-      mockLocationRepository.readById.mockResolvedValueOnce(mockLocation);
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
       // 2. update returns unexpected count (2 locations updated)
       mockLocationRepository.update.mockResolvedValueOnce([2, [updatedLocation, updatedLocation]]);
 
@@ -170,7 +171,7 @@ describe('LocationService', () => {
     it('should throw NOT_FOUND error if repository returns updated count of 0 (safety net)', async () => {
       // Arrange
       // 1. readById returns existing location
-      mockLocationRepository.readById.mockResolvedValueOnce(mockLocation);
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
       // 2. update returns 0 count (should not happen after pre-check, but testing robust code)
       mockLocationRepository.update.mockResolvedValueOnce([0, []]);
 

@@ -6,6 +6,7 @@ import { connectDB } from './database/connect.js'; // You'll create this functio
 
 const startServer = async () => {
   try {
+    const testVar: any = 'This should trigger a warning';
     // 1. Connect to the database
     console.log('Attempting to connect to the database...');
     await connectDB();

@@ -62,11 +62,16 @@ export class MockLocationRepository implements ILocationRepository {
   static mockLocationId = mockLocationId;
 
   // Jest Mocks for Repository methods
-  create = jest.fn<ILocationRepository['create']>();
-  readById = jest.fn<ILocationRepository['readById']>();
-  readAllByUserId = jest.fn<ILocationRepository['readAllByUserId']>();
-  update = jest.fn<ILocationRepository['update']>();
-  delete = jest.fn<ILocationRepository['delete']>();
+  create: jest.MockedFunction<(location: LocationServiceCreateDTO) => Promise<LocationServiceRetrievedDTO>> = jest.fn();
+  findById: jest.MockedFunction<(id: string) => Promise<LocationServiceRetrievedDTO | null>> = jest.fn();
+  findAllByUserId: jest.MockedFunction<(userId: string) => Promise<LocationServiceRetrievedDTO[]>> = jest.fn();
+  update: jest.MockedFunction<(id: string, location: LocationServiceUpdateDTO) => Promise<[number, LocationServiceRetrievedDTO[]]>> = jest.fn();
+  delete: jest.MockedFunction<(id: string) => Promise<number>> = jest.fn();
+  //create = jest.fn<ILocationRepository['create']>();
+  //readById = jest.fn<ILocationRepository['readById']>();
+  // readAllByUserId = jest.fn<ILocationRepository['readAllByUserId']>();
+  // update = jest.fn<ILocationRepository['update']>();
+  //delete = jest.fn<ILocationRepository['delete']>();
 
   /**
    * Helper function to create a new mock instance with clear mocks.
