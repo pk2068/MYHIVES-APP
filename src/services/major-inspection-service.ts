@@ -6,12 +6,12 @@ export class MajorInspectionService {
   // Dependency Injection: Injecting the repository contract
   private _majorInspectionRepository: IMajorInspectionRepository;
 
+  /**
+   * Initializes the MajorInspectionService with a concrete repository implementation.
+   * This implements Dependency Injection (DI).
+   * @param majorInspectionRepository The repository instance (e.g., MajorInspectionRepository or MockMajorInspectionRepository).
+   */
   constructor(majorInspectionRepository: IMajorInspectionRepository) {
-    /**
-     * Initializes the MajorInspectionService with a concrete repository implementation.
-     * This implements Dependency Injection (DI).
-     * @param majorInspectionRepository The repository instance (e.g., MajorInspectionRepository or MockMajorInspectionRepository).
-     */
     this._majorInspectionRepository = majorInspectionRepository;
   }
 
@@ -44,7 +44,13 @@ export class MajorInspectionService {
     return affectedRows[0];
   }
 
-  public async deleteMajorInspection(locationId: string, majorInspectionId: string): Promise<boolean> {
+  public async deleteMajorInspection(locationId: string, majorInspectionId: string, userId: string): Promise<boolean> {
+    const isOwner: boolean = await this.checkMajorInspectionOwnership(majorInspectionId, locationId, userId);
+
+    if (!isOwner) {
+      return false;
+    }
+
     const deletedRows = await await this._majorInspectionRepository.delete(majorInspectionId, locationId);
 
     return deletedRows > 0;
@@ -53,14 +59,6 @@ export class MajorInspectionService {
   public async foodbar(): Promise<void> {
     console.log('Foodbar method called');
   }
-
-  // public async checkOwnership(majorInspectionId: string, locationId: string, userId: string): Promise<boolean> {
-  //   const majorInspection = await this._majorInspectionRepository.findById(majorInspectionId, locationId);
-  //   if (!majorInspection) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
 
   /**
    * Checks if a Major Inspection exists at a specific Location owned by a specific User.

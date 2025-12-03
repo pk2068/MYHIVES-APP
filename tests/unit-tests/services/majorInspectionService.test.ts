@@ -157,13 +157,13 @@ describe('MajorInspectionService', () => {
         const deleteSpy = mockRepository.delete.mockResolvedValue(1);
 
         // Act
-        const result = await majorInspectionService.deleteMajorInspection(MOCK_LOCATION_ID, MOCK_INSPECTION_ID);
+        const result = await majorInspectionService.deleteMajorInspection(MOCK_LOCATION_ID, MOCK_INSPECTION_ID, MOCK_USER_ID);
 
         // Assert
         // Check that the service first validated ownership
         expect(mockRepository.findInspectionByLocationAndUser).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID, MOCK_USER_ID);
         // Check that the delete method was called only after ownership validation
-        expect(deleteSpy).toHaveBeenCalledWith(MOCK_INSPECTION_ID);
+        expect(deleteSpy).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID);
         expect(result).toBe(true);
       });
 

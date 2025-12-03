@@ -2,7 +2,11 @@ import { Sequelize } from 'sequelize';
 import { IMajorInspectionRepository } from '../interfaces/i-major-inspection-repository.js';
 import { major_inspections } from '../../database/models-ts/major-inspections.js';
 import { locations } from 'database/models-ts/locations.js';
-import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from '../../services/dto/major-inspection-service.dto.js';
+import {
+  MajorInspectionServiceCreateDTO,
+  MajorInspectionServiceRetrievedDTO,
+  MajorInspectionServiceUpdateDTO,
+} from '../../services/dto/major-inspection-service.dto.js';
 
 export class MajorInspectionRepository implements IMajorInspectionRepository {
   private readonly db: Sequelize; // Dependency for Sequelize instance (for transactions)
@@ -41,14 +45,14 @@ export class MajorInspectionRepository implements IMajorInspectionRepository {
     return allInspections.map((insp) => insp.toJSON() as MajorInspectionServiceRetrievedDTO);
   }
 
-  async delete(inspectionId: string, locationId?: string): Promise<number> {
+  public async delete(inspectionId: string, locationId?: string): Promise<number> {
     const deleteCount = await major_inspections.destroy({
       where: locationId ? { major_inspection_id: inspectionId, location_id: locationId } : { major_inspection_id: inspectionId },
     });
     return deleteCount;
   }
 
-  async findInspectionByLocationAndUser(inspectionId: string, locationId: string, userId: string): Promise<MajorInspectionServiceRetrievedDTO | null> {
+  public async findInspectionByLocationAndUser(inspectionId: string, locationId: string, userId: string): Promise<MajorInspectionServiceRetrievedDTO | null> {
     const inspection = await major_inspections.findOne({
       where: { major_inspection_id: inspectionId },
       include: [
