@@ -16,6 +16,7 @@ const MOCK_INSPECTION_RETRIEVED = MockMajorInspectionRepository.mockInspectionRe
 const MOCK_INSPECTION_CREATED_DATA: MajorInspectionServiceCreateDTO = MockMajorInspectionRepository.mockInspectionCreated;
 const MOCK_INSPECTION_UPDATE_DATA: MajorInspectionServiceUpdateDTO = {
   description: 'Updated Test Description',
+  location_id: MOCK_LOCATION_ID,
 };
 const MOCK_INSPECTION_LIST: MajorInspectionServiceRetrievedDTO[] = [
   MOCK_INSPECTION_RETRIEVED,
