@@ -4,8 +4,7 @@ import { HiveInspectionService } from '../services/hive-inspection-service.js';
 import { hive_inspectionsAttributes } from '../database/models-ts/hive_inspections.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
-import { checkMajorInspectionOwnershipForHive as checkMajorInspectionOwnership } from '../middleware/ownership.js';
-import { CustomError } from '../middleware/errorHandler.js';
+
 //import {CustomRequest} from '../types/custom-request.js';
 
 // Assuming these enums are defined in your models/types
@@ -117,7 +116,7 @@ hiveInspectionRouter.post(
   //   console.log('Validation successful');
   //   next();
   // },
-  checkMajorInspectionOwnership, // Verify parent MajorInspection ownership
+  //checkMajorInspectionOwnership, // Verify parent MajorInspection ownership
   HiveInspectionController.createHiveInspection
 );
 
@@ -129,7 +128,7 @@ hiveInspectionRouter.get(
     params: rootHiveInspectionParamsSchema,
   }),
 
-  checkMajorInspectionOwnership,
+  //  checkMajorInspectionOwnership,
   (req, res, next) => {
     console.log('****** GET /  ownership verified *****');
     next();
@@ -146,7 +145,7 @@ hiveInspectionRouter.get(
   // },
   isAuthenticated,
   validate({ params: specificHiveInspectionParamsSchema }),
-  checkMajorInspectionOwnership,
+  //checkMajorInspectionOwnership,
   HiveInspectionController.getHiveInspectionById
 );
 
@@ -162,7 +161,7 @@ hiveInspectionRouter.put(
     params: specificHiveInspectionParamsSchema,
     body: updateHiveInspectionSchema,
   }),
-  checkMajorInspectionOwnership,
+  //checkMajorInspectionOwnership,
   HiveInspectionController.updateHiveInspection
 );
 
@@ -175,7 +174,7 @@ hiveInspectionRouter.delete(
   // },
   isAuthenticated,
   validate({ params: specificHiveInspectionParamsSchema }),
-  checkMajorInspectionOwnership,
+  //checkMajorInspectionOwnership,
   HiveInspectionController.deleteHiveInspection
 );
 

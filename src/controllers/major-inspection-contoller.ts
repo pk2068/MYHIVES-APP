@@ -3,131 +3,218 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../middleware/errorHandler.js';
 import { MajorInspectionService } from '../services/major-inspection-service.js';
-import { LocationService } from '../services/location-service.js'; // To check location ownership
-// import { MajorInspection as MajorInspectionInterface } from '../types/models.js';
-// import { CreateMajorInspectionDto, UpdateMajorInspectionDto } from '../types/dtos.js';
-import { major_inspectionsAttributes } from 'database/models-ts/major-inspections.js';
+import { LocationService } from '../services/location-service.js'; // To check locat
+import { MajorInspectionServiceRetrievedDTO, MajorInspectionServiceCreateDTO, MajorInspectionServiceUpdateDTO } from 'services/dto/major-inspection-service.dto.js';
 
-// // Middleware to ensure location belongs to the authenticated user
-// const checkLocationOwnership = async (req: Request, res: Response, next: NextFunction) => {
+export class MajorInspectionController {
+  private readonly _majorInspectionService: MajorInspectionService;
+
+  constructor(majorInspectionService: MajorInspectionService) {
+    this._majorInspectionService = majorInspectionService;
+  }
+
+  public async createMajorInspection(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log('Creating major inspection...ABCD', req.params, req.body);
+      const { locationId } = req.params;
+
+      const myData: MajorInspectionServiceCreateDTO = {
+        location_id: locationId,
+        ...req.body,
+      };
+
+      const newMajorInspection = await this._majorInspectionService.createMajorInspection(myData);
+      res.status(201).json({
+        success: true,
+        message: 'Major inspection created successfully',
+        data: newMajorInspection,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async getMajorInspections(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log('Fetching major inspections...');
+      const { locationId } = req.params;
+      const majorInspections = await this._majorInspectionService.getMajorInspectionsByLocationId(locationId);
+      res.status(200).json({
+        success: true,
+        data: majorInspections,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async getSpecificMajorInspectionById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { majorInspectionId, locationId } = req.params;
+
+      const majorInspection = await this._majorInspectionService.getMajorInspectionById(majorInspectionId, locationId);
+
+      if (!majorInspection) {
+        const error = new Error('cMajor inspection not found.') as CustomError;
+        error.statusCode = 404;
+        throw error;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: majorInspection,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async updateMajorInspection(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { majorInspectionId, locationId } = req.params;
+      const updateData: MajorInspectionServiceUpdateDTO = { ...req.body, location_id: locationId };
+      console.log('Updating major inspection controller...', majorInspectionId, locationId, updateData);
+      const updatedMajorInspection = await this._majorInspectionService.updateMajorInspection(majorInspectionId, updateData);
+
+      if (!updatedMajorInspection) {
+        const error = new Error('cMajor inspection not found.') as CustomError;
+        error.statusCode = 404;
+        throw error;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Major inspection updated successfully',
+        data: updatedMajorInspection,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  public async deleteMajorInspection(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { majorInspectionId, locationId } = req.params;
+      const userId = req.currentUser!.id;
+      const deleted = await this._majorInspectionService.deleteMajorInspection(locationId, majorInspectionId);
+
+      if (!deleted) {
+        const error = new Error('cMajor inspection not found.') as CustomError;
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({
+        success: true,
+        message: 'Major inspection deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // end of class
+}
+
+// export const createMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
-//     console.log('Checking location ownership...', req.params, req.body, req.currentUser);
-//     const userId = req.currentUser!.id;
+//     console.log('Creating major inspection...ABCD', req.params, req.body);
 //     const { locationId } = req.params;
+//     //const inspectionData: Partial<MajorInspectionInterface> = req.body;
+//     const inspectionData: Omit<MajorInspectionServiceCreateDTO, 'locationId'> = req.body;
 
-//     const location = await LocationService.getLocationById(locationId, userId);
-//     if (!location) {
-//       const error = new Error('Location not found or unauthorized.') as CustomError;
-//       error.statusCode = 403; // Forbidden
-//       throw error;
-//     }
-//     next(); // Location is owned by the user, proceed
+//     const newMajorInspection = await MajorInspectionService.createMajorInspection(locationId, inspectionData);
+
+//     res.status(201).json({
+//       success: true,
+//       message: 'Major inspection created successfully',
+//       data: newMajorInspection,
+//     });
 //   } catch (error) {
 //     next(error);
 //   }
 // };
 
-export const createMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log('Creating major inspection...ABCD', req.params, req.body);
-    const { locationId } = req.params;
-    //const inspectionData: Partial<MajorInspectionInterface> = req.body;
-    const inspectionData: major_inspectionsAttributes = req.body;
+// export const getMajorInspections = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     console.log('Fetching major inspections...');
+//     const { locationId } = req.params;
 
-    const newMajorInspection = await MajorInspectionService.createMajorInspection(locationId, inspectionData);
+//     const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId);
 
-    res.status(201).json({
-      success: true,
-      message: 'Major inspection created successfully',
-      data: newMajorInspection,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       data: majorInspections,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-export const getMajorInspections = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log('Fetching major inspections...');
-    const { locationId } = req.params;
+// export const getMajorInspectionById = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { majorInspectionId, locationId } = req.params;
+//     const userId = req.currentUser!.id;
 
-    const majorInspections = await MajorInspectionService.getMajorInspectionsByLocationId(locationId);
+//     const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
 
-    res.status(200).json({
-      success: true,
-      data: majorInspections,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     if (!majorInspection) {
+//       const error = new Error('cMajor inspection not found.') as CustomError;
+//       error.statusCode = 404;
+//       throw error;
+//     }
 
-export const getMajorInspectionById = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { majorInspectionId, locationId } = req.params;
-    const userId = req.currentUser!.id;
+//     res.status(200).json({
+//       success: true,
+//       data: majorInspection,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-    const majorInspection = await MajorInspectionService.getMajorInspectionById(userId, majorInspectionId, locationId);
+// export const updateMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { majorInspectionId, locationId } = req.params;
+//     const updateData: major_inspectionsAttributes = req.body;
+//     console.log('Updating major inspection controller...', majorInspectionId, locationId, updateData);
 
-    if (!majorInspection) {
-      const error = new Error('cMajor inspection not found.') as CustomError;
-      error.statusCode = 404;
-      throw error;
-    }
+//     const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(locationId, majorInspectionId, updateData);
 
-    res.status(200).json({
-      success: true,
-      data: majorInspection,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     if (!updatedMajorInspection) {
+//       const error = new Error('cMajor inspection not found.') as CustomError;
+//       error.statusCode = 404;
+//       throw error;
+//     }
 
-export const updateMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { majorInspectionId, locationId } = req.params;
-    const updateData: major_inspectionsAttributes = req.body;
-    console.log('Updating major inspection controller...', majorInspectionId, locationId, updateData);
+//     res.status(200).json({
+//       success: true,
+//       message: 'Major inspection updated successfully',
+//       data: updatedMajorInspection,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-    const updatedMajorInspection = await MajorInspectionService.updateMajorInspection(locationId, majorInspectionId, updateData);
+// export const deleteMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { majorInspectionId, locationId } = req.params;
+//     const userId = req.currentUser!.id;
 
-    if (!updatedMajorInspection) {
-      const error = new Error('cMajor inspection not found.') as CustomError;
-      error.statusCode = 404;
-      throw error;
-    }
+//     const deleted = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
 
-    res.status(200).json({
-      success: true,
-      message: 'Major inspection updated successfully',
-      data: updatedMajorInspection,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     if (!deleted) {
+//       const error = new Error('cMajor inspection not found.') as CustomError;
+//       error.statusCode = 404;
+//       throw error;
+//     }
 
-export const deleteMajorInspection = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { majorInspectionId, locationId } = req.params;
-    const userId = req.currentUser!.id;
+//     res.status(200).json({
+//       success: true,
+//       message: 'Major inspection deleted successfully',
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-    const deleted = await MajorInspectionService.deleteMajorInspection(userId, locationId, majorInspectionId);
-
-    if (!deleted) {
-      const error = new Error('cMajor inspection not found.') as CustomError;
-      error.statusCode = 404;
-      throw error;
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Major inspection deleted successfully',
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-//export { checkLocationOwnership }; // Export for use in routes
+// //export { checkLocationOwnership }; // Export for use in routes

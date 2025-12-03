@@ -51,6 +51,8 @@ const locationIdParamSchema = Joi.object({
     .required(), // Validate as UUID
 });
 
+const ownershipMiddleware = checkLocationOwnership(locationService);
+
 // Mount nested major inspection routes
 locationRouter.use('/:locationId/major-inspections', isAuthenticated, majorInspectionRouter);
 locationRouter.use('/:locationId/hives', isAuthenticated, hiveRouter);
@@ -73,8 +75,8 @@ locationRouter.get('/', isAuthenticated, locationController.getAllLocations);
 locationRouter.get(
   '/:locationId',
   isAuthenticated,
-  checkLocationOwnership(locationService),
   validate({ params: locationIdParamSchema }), // <--- Params validation
+  ownershipMiddleware,
   locationController.getLocationById
 );
 
@@ -83,6 +85,7 @@ locationRouter.put(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema, body: updateLocationSchema }), // <--- Both params and body validation
+  ownershipMiddleware,
   locationController.updateLocation
 );
 
@@ -91,6 +94,7 @@ locationRouter.delete(
   '/:locationId',
   isAuthenticated,
   validate({ params: locationIdParamSchema }), // <--- Params validation
+  ownershipMiddleware,
   locationController.deleteLocation
 );
 

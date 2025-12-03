@@ -5,13 +5,35 @@ import Joi from 'joi';
 
 //import { isAuthenticated } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { MajorInspectionService } from '../services/major-inspection-service.js';
+import { MajorInspectionController } from '../controllers/major-inspection-contoller.js';
+import { IMajorInspectionRepository } from '../repositories/interfaces/i-major-inspection-repository.js';
+import { MajorInspectionRepository } from '../repositories/implementations/major-inspection-repository.js';
+import { sequelizeInstance as database } from '../database/connect.js';
+import { checkMajorInspectionOwnership } from '../middleware/ownership.js';
 
-import { createMajorInspection, getMajorInspections, getMajorInspectionById, updateMajorInspection, deleteMajorInspection } from '../controllers/major-inspection-contoller.js';
 import { checkLocationOwnership } from '../middleware/ownership.js';
 import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
 import hiveInspectionRouter from './hiveInspectionRoutes.js';
 
 const majorInspectionRouter = Router({ mergeParams: true });
+
+// --- DI SETUP ---
+
+const majorInspectionRepository: IMajorInspectionRepository =
+  new MajorInspectionRepository(database);
+const majorInspectionService = new MajorInspectionService(
+  majorInspectionRepository
+);
+const majorInspectionController = new MajorInspectionController(
+  majorInspectionService
+);
+
+// --- Instantiate the HOF to create the middleware function ---
+const majorInspectionOwnershipMiddleware = checkMajorInspectionOwnership(
+  majorInspectionService
+);
+// --- END DI SETUP ---
 
 // --- Joi Schemas for MajorInspection ---
 const createMajorInspectionSchema = Joi.object<major_inspectionsAttributes>({
@@ -46,7 +68,10 @@ const loggging = async (req: Request, res: Response, next: NextFunction) => {
 // majorInspectionRouter.use('/:majorInspectionId/hive-inspections', (req, res, next) => {
 //   next();
 // });
-majorInspectionRouter.use('/:majorInspectionId/hive-inspections', hiveInspectionRouter);
+majorInspectionRouter.use(
+  '/:majorInspectionId/hive-inspections',
+  hiveInspectionRouter
+);
 
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(
@@ -59,15 +84,24 @@ majorInspectionRouter.post(
     }),
     body: createMajorInspectionSchema,
   }),
-  checkLocationOwnership, // Ensure the location belongs to the user //createMajorInspection
-  createMajorInspection
+  majorInspectionOwnershipMiddleware,
+  majorInspectionController.createMajorInspection
 );
 
 // GET /api/locations/:locationId/major-inspections - Get all major inspections for a specific location
-majorInspectionRouter.get('/', checkLocationOwnership, getMajorInspections);
+majorInspectionRouter.get(
+  '/',
+  majorInspectionOwnershipMiddleware,
+  majorInspectionController.getMajorInspections
+);
 
 // GET /api/locations/:locationId/major-inspections/:majorInspectionId - Get a specific major inspection
-majorInspectionRouter.get('/:majorInspectionId', validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, getMajorInspectionById);
+majorInspectionRouter.get(
+  '/:majorInspectionId',
+  validate({ params: majorInspectionParamsSchema }),
+  majorInspectionOwnershipMiddleware,
+  majorInspectionController.getSpecificMajorInspectionById
+);
 
 // PUT /api/locations/:locationId/major-inspections/:majorInspectionId - Update a specific major inspection
 majorInspectionRouter.put(
@@ -76,11 +110,16 @@ majorInspectionRouter.put(
     params: majorInspectionParamsSchema,
     body: updateMajorInspectionSchema,
   }),
-  checkLocationOwnership,
-  updateMajorInspection
+  majorInspectionOwnershipMiddleware,
+  majorInspectionController.updateMajorInspection
 );
 
 // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId - Delete a specific major inspection
-majorInspectionRouter.delete('/:majorInspectionId', validate({ params: majorInspectionParamsSchema }), checkLocationOwnership, deleteMajorInspection);
+majorInspectionRouter.delete(
+  '/:majorInspectionId',
+  validate({ params: majorInspectionParamsSchema }),
+  majorInspectionOwnershipMiddleware,
+  majorInspectionController.deleteMajorInspection
+);
 
 export default majorInspectionRouter;
