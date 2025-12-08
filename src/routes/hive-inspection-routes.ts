@@ -1,17 +1,30 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { HiveInspectionService } from '../services/hive-inspection-service.js';
+import { MajorInspectionService } from '../services/major-inspection-service.js';
+import { HiveInspectionController } from '../controllers/hive-inspection-controller.js';
+import { HiveInspectionRepository } from '../repositories/implementations/hive-inspection-repository.js';
+import { MajorInspectionRepository } from '../repositories/implementations/major-inspection-repository.js';
+import { sequelizeInstance as database } from '../database/connect.js';
 import { hive_inspectionsAttributes } from '../database/models-ts/hive_inspections.js';
 import { isAuthenticated } from '../middleware/auth.js';
+import { checkHiveInspectionOwnership } from 'middleware/ownership.js';
 import { validate } from '../middleware/validation.js';
 
-//import {CustomRequest} from '../types/custom-request.js';
-
-// Assuming these enums are defined in your models/types
-//import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } from '../types/models.js';
-import { HiveInspectionController } from '../controllers/hive-inspection-controller.js';
+1;
 
 const hiveInspectionRouter = Router({ mergeParams: true });
+
+// --- DI SETUP ---
+const hiveInspectionRepository = new HiveInspectionRepository(database);
+const majorInspectionRepository = new MajorInspectionRepository(database);
+const majorInspectionService = new MajorInspectionService(majorInspectionRepository); // For ownership checks
+const hiveInspectionService = new HiveInspectionService(hiveInspectionRepository, majorInspectionService);
+const hiveInspectionController = new HiveInspectionController(hiveInspectionService);
+// --- END DI SETUP ---
+
+// --- Instantiate the HOF to create the middleware function ---
+const hiveInspectionOwnershipMiddleware = checkHiveInspectionOwnership(hiveInspectionService);
 
 // --- Joi Schemas for HiveInspection ---
 // const beehiveConfigurationSchema = Joi.object({
@@ -104,10 +117,9 @@ const rootHiveInspectionParamsSchema = Joi.object({
     .required(),
 });
 
-// POST /api/major-inspections/:majorInspectionId/hive-inspections - Create a hive inspection
+// POST /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections - Create a hive inspection
 hiveInspectionRouter.post(
   '/',
-  isAuthenticated,
   validate({
     params: rootHiveInspectionParamsSchema,
     body: createHiveInspectionSchema,
@@ -116,66 +128,52 @@ hiveInspectionRouter.post(
   //   console.log('Validation successful');
   //   next();
   // },
-  //checkMajorInspectionOwnership, // Verify parent MajorInspection ownership
-  HiveInspectionController.createHiveInspection
+
+  hiveInspectionController.createHiveInspection
 );
 
-// GET /api/major-inspections/:majorInspectionId/hive-inspections - Get all hive inspections
+// GET /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections - Get all hive inspections
 hiveInspectionRouter.get(
   '/',
-  isAuthenticated,
   validate({
     params: rootHiveInspectionParamsSchema,
   }),
-
-  //  checkMajorInspectionOwnership,
-  (req, res, next) => {
-    console.log('****** GET /  ownership verified *****');
-    next();
-  },
-  HiveInspectionController.getHiveInspectionsByMajorInspectionId
+  hiveInspectionController.getHiveInspectionsByMajorInspectionId
 );
 
-// GET /api/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId - Get a specific hive inspection
+// GET /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Get a specific hive inspection
 hiveInspectionRouter.get(
   '/:hiveInspectionId',
-  // (req, res, next) => {
-  //   console.log('****** GET /:hiveInspectionId  *****');
-  //   next();
-  // },
-  isAuthenticated,
   validate({ params: specificHiveInspectionParamsSchema }),
-  //checkMajorInspectionOwnership,
-  HiveInspectionController.getHiveInspectionById
+  hiveInspectionOwnershipMiddleware,
+  hiveInspectionController.getHiveInspectionById
 );
 
-// PUT /api/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId - Update a specific hive inspection
+// PUT /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Update a specific hive inspection
 hiveInspectionRouter.put(
   '/:hiveInspectionId',
   // (req, res, next) => {
   //   console.log('****** PUT /:hiveInspectionId  *****');
   //   next();
   // },
-  isAuthenticated,
   validate({
     params: specificHiveInspectionParamsSchema,
     body: updateHiveInspectionSchema,
   }),
-  //checkMajorInspectionOwnership,
-  HiveInspectionController.updateHiveInspection
+  hiveInspectionOwnershipMiddleware,
+  hiveInspectionController.updateHiveInspection
 );
 
-// DELETE /api/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId - Delete a specific hive inspection
+// DELETE /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Delete a specific hive inspection
 hiveInspectionRouter.delete(
   '/:hiveInspectionId',
   // (req, res, next) => {
   //   console.log('****** DELETE /:hiveInspectionId  *****');
   //   next();
   // },
-  isAuthenticated,
   validate({ params: specificHiveInspectionParamsSchema }),
-  //checkMajorInspectionOwnership,
-  HiveInspectionController.deleteHiveInspection
+  hiveInspectionOwnershipMiddleware,
+  hiveInspectionController.deleteHiveInspection
 );
 
 export default hiveInspectionRouter;

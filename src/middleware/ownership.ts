@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { LocationService } from '../services/location-service.js'; // To check location ownership
 import { MajorInspectionService } from '../services/major-inspection-service.js';
+import { HiveInspectionService } from '../services/hive-inspection-service.js';
 import httpStatus from 'http-status';
 import { CustomError } from '../middleware/errorHandler.js';
 import { ParamsDictionary } from 'express-serve-static-core';
@@ -74,6 +75,47 @@ export const checkMajorInspectionOwnership = (majorInspectionService: MajorInspe
 
       if (!isOwner) {
         const error = new Error('Forbidden. You do not own this Major Inspection or it does not exist.') as CustomError;
+        error.statusCode = httpStatus.FORBIDDEN; // 403
+        throw error;
+      }
+
+      // Ownership confirmed. Proceed to the Controller.
+      next();
+    } catch (error) {
+      // Forward error to Express error handler middleware
+      next(error);
+    }
+  };
+};
+
+/**
+ * Middleware factory that checks if the authenticated user owns a Major Inspection
+ * via its associated Location.
+ * * @param hiveInspectionService An instance of the MajorInspectionService.
+ * @returns The Express middleware function.
+ */
+export const checkHiveInspectionOwnership = (hiveInspectionService: HiveInspectionService) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const locationId = req.params.locationId as string;
+      const majorInspectionId = req.params.majorInspectionId as string;
+      const hiveInspectionId = req.params.hiveInspectionId as string;
+      const userId = req.currentUser?.id;
+      const hiveId = req.body.hiveId as string;
+
+      if (!userId || !locationId || !majorInspectionId || !hiveInspectionId || !hiveId) {
+        // If any ID is missing, something is wrong with the preceding middleware or routing.
+        const error = new Error('Missing authentication or resource IDs.') as CustomError;
+        error.statusCode = httpStatus.BAD_REQUEST; // 400
+        throw error;
+      }
+
+      // --- 🔑 The Core Check (Service/Repository Delegation) ---
+      // The MajorInspectionService should have a dedicated method for this.
+      const isOwner = await hiveInspectionService.checkHiveInspectionOwnership(hiveInspectionId, hiveId, userId);
+
+      if (!isOwner) {
+        const error = new Error('Forbidden. You do not own this Hive Inspection for this hive or it does not exist.') as CustomError;
         error.statusCode = httpStatus.FORBIDDEN; // 403
         throw error;
       }

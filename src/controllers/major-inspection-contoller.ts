@@ -95,7 +95,7 @@ export class MajorInspectionController {
     try {
       const { majorInspectionId, locationId } = req.params;
       const userId = req.currentUser!.id;
-      const deleted = await this._majorInspectionService.deleteMajorInspection(locationId, majorInspectionId);
+      const deleted = await this._majorInspectionService.deleteMajorInspection(locationId, majorInspectionId, userId);
 
       if (!deleted) {
         const error = new Error('cMajor inspection not found.') as CustomError;

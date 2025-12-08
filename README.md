@@ -1,10 +1,21 @@
-# MYHIVES-APP
+# MYHIVES-APP Overview
 
-Helps you keep track of multiple beehive inspections on your locations
+This is a Node.js + Express + TypeScript REST API for managing beekeeping data (users, locations, hives, major inspections and hive inspections).​
+PostgreSQL is accessed via sequelize-typescript models, and JWT-based auth is used (with optional Google/LinkedIn OAuth).​
 
-Base url : http://localhost:3000/api/v1/
+Base API path: /api/v1 (for example: http://localhost:3000/api/v1).​
 
 Check server running on http://localhost:3000/api/v1/health
+
+# Tech stack
+
+Runtime: Node.js, Express, TypeScript.​
+
+Database: PostgreSQL, sequelize-typescript models with associations for users, locations, hives, major_inspections and hive_inspections.​
+
+Auth: Username/password with bcrypt and JWT. Google and LinkedIn OAuth hooks will follow later.​
+
+Middleware: CORS, Helmet, Morgan, JSON/urlencoded body parsing, centralized error handler.​
 
 4 routes
 

@@ -14,25 +14,18 @@ import { checkMajorInspectionOwnership } from '../middleware/ownership.js';
 
 import { checkLocationOwnership } from '../middleware/ownership.js';
 import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
-import hiveInspectionRouter from './hiveInspectionRoutes.js';
+import hiveInspectionRouter from './hive-inspection-routes.js';
 
 const majorInspectionRouter = Router({ mergeParams: true });
 
 // --- DI SETUP ---
 
-const majorInspectionRepository: IMajorInspectionRepository =
-  new MajorInspectionRepository(database);
-const majorInspectionService = new MajorInspectionService(
-  majorInspectionRepository
-);
-const majorInspectionController = new MajorInspectionController(
-  majorInspectionService
-);
+const majorInspectionRepository: IMajorInspectionRepository = new MajorInspectionRepository(database);
+const majorInspectionService = new MajorInspectionService(majorInspectionRepository);
+const majorInspectionController = new MajorInspectionController(majorInspectionService);
 
 // --- Instantiate the HOF to create the middleware function ---
-const majorInspectionOwnershipMiddleware = checkMajorInspectionOwnership(
-  majorInspectionService
-);
+const majorInspectionOwnershipMiddleware = checkMajorInspectionOwnership(majorInspectionService);
 // --- END DI SETUP ---
 
 // --- Joi Schemas for MajorInspection ---
@@ -68,10 +61,7 @@ const loggging = async (req: Request, res: Response, next: NextFunction) => {
 // majorInspectionRouter.use('/:majorInspectionId/hive-inspections', (req, res, next) => {
 //   next();
 // });
-majorInspectionRouter.use(
-  '/:majorInspectionId/hive-inspections',
-  hiveInspectionRouter
-);
+majorInspectionRouter.use('/:majorInspectionId/hive-inspections', majorInspectionOwnershipMiddleware, hiveInspectionRouter);
 
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(
@@ -84,14 +74,14 @@ majorInspectionRouter.post(
     }),
     body: createMajorInspectionSchema,
   }),
-  majorInspectionOwnershipMiddleware,
+  //majorInspectionOwnershipMiddleware, // Verify only location ownership for creation
   majorInspectionController.createMajorInspection
 );
 
 // GET /api/locations/:locationId/major-inspections - Get all major inspections for a specific location
 majorInspectionRouter.get(
   '/',
-  majorInspectionOwnershipMiddleware,
+  //majorInspectionOwnershipMiddleware, // Verify location ownership
   majorInspectionController.getMajorInspections
 );
 

@@ -2,7 +2,7 @@
 
 //import { hives, hivesAttributes } from '../database/models-ts/hives.js';
 import { IHiveRepository } from '../repositories/interfaces/i-hive-repository.js'; // repositories/interfaces/i-hive-repository.js';
-import { HiveInspectionServiceRetrievedDTO } from './dto/hive-inspection.dto.js';
+import { HiveInspectionServiceRetrievedDTO } from './dto/hive-inspection-service.dto.js';
 //import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from './dto/hive-service.dto.js';
 //import { locations } from '../database/models-ts/locations.js';
 import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from './dto/hive-service.dto.js';
