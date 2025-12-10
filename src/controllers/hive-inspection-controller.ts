@@ -3,8 +3,7 @@
 import { Response, NextFunction } from 'express';
 import { CustomRequest } from '../types/DTO/per-controller/custom-request.js';
 import { HiveInspectionService } from '../services/hive-inspection-service.js';
-import { MajorInspectionService } from '../services/major-inspection-service.js'; // Needed for ownership check
-import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';
+
 import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../services/dto/hive-inspection-service.dto.js';
 
 //import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
