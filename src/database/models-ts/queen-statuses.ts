@@ -10,7 +10,7 @@ export interface queen_statusesAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class queen_statuses extends Model<queen_statusesAttributes, queen_statusesAttributes> implements queen_statusesAttributes {
+export class Queen_statuses extends Model<queen_statusesAttributes, queen_statusesAttributes> implements queen_statusesAttributes {
   @Column({
     primaryKey: true,
     autoIncrement: true,

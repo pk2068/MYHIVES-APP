@@ -37,6 +37,46 @@ function summarize() {
 summarize();
 
 
+// filepath: test-summary.txt
+// filepath: summarize-test.ts
+// Save this as summarize-test.ts in your project root and run with: npx ts-node summarize-test.ts
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const SRC_DIR = __dirname;
+const OUTPUT_FILE = path.join(__dirname, 'test-summary.txt');
+
+function walkDir(dir: string, fileList: string[] = []) {
+  fs.readdirSync(dir).forEach((file) => {
+    const fullPath = path.join(dir, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      walkDir(fullPath, fileList);
+    } else {
+      fileList.push(fullPath);
+    }
+  });
+  return fileList;
+}
+
+function summarize() {
+  const files = walkDir(SRC_DIR);
+  let summary = '';
+  files.forEach((file) => {
+    summary += `// filepath: ${path.relative(__dirname, file)}\n`;
+    summary += fs.readFileSync(file, 'utf-8') + '\n\n';
+  });
+  fs.writeFileSync(OUTPUT_FILE, summary, 'utf-8');
+  console.log(`Summary written to ${OUTPUT_FILE}`);
+}
+
+summarize();
+
+
 // filepath: unit-tests\mocks\MockHiveRepository.ts
 import { IHiveRepository } from '../../../src/repositories/interfaces/i-hive-repository.js';
 import { jest } from '@jest/globals';
@@ -338,6 +378,1465 @@ export class MockUserRepository implements IUserRepository {
     return mockRepo;
   }
 }
+
+
+// filepath: unit-tests\services\hiveService.test.ts
+import { HiveService } from '../../../src/services/hive-service.ts';
+import { MockHiveRepository } from '../mocks/MockHiveRepository.ts'; // Assuming this is the path
+import { IHiveRepository } from '../../../src/repositories/interfaces/i-hive-repository.ts';
+import { HiveServiceCreateDTO, HiveServiceRetrievedDTO, HiveServiceUpdateDTO } from '../../../src/services/dto/hive-service.dto.ts'; // Assuming you have DTOs for the service
+import httpStatus from 'http-status';
+import { beforeEach, describe, it, expect, jest } from '@jest/globals';
+
+// --- MOCK DATA ---
+const MOCK_USER_ID = MockHiveRepository.mockHiveId; //'user-7890';
+const MOCK_LOCATION_ID = MockHiveRepository.mockLocationId; //'location-4567';
+const MOCK_HIVE_ID = MockHiveRepository.mockHiveId; //'hive-1234';
+const MOCK_HIVE_RETRIEVED = MockHiveRepository.mockHiveRetrieved;
+const MOCK_HIVE_CREATED = MockHiveRepository.mockHiveCreated;
+const MOCK_HIVE_CREATED_AFTER = MockHiveRepository.mockHiveCreatedAfter;
+const MOCK_HIVE_UPDATE = MockHiveRepository.mockHiveUpdate;
+const MOCK_HIVE_UPDATED_AFTER = MockHiveRepository.mockHiveUpdatedAfter;
+
+// // The actual structure of the retrieved HiveDTO will match the database model properties
+const MOCK_HIVE: HiveServiceRetrievedDTO = {
+  hive_id: MOCK_HIVE_ID,
+  location_id: MOCK_LOCATION_ID,
+  hive_number: 'Hive 1A',
+  description: 'First Langstroth hive at test location',
+  supers_count: 2,
+  brood_frames_count: 10,
+  created_at: new Date('2025-10-27T10:00:00.000Z'),
+  updated_at: new Date('2025-10-27T10:00:00.000Z'),
+};
+
+const MOCK_HIVE2: HiveServiceRetrievedDTO = {
+  hive_id: `${MOCK_HIVE_ID}-2`,
+  location_id: MOCK_LOCATION_ID,
+  hive_number: `Hive 2A`,
+  description: 'First Langstroth hive at test location',
+  supers_count: 5,
+  brood_frames_count: 8,
+  created_at: new Date('2025-10-27T10:00:00.000Z'),
+  updated_at: new Date('2025-10-27T10:00:00.000Z'),
+};
+
+// const MOCK_HIVE_CREATE_DATA: HiveServiceCreateDTO = {
+//   location_id: MOCK_LOCATION_ID,
+//   hive_number: 'Hive 1A',
+//   description: 'First Langstroth hive at location 4567',
+//   supers_count: 2,
+//   brood_frames_count: 10,
+// };
+
+// const MOCK_HIVE_UPDATE_DATA: HiveServiceUpdateDTO = {
+//   description: 'Updated description for Hive 1A',
+//   supers_count: 3,
+// };
+
+describe('HiveService', () => {
+  let hiveService: HiveService;
+  // Use IHiveRepository interface for type hinting the mock instance
+  let mockHiveRepository: IHiveRepository;
+
+  // Use beforeEach to ensure a fresh service and mock instance for every test
+  beforeEach(() => {
+    // 1. Create a new instance of the Mock repository
+    mockHiveRepository = MockHiveRepository.createMockInstance();
+
+    // 2. Inject the mock into the service
+    hiveService = new HiveService(mockHiveRepository);
+
+    // 3. Clear all mock calls before each test (best practice with spies)
+    jest.clearAllMocks();
+  });
+
+  // ------------------------------------------------------------------
+  // TEST: getAllHivesByLocationId
+  // ------------------------------------------------------------------
+  describe('getAllHivesByLocationId', () => {
+    it('should return an array of hives for a valid user and location', async () => {
+      // Arrange
+      const expectedHives = [MOCK_HIVE, MOCK_HIVE2];
+      // Spy on the repository method and mock its implementation
+      const findAllByLocationIdSpy = jest.spyOn(mockHiveRepository, 'findAllByLocationId').mockResolvedValue(expectedHives);
+
+      // Act
+      const result = await hiveService.getHivesByLocationId(MOCK_LOCATION_ID);
+
+      // Assert
+      expect(findAllByLocationIdSpy).toHaveBeenCalledWith(MOCK_LOCATION_ID);
+      expect(result).toEqual(expectedHives);
+      expect(result.length).toBe(2);
+    });
+
+    it('should return an empty array if no hives are found', async () => {
+      // Arrange
+      const findAllByLocationIdSpy = jest.spyOn(mockHiveRepository, 'findAllByLocationId').mockResolvedValue([]);
+
+      // Act
+      const result = await hiveService.getHivesByLocationId(MOCK_LOCATION_ID);
+
+      // Assert
+      expect(findAllByLocationIdSpy).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('should return an empty array if location is not existend', async () => {
+      // Arrange
+      const findAllByLocationIdSpy = jest.spyOn(mockHiveRepository, 'findAllByLocationId').mockResolvedValue([]);
+
+      // Act
+      const result = await hiveService.getHivesByLocationId('non-existent-location-id');
+
+      // Assert
+      expect(findAllByLocationIdSpy).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // TEST: getHiveById
+  // ------------------------------------------------------------------
+  describe('getHiveById', () => {
+    it('should return the hive when found', async () => {
+      // Arrange
+      const findByIdSpy = jest.spyOn(mockHiveRepository, 'findById').mockResolvedValue(MOCK_HIVE_RETRIEVED);
+
+      // Act
+      const result = await hiveService.getHiveById(MOCK_HIVE_RETRIEVED.location_id, MOCK_HIVE_RETRIEVED.hive_id);
+
+      // Assert
+      expect(findByIdSpy).toHaveBeenCalledWith(MOCK_HIVE_RETRIEVED.hive_id, MOCK_HIVE_RETRIEVED.location_id);
+      expect(result).toEqual(MOCK_HIVE_RETRIEVED);
+    });
+
+    it('should return null if the hive is not found ', async () => {
+      // Arrange
+      const findByIdSpy = jest.spyOn(mockHiveRepository, 'findById').mockResolvedValue(null);
+
+      // Act
+      const result = await hiveService.getHiveById(MOCK_LOCATION_ID, 'non-existent-hive-id');
+
+      // Assert
+      expect(findByIdSpy).toHaveBeenCalledWith('non-existent-hive-id', MOCK_LOCATION_ID);
+      expect(result).toBeNull();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // TEST: createHive
+  // ------------------------------------------------------------------
+  describe('createHive', () => {
+    it('should successfully create and return a new hive', async () => {
+      // Arrange
+
+      const createSpy = jest.spyOn(mockHiveRepository, 'create').mockResolvedValue(MOCK_HIVE_CREATED_AFTER);
+
+      // Act
+      const result = await hiveService.createHive(MOCK_HIVE_CREATED);
+
+      // Assert
+      expect(createSpy).toHaveBeenCalledWith(MOCK_HIVE_CREATED);
+      expect(result).toEqual(MOCK_HIVE_CREATED_AFTER);
+    });
+
+    // You might add a test here for unique constraint violation,
+    // which would involve the service catching an error from the repository
+    // and re-throwing a custom ServiceError or null/false as per your error handling design.
+  });
+
+  // ------------------------------------------------------------------
+  // TEST: updateHive
+  // ------------------------------------------------------------------
+  describe('updateHive', () => {
+    it('should successfully update and return the updated hive', async () => {
+      // Arrange
+      // const updatedHive = { ...MOCK_HIVE, ...MOCK_HIVE_UPDATE_DATA, updated_at: new Date() };
+      // 1. Mock the findById call to ensure the hive exists and is owned
+      const findByIdSpy = jest.spyOn(mockHiveRepository, 'findById').mockResolvedValue(MOCK_HIVE_UPDATED_AFTER);
+      // 2. Mock the update call (which usually returns [count, [updatedObject]])
+      const updateSpy = jest.spyOn(mockHiveRepository, 'update').mockResolvedValue([1, [MOCK_HIVE_UPDATED_AFTER]]);
+
+      // Act
+      const result = await hiveService.updateHive(MOCK_HIVE_UPDATED_AFTER.hive_id, MOCK_HIVE_UPDATE);
+
+      // Assert
+      expect(findByIdSpy).toHaveBeenCalledWith(MOCK_HIVE_UPDATED_AFTER.hive_id);
+      expect(updateSpy).toHaveBeenCalledWith(MOCK_HIVE_UPDATED_AFTER.hive_id, MOCK_HIVE_UPDATE);
+      expect(result).toEqual(MOCK_HIVE_UPDATED_AFTER);
+    });
+
+    it('should return null if the hive to update is not found', async () => {
+      // Arrange
+      const findByIdSpy = jest.spyOn(mockHiveRepository, 'findById').mockResolvedValue(null);
+      const updateSpy = jest.spyOn(mockHiveRepository, 'update'); // Should not be called
+
+      // Act
+      const result = await hiveService.updateHive('non-existent-id', MOCK_HIVE_UPDATE);
+
+      // Assert
+      expect(findByIdSpy).toHaveBeenCalled();
+      expect(updateSpy).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // TEST: deleteHive
+  // ------------------------------------------------------------------
+  describe('deleteHive', () => {
+    it('should return true if the hive is successfully deleted', async () => {
+      // Arrange
+      // Mock the delete method to return a count of deleted rows (1 for success)
+      const deleteSpy = jest.spyOn(mockHiveRepository, 'delete').mockResolvedValue(1);
+
+      // Act
+      const result = await hiveService.deleteHive(MOCK_LOCATION_ID, MOCK_HIVE_ID);
+
+      // Assert
+      expect(deleteSpy).toHaveBeenCalledWith(MOCK_HIVE_ID, MOCK_LOCATION_ID);
+      expect(result).toBe(true);
+    });
+
+    it('should return false if the hive was not found or not owned', async () => {
+      // Arrange
+      // Mock the delete method to return 0 deleted rows
+      const deleteSpy = jest.spyOn(mockHiveRepository, 'delete').mockResolvedValue(0);
+
+      // Act
+      const result = await hiveService.deleteHive('non-existent-location-id', 'non-existent-hive-id');
+
+      // Assert
+      expect(deleteSpy).toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+  });
+});
+
+
+// filepath: unit-tests\services\locationService.test.ts
+import { LocationService } from '../../../src/services/location-service.ts';
+import { MockLocationRepository, mockLocation, mockUserId, mockLocationId } from '../mocks/MockLocationRepository.ts'; // Use generated mock
+import { ILocationRepository } from '../../../src/repositories/interfaces/i-location-repository.ts';
+import { LocationServiceCreateDTO, LocationServiceUpdateDTO, LocationServiceRetrievedDTO } from '../../../src/services/dto/location-service.dto.ts';
+
+import httpStatus from 'http-status';
+import { beforeEach, describe, it, expect, jest } from '@jest/globals';
+
+// Mock the CustomError class since it's used for error throwing in the service
+// This assumes CustomError is a class that accepts a message and has a statusCode property.
+class CustomError extends Error {
+  public statusCode: number;
+  constructor(message: string, statusCode: number = httpStatus.INTERNAL_SERVER_ERROR) {
+    super(message);
+    this.name = 'CustomError';
+    this.statusCode = statusCode;
+  }
+}
+
+// Mock instance setup
+let mockLocationRepository: MockLocationRepository;
+let locationService: LocationService;
+
+// Setup before each test
+beforeEach(() => {
+  // Create a clean mock instance before every test
+  mockLocationRepository = MockLocationRepository.createMockInstance();
+
+  // Inject the mock instance into the LocationService
+  // @ts-ignore: We know the mock implements the required interface methods
+  locationService = new LocationService(mockLocationRepository as ILocationRepository);
+
+  // Clear mock history before each test to ensure tests are isolated
+  jest.clearAllMocks();
+});
+
+describe('LocationService', () => {
+  // --- createLocation tests ---
+  describe('createLocation', () => {
+    it('should successfully create a new location', async () => {
+      // Arrange
+      const newLocationData: LocationServiceCreateDTO = {
+        user_id: mockUserId,
+        name: 'New Location',
+        latitude: '45.0',
+        longitude: '15.0',
+      };
+      const createdLocation: LocationServiceRetrievedDTO = {
+        ...mockLocation,
+        ...newLocationData,
+        location_id: 'new-location-id',
+      };
+      mockLocationRepository.create.mockResolvedValue(createdLocation);
+
+      // Act
+      const result = await locationService.createLocation(newLocationData);
+
+      // Assert
+      expect(mockLocationRepository.create).toHaveBeenCalledWith(newLocationData);
+      expect(result).toEqual(createdLocation);
+    });
+  });
+
+  // --- getAllLocationsByUserId tests ---
+  describe('getAllLocationsByUserId', () => {
+    it('should return an array of locations for a given user ID', async () => {
+      // Arrange
+      const locationList: LocationServiceRetrievedDTO[] = [mockLocation, { ...mockLocation, location_id: 'other-loc-id', name: 'Other Spot' }];
+      //mockLocationRepository.readAllByUserId.mockResolvedValue(locationList);
+      mockLocationRepository.findAllByUserId.mockResolvedValue(locationList);
+
+      // Act
+      const result = await locationService.getAllLocationsByUserId(mockUserId);
+
+      // Assert
+      expect(mockLocationRepository.findAllByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(result).toEqual(locationList);
+      expect(result.length).toBe(2);
+    });
+
+    it('should return an empty array if no locations are found for the user', async () => {
+      // Arrange
+      mockLocationRepository.findAllByUserId.mockResolvedValue([]);
+
+      // Act
+      const result = await locationService.getAllLocationsByUserId(mockUserId);
+
+      // Assert
+      expect(mockLocationRepository.findAllByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(result).toEqual([]);
+      expect(result.length).toBe(0);
+    });
+  });
+
+  // --- getLocationById tests ---
+  describe('getLocationById', () => {
+    it('should return a location if found by ID', async () => {
+      // Arrange
+      mockLocationRepository.findById.mockResolvedValue(mockLocation);
+
+      // Act
+      const result = await locationService.getLocationById(mockLocationId);
+
+      // Assert
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
+      expect(result).toEqual(mockLocation);
+    });
+
+    it('should return null if no location is found', async () => {
+      // Arrange
+      mockLocationRepository.findById.mockResolvedValue(null);
+
+      // Act
+      const result = await locationService.getLocationById(mockLocationId);
+
+      // Assert
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
+      expect(result).toBeNull();
+    });
+  });
+
+  // --- updateLocation tests ---
+  describe('updateLocation', () => {
+    const updateData: LocationServiceUpdateDTO = { name: 'Updated Apiary Name' };
+    const updatedLocation: LocationServiceRetrievedDTO = { ...mockLocation, name: 'Updated Apiary Name', updated_at: new Date() };
+
+    it('should successfully update an existing location', async () => {
+      // Arrange
+      // 1. readById returns existing location
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
+      // 2. update returns success count (1 user updated)
+      mockLocationRepository.update.mockResolvedValueOnce([1, [updatedLocation]]);
+
+      // Act
+      const result = await locationService.updateLocation(mockLocationId, updateData);
+
+      // Assert
+      expect(mockLocationRepository.findById).toHaveBeenCalledWith(mockLocationId);
+      expect(mockLocationRepository.update).toHaveBeenCalledWith(mockLocationId, updateData);
+      expect(result).toEqual(updatedLocation);
+    });
+
+    it('should throw NOT_FOUND error if location does not exist before update', async () => {
+      // Arrange
+      // 1. readById returns null (location not found)
+      mockLocationRepository.findById.mockResolvedValueOnce(null);
+
+      // Act & Assert
+      await expect(locationService.updateLocation(mockLocationId, updateData)).rejects.toMatchObject({
+        message: 'Location not found.',
+        statusCode: httpStatus.NOT_FOUND, // 404
+      });
+      // Assert that update was never called
+      expect(mockLocationRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw INTERNAL_SERVER_ERROR if repository updates > 1 location', async () => {
+      // Arrange
+      // 1. readById returns existing location
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
+      // 2. update returns unexpected count (2 locations updated)
+      mockLocationRepository.update.mockResolvedValueOnce([2, [updatedLocation, updatedLocation]]);
+
+      // Act & Assert
+      await expect(locationService.updateLocation(mockLocationId, updateData)).rejects.toMatchObject({
+        message: expect.stringContaining(`Failed to update location with ID ${mockLocationId}. Concurrency issue suspected.`),
+        statusCode: httpStatus.INTERNAL_SERVER_ERROR, // 500
+      });
+    });
+
+    it('should throw NOT_FOUND error if repository returns updated count of 0 (safety net)', async () => {
+      // Arrange
+      // 1. readById returns existing location
+      mockLocationRepository.findById.mockResolvedValueOnce(mockLocation);
+      // 2. update returns 0 count (should not happen after pre-check, but testing robust code)
+      mockLocationRepository.update.mockResolvedValueOnce([0, []]);
+
+      // Act & Assert
+      await expect(locationService.updateLocation(mockLocationId, updateData)).rejects.toMatchObject({
+        message: expect.stringContaining(`Location with ID ${mockLocationId} not found during update.`),
+        statusCode: httpStatus.NOT_FOUND, // 404
+      });
+    });
+  });
+
+  // --- deleteLocation tests ---
+  describe('deleteLocation', () => {
+    it('should successfully delete a location and return 1 (records deleted)', async () => {
+      // Arrange
+      mockLocationRepository.delete.mockResolvedValue(1);
+
+      // Act
+      const result = await locationService.deleteLocation(mockLocationId);
+
+      // Assert
+      expect(mockLocationRepository.delete).toHaveBeenCalledWith(mockLocationId);
+      expect(result).toBe(1);
+    });
+
+    it('should return 0 if no location was deleted', async () => {
+      // Arrange
+      mockLocationRepository.delete.mockResolvedValue(0);
+
+      // Act
+      const result = await locationService.deleteLocation(mockLocationId);
+
+      // Assert
+      expect(mockLocationRepository.delete).toHaveBeenCalledWith(mockLocationId);
+      expect(result).toBe(0);
+    });
+  });
+});
+
+
+// filepath: unit-tests\services\majorInspectionService.test.ts
+import { MajorInspectionService } from '../../../src/services/major-inspection-service.ts'; // Adjust path as needed
+import { MockMajorInspectionRepository } from '../mocks/MockMajorInspectionRepository.ts';
+import { IMajorInspectionRepository } from '../../../src/repositories/interfaces/i-major-inspection-repository.ts';
+import {
+  MajorInspectionServiceCreateDTO,
+  MajorInspectionServiceRetrievedDTO,
+  MajorInspectionServiceUpdateDTO,
+} from '../../../src/services/dto/major-inspection-service.dto.ts';
+import { beforeEach, describe, it, expect, jest } from '@jest/globals';
+
+// --- MOCK DATA ---
+const MOCK_USER_ID = MockMajorInspectionRepository.mockUserId;
+const MOCK_LOCATION_ID = MockMajorInspectionRepository.mockLocationId;
+const MOCK_INSPECTION_ID = MockMajorInspectionRepository.mockMajorInspectionId;
+const MOCK_INSPECTION_RETRIEVED = MockMajorInspectionRepository.mockInspectionRetrieved;
+const MOCK_INSPECTION_CREATED_DATA: MajorInspectionServiceCreateDTO = MockMajorInspectionRepository.mockInspectionCreated;
+const MOCK_INSPECTION_UPDATE_DATA: MajorInspectionServiceUpdateDTO = {
+  description: 'Updated Test Description',
+  location_id: MOCK_LOCATION_ID,
+};
+const MOCK_INSPECTION_LIST: MajorInspectionServiceRetrievedDTO[] = [
+  MOCK_INSPECTION_RETRIEVED,
+  { ...MOCK_INSPECTION_RETRIEVED, major_inspection_id: 'inspection-uuid-999', description: 'Summer Check' },
+];
+
+describe('MajorInspectionService', () => {
+  let majorInspectionService: MajorInspectionService;
+  let mockRepository: MockMajorInspectionRepository;
+
+  beforeEach(() => {
+    // Recreate the mock and service instance before each test
+    mockRepository = MockMajorInspectionRepository.createMockInstance();
+    // The service must be initialized with the mocked repository (Dependency Injection)
+    majorInspectionService = new MajorInspectionService(mockRepository as IMajorInspectionRepository);
+    jest.clearAllMocks(); // Clear call counts on the mock functions
+  });
+
+  // ------------------------------------------------------------------
+  // TEST BLOCK: READ Operations (Find)
+  // ------------------------------------------------------------------
+  describe('Read Operations', () => {
+    // --- TEST: findById (Get Single Major Inspection) ---
+    describe('findById (Get Major Inspection)', () => {
+      it('should successfully retrieve a major inspection by ID', async () => {
+        // Arrange (Default mock returns MOCK_INSPECTION_RETRIEVED)
+        const findByIdSpy = mockRepository.findById;
+
+        // Act
+        const result = await majorInspectionService.getMajorInspectionById(MOCK_INSPECTION_ID, MOCK_LOCATION_ID);
+
+        // Assert
+        expect(findByIdSpy).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID);
+        expect(result).toEqual(MOCK_INSPECTION_RETRIEVED);
+      });
+
+      it('should return null if the major inspection is not found', async () => {
+        // Arrange
+        const findByIdSpy = mockRepository.findById.mockResolvedValue(null);
+
+        // Act
+        const result = await majorInspectionService.getMajorInspectionById('non-existent-id', MOCK_LOCATION_ID);
+
+        // Assert
+        expect(findByIdSpy).toHaveBeenCalled();
+        expect(result).toBeNull();
+      });
+    });
+
+    // --- TEST: findAllByLocationId (Get All Inspections for Location) ---
+    describe('findAllByLocationId (Get Inspections by Location)', () => {
+      it('should successfully retrieve a list of major inspections for a given location ID', async () => {
+        // Arrange
+        const findAllByLocationIdSpy = mockRepository.findAllByLocationId.mockResolvedValue(MOCK_INSPECTION_LIST);
+
+        // Act
+        const result = await majorInspectionService.getMajorInspectionsByLocationId(MOCK_LOCATION_ID);
+
+        // Assert
+        expect(findAllByLocationIdSpy).toHaveBeenCalledWith(MOCK_LOCATION_ID);
+        expect(result).toEqual(MOCK_INSPECTION_LIST);
+        expect(result.length).toBe(2);
+      });
+
+      it('should return an empty array if no major inspections are found for the location', async () => {
+        // Arrange
+        const findAllByLocationIdSpy = mockRepository.findAllByLocationId.mockResolvedValue([]);
+
+        // Act
+        const result = await majorInspectionService.getMajorInspectionsByLocationId('location-with-no-inspections');
+
+        // Assert
+        expect(findAllByLocationIdSpy).toHaveBeenCalled();
+        expect(result).toEqual([]);
+      });
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // TEST BLOCK: WRITE Operations (Create, Update, Delete)
+  // ------------------------------------------------------------------
+  describe('Write Operations', () => {
+    // --- TEST: createMajorInspection ---
+    describe('createMajorInspection', () => {
+      it('should successfully create and return a new major inspection', async () => {
+        // Act
+        const result = await majorInspectionService.createMajorInspection(MOCK_INSPECTION_CREATED_DATA);
+
+        // Assert
+        expect(mockRepository.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            location_id: MOCK_LOCATION_ID,
+            inspection_type: MOCK_INSPECTION_CREATED_DATA.inspection_type,
+          })
+        );
+        expect(result).toEqual(MOCK_INSPECTION_RETRIEVED);
+      });
+    });
+
+    // --- TEST: updateMajorInspection (Ownership Validation Check) ---
+    describe('updateMajorInspection', () => {
+      it('should return the updated inspection if it exists and ownership is confirmed', async () => {
+        // Arrange
+        // The mock default (from factory) is [1, [MOCK_INSPECTION_RETRIEVED]]
+        const updateSpy = mockRepository.update;
+
+        // Act
+        const result = await majorInspectionService.updateMajorInspection(MOCK_INSPECTION_ID, MOCK_INSPECTION_UPDATE_DATA);
+
+        // Assert
+        // The Service calls the repository with all constraints (ID + Location ID).
+        // We assume the service performs the triple-ID check before the update.
+        expect(updateSpy).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID, expect.objectContaining(MOCK_INSPECTION_UPDATE_DATA));
+        expect(result).toEqual(MOCK_INSPECTION_RETRIEVED);
+      });
+
+      it('should return null if the update fails (not found/not owned)', async () => {
+        // Arrange
+        // Mock the update method to return 0 affected rows, indicating no update occurred
+        const updateSpy = mockRepository.update.mockResolvedValue([0, []]);
+
+        // Act
+        const result = await majorInspectionService.updateMajorInspection('non-existent-id', MOCK_INSPECTION_UPDATE_DATA);
+
+        // Assert
+        expect(updateSpy).toHaveBeenCalled();
+        expect(result).toBeNull();
+      });
+    });
+
+    // --- TEST: deleteMajorInspection (Ownership Validation Check) ---
+    describe('deleteMajorInspection', () => {
+      it('should return true if the major inspection is successfully deleted with valid location/ownership', async () => {
+        // Arrange
+        // 1. Ownership check passes:
+        mockRepository.findInspectionByLocationAndUser.mockResolvedValue(MOCK_INSPECTION_RETRIEVED);
+        // 2. Delete succeeds:
+        const deleteSpy = mockRepository.delete.mockResolvedValue(1);
+
+        // Act
+        const result = await majorInspectionService.deleteMajorInspection(MOCK_LOCATION_ID, MOCK_INSPECTION_ID, MOCK_USER_ID);
+
+        // Assert
+        // Check that the service first validated ownership
+        expect(mockRepository.findInspectionByLocationAndUser).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID, MOCK_USER_ID);
+        // Check that the delete method was called only after ownership validation
+        expect(deleteSpy).toHaveBeenCalledWith(MOCK_INSPECTION_ID, MOCK_LOCATION_ID);
+        expect(result).toBe(true);
+      });
+
+      it('should return false and NOT delete if the major inspection is not owned', async () => {
+        // Arrange
+        // 1. Ownership check fails:
+        mockRepository.findInspectionByLocationAndUser.mockResolvedValue(null);
+        // 2. Mock delete to ensure it is NOT called
+        const deleteSpy = mockRepository.delete.mockResolvedValue(0);
+
+        // Act
+        const result = await majorInspectionService.deleteMajorInspection('wrong-location-id', 'non-owned-major-insp-id');
+
+        // Assert
+        expect(mockRepository.findInspectionByLocationAndUser).toHaveBeenCalled();
+        // Crucially, the simple delete should not have been called
+        expect(deleteSpy).not.toHaveBeenCalled();
+        expect(result).toBe(false);
+      });
+    });
+  });
+});
+
+
+// filepath: unit-tests\services\userService.test.ts
+import { UserService } from '../../../src/services/user-service.ts';
+import { MockUserRepository } from '../mocks/MockUserRepository.ts'; // Assuming you put the mock in a /mocks folder
+import { IUserRepository } from '../../../src/repositories/interfaces/i-user-repository.ts';
+import { UserCreationDTO, UserUpdateDTO, UserRetrievedDTO } from '../../../src/services/dto/user-service.dto.ts';
+import httpStatus from 'http-status';
+import { beforeEach, describe, it, expect, jest } from '@jest/globals';
+
+// Mock data
+const mockUser: UserRetrievedDTO = MockUserRepository.mockUser;
+const mockUserId: string = MockUserRepository.mockUserId;
+const newUserEmail = 'new.user@example.com';
+
+// Mock instance setup
+let mockUserRepository: MockUserRepository;
+let userService: UserService;
+
+// Setup before each test
+beforeEach(() => {
+  // Create a clean mock instance before every test
+  mockUserRepository = MockUserRepository.createMockInstance();
+
+  // Inject the mock instance into the UserService
+  userService = new UserService(mockUserRepository as IUserRepository);
+
+  // Clear mock history before each test to ensure tests are isolated
+  jest.clearAllMocks();
+});
+
+describe('UserService', () => {
+  // --- findUserByEmail tests ---
+  describe('findUserByEmail', () => {
+    it('should return a user if found by email', async () => {
+      // Arrange
+      mockUserRepository.readByEmail.mockResolvedValue(mockUser);
+
+      // Act
+      const result = await userService.findUserByEmail(mockUser.email);
+
+      // Assert
+      expect(result).toEqual(mockUser);
+      expect(mockUserRepository.readByEmail).toHaveBeenCalledTimes(1);
+      expect(mockUserRepository.readByEmail).toHaveBeenCalledWith(mockUser.email);
+    });
+
+    it('should return null if no user is found by email', async () => {
+      // Arrange
+      mockUserRepository.readByEmail.mockResolvedValue(null);
+
+      // Act
+      const result = await userService.findUserByEmail(newUserEmail);
+
+      // Assert
+      expect(result).toBeNull();
+    });
+  });
+
+  // --- findUserById tests ---
+  describe('findUserById', () => {
+    it('should return a user if found by ID', async () => {
+      // Arrange
+      mockUserRepository.readById.mockResolvedValue(mockUser);
+
+      // Act
+      const result = await userService.findUserById(mockUserId);
+
+      // Assert
+      expect(result).toEqual(mockUser);
+      expect(mockUserRepository.readById).toHaveBeenCalledTimes(1);
+      expect(mockUserRepository.readById).toHaveBeenCalledWith(mockUserId);
+    });
+
+    it('should return null if no user is found by ID', async () => {
+      // Arrange
+      mockUserRepository.readById.mockResolvedValue(null);
+
+      // Act
+      const result = await userService.findUserById('non-existent-id');
+
+      // Assert
+      expect(result).toBeNull();
+    });
+  });
+
+  // --- createUser tests ---
+  describe('createUser', () => {
+    const newUser: UserCreationDTO = {
+      username: 'NewGuy',
+      email: newUserEmail,
+      password_hash: 'newHashedPass',
+    };
+    const createdUser: UserRetrievedDTO = {
+      ...mockUser,
+      ...newUser,
+      user_id: 'new-user-id',
+    };
+
+    it('should successfully create a new user if email is unique', async () => {
+      // Arrange
+      // 1. readByEmail returns null (user does not exist)
+      mockUserRepository.readByEmail.mockResolvedValueOnce(null);
+      // 2. create returns the new user object
+      mockUserRepository.create.mockResolvedValueOnce(createdUser);
+
+      // Act
+      const result = await userService.createUser(newUser);
+
+      // Assert
+      expect(result).toEqual(createdUser);
+      expect(mockUserRepository.readByEmail).toHaveBeenCalledWith(newUser.email);
+      expect(mockUserRepository.create).toHaveBeenCalledWith(newUser);
+      expect(mockUserRepository.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw CONFLICT error if user with email already exists', async () => {
+      // Arrange
+      // 1. readByEmail returns an existing user object (user exists)
+      mockUserRepository.readByEmail.mockResolvedValueOnce(mockUser);
+
+      // Act & Assert
+      await expect(userService.createUser(newUser)).rejects.toMatchObject({
+        message: 'User with this email already exists.',
+        statusCode: httpStatus.CONFLICT, // 409
+      });
+
+      // Assert that create was never called
+      expect(mockUserRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  // --- updateUser tests ---
+  describe('updateUser', () => {
+    const updateData: Partial<UserUpdateDTO> = { username: 'UpdatedName' };
+    const updatedUser: UserRetrievedDTO = { ...mockUser, username: 'UpdatedName' };
+
+    it('should successfully update an existing user', async () => {
+      // Arrange
+      // 1. readById returns existing user
+      mockUserRepository.readById.mockResolvedValueOnce(mockUser);
+      // 2. update returns success tuple
+      mockUserRepository.update.mockResolvedValueOnce([1, [updatedUser]]);
+
+      // Act
+      const result = await userService.updateUser(mockUserId, updateData);
+
+      // Assert
+      expect(result).toEqual(updatedUser);
+      expect(mockUserRepository.readById).toHaveBeenCalledWith(mockUserId);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(mockUserId, updateData);
+    });
+
+    it('should throw NOT_FOUND error if user ID does not exist (pre-check)', async () => {
+      // Arrange
+      // 1. readById returns null
+      mockUserRepository.readById.mockResolvedValueOnce(null);
+
+      // Act & Assert
+      await expect(userService.updateUser(mockUserId, updateData)).rejects.toMatchObject({
+        message: 'User not found.',
+        statusCode: httpStatus.NOT_FOUND, // 404
+      });
+      // Assert that update was never called
+      expect(mockUserRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw INTERNAL_SERVER_ERROR if repository updates > 1 user', async () => {
+      // Arrange
+      // 1. readById returns existing user
+      mockUserRepository.readById.mockResolvedValueOnce(mockUser);
+      // 2. update returns unexpected count (2 users updated)
+      mockUserRepository.update.mockResolvedValueOnce([2, [updatedUser, updatedUser]]);
+
+      // Act & Assert
+      await expect(userService.updateUser(mockUserId, updateData)).rejects.toMatchObject({
+        message: expect.stringContaining('Failed to update user with ID'),
+        statusCode: httpStatus.INTERNAL_SERVER_ERROR, // 500
+      });
+    });
+
+    it('should throw NOT_FOUND error if repository returns updated count of 0', async () => {
+      // Arrange
+      // 1. readById returns existing user
+      mockUserRepository.readById.mockResolvedValueOnce(mockUser);
+      // 2. update returns 0 count (should not happen after pre-check, but testing robust code)
+      mockUserRepository.update.mockResolvedValueOnce([0, []]);
+
+      // Act & Assert
+      await expect(userService.updateUser(mockUserId, updateData)).rejects.toMatchObject({
+        message: expect.stringContaining(`User with ID ${mockUserId} not found`), // Assuming ID is not the mockUserId for this test path
+        statusCode: httpStatus.NOT_FOUND, // 404
+      });
+    });
+  });
+});
+
+
+
+
+// filepath: unit-tests\mocks\MockHiveInspectionRepository.ts
+import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../../../src/services/dto/hive-inspection-service.dto.js';
+import { IHiveInspectionRepository } from '../../../src/repositories/interfaces/i-hive-inspection-repository.js';
+import { jest } from '@jest/globals';
+
+// define the shape of a mock hive inspection for testing purposes
+const userId = 'user-uuid-123';
+const hiveId = 'hive-uuid-456';
+const hiveInspectionId = 'hive-inspection-uuid-789';
+const majorInspectionId = 'major-inspection-uuid-101112';
+
+const mockHiveInspectionRetrieved: HiveInspectionServiceRetrievedDTO = {
+  hive_inspection_id: hiveInspectionId,
+  hive_id: hiveId,
+  major_inspection_id: majorInspectionId,
+  inspection_time: new Date('2023-01-01T00:00:00Z').toDateString,
+  colony_health_status_id: 1,
+  num_chambers: 1,
+  brood_frames_count: 6,
+  brood_percentage: 30, // no longer string
+  queen_status_id: 1,
+  approx_honey_weight_kg: 45,
+  drone_comb_frames_count: 2,
+  drone_comb_percentage: 5, // no longer string
+  sugar_feed_added: false,
+  sugar_feed_quantity_kg: 0,
+  brood_chambers_count: 1,
+  supers_count: 0,
+  queen_excluder_present: false,
+  num_varroa_mites_found: 0,
+  varroa_treatment_id: 1,
+  varroa_treatment_dosage: '1 ml OC',
+  raising_new_queen: false,
+  queen_cell_age_days: 0,
+  queen_cell_status_id: 0,
+  other_notes: 'Initial inspection notes',
+  created_at: new Date('2023-01-01T00:00:00Z'),
+  updated_at: new Date('2023-01-01T00:00:00Z'),
+};
+
+const mockHiveInspectionCreationData: HiveInspectionServiceCreateDTO = {
+  hive_id: 'mock-hive-1',
+  major_inspection_id: 'mock-major-1',
+  inspection_date: new Date('2023-01-01T00:00:00Z').toDateString,
+  colony_health_status_id: 1,
+  num_chambers: 1,
+  brood_frames_count: 6,
+  brood_percentage: 30, // no longer string
+  queen_status_id: 1,
+  approx_honey_weight_kg: 45,
+  drone_comb_frames_count: 2,
+  drone_comb_percentage: 5, // no longer string
+  sugar_feed_added: false,
+  sugar_feed_quantity_kg: 0,
+  brood_chambers_count: 1,
+  supers_count: 0,
+  queen_excluder_present: false,
+  num_varroa_mites_found: 0,
+  varroa_treatment_id: 1,
+  varroa_treatment_dosage: '1 ml OC',
+  raising_new_queen: false,
+  queen_cell_age_days: 0,
+  queen_cell_status_id: 0,
+  other_notes: 'Initial inspection notes',
+};
+
+const mockHiveInspectionUpdateData: HiveInspectionServiceUpdateDTO = {
+  raising_new_queen: true,
+  queen_cell_age_days: 33,
+  queen_cell_status_id: 1,
+  other_notes: 'Updated inspection notes',
+};
+
+// --- MOCK IMPLEMENTATION ---
+// Implement the interface with Jest mock functions
+export class MockHiveInspectionRepository implements IHiveInspectionRepository {
+  // CRUD Methods
+  create: jest.MockedFunction<(inspection: HiveInspectionServiceCreateDTO) => Promise<HiveInspectionServiceRetrievedDTO>> = jest.fn();
+  update: jest.MockedFunction<(inspectionId: string, hiveId: string, inspection: HiveInspectionServiceUpdateDTO) => Promise<[number, HiveInspectionServiceRetrievedDTO[]]>> =
+    jest.fn();
+  findById: jest.MockedFunction<(inspectionId: string, hiveId?: string) => Promise<HiveInspectionServiceRetrievedDTO | null>> = jest.fn();
+  findAllByHiveId: jest.MockedFunction<(hiveId: string) => Promise<HiveInspectionServiceRetrievedDTO[]>> = jest.fn();
+  findAllByMajorInspectionId: jest.MockedFunction<(majorInspectionId: string) => Promise<HiveInspectionServiceRetrievedDTO[]>> = jest.fn();
+  delete: jest.MockedFunction<(inspectionId: string, hiveId?: string) => Promise<number>> = jest.fn();
+  findHiveInspectionByHiveAndUser: jest.MockedFunction<(inspectionId: string, hiveId: string, userId: string) => Promise<HiveInspectionServiceRetrievedDTO | null>> = jest.fn();
+
+  // Helper properties and methods for test setup
+  public static mockHiveInspectionRetrieved = mockHiveInspectionRetrieved;
+  public static mockHiveInspectionCreationData = mockHiveInspectionCreationData;
+  public static mockHiveInspectionUpdateData = mockHiveInspectionUpdateData;
+  public static mockHiveMajorInspectionId: string = mockHiveInspectionRetrieved.major_inspection_id;
+  public static mockHiveId: string = mockHiveInspectionRetrieved.hive_id;
+  public static mockUserId: string = userId;
+
+  // Static method to create an instance and set default behaviors
+  public static createMockInstance(): MockHiveInspectionRepository {
+    const mockRepo = new MockHiveInspectionRepository();
+
+    // Default mock implementations for successful scenarios--
+    mockRepo.create.mockResolvedValue(this.mockHiveInspectionRetrieved);
+    mockRepo.update.mockResolvedValue([1, [this.mockHiveInspectionRetrieved]]);
+    mockRepo.findById.mockResolvedValue(this.mockHiveInspectionRetrieved);
+    mockRepo.findAllByHiveId.mockResolvedValue([this.mockHiveInspectionRetrieved]);
+    mockRepo.findAllByMajorInspectionId.mockResolvedValue([this.mockHiveInspectionRetrieved]);
+    mockRepo.delete.mockResolvedValue(1);
+    mockRepo.findHiveInspectionByHiveAndUser.mockResolvedValue(this.mockHiveInspectionRetrieved);
+
+    return mockRepo;
+  }
+}
+
+
+// filepath: unit-tests\mocks\MockHiveRepository.ts
+import { IHiveRepository } from '../../../src/repositories/interfaces/i-hive-repository.js';
+import { jest } from '@jest/globals';
+import { HiveServiceRetrievedDTO, HiveServiceCreateDTO, HiveServiceUpdateDTO } from '../../../src/services/dto/hive-service.dto.js';
+
+const hiveId = 'hive-uuid-123';
+const locationId = 'location-uuid-456';
+
+// Define the shape of a mock hive for testing purposes
+// this one is my single source of truth
+const mockHiveRetrieved: HiveServiceRetrievedDTO = {
+  hive_id: hiveId,
+  location_id: locationId,
+  name: 'Test Hive',
+  type: 'Langstroth',
+  created_at: new Date(),
+  updated_at: new Date(),
+};
+
+// that would be used as input for creating a new hive
+const mockHiveCreated: HiveServiceCreateDTO = {
+  location_id: locationId,
+  name: 'Test Hive',
+  type: 'Top-Bar',
+};
+
+// tghat would be used as output after creation
+const mockHiveCreatedAfter: HiveServiceRetrievedDTO = {
+  ...mockHiveCreated,
+  hive_id: 'new-hive-uuid-789',
+  created_at: new Date(),
+  updated_at: new Date(),
+};
+
+// that would be used as input for updating an existing hive
+const mockHiveUpdated: HiveServiceUpdateDTO = {
+  name: 'Updated Test Hive',
+};
+
+const mockHiveUpdatedAfter: HiveServiceRetrievedDTO = {
+  ...mockHiveRetrieved,
+  ...mockHiveUpdated,
+  updated_at: new Date(),
+};
+
+// Implement the interface with Jest mock functions
+export class MockHiveRepository implements IHiveRepository {
+  create: jest.MockedFunction<(hive: HiveServiceCreateDTO) => Promise<HiveServiceRetrievedDTO>> = jest.fn();
+  update: jest.MockedFunction<(id: string, hive: HiveServiceUpdateDTO) => Promise<[number, HiveServiceRetrievedDTO[]]>> = jest.fn();
+  findById: jest.MockedFunction<(hiveId: string, locationId?: string) => Promise<HiveServiceRetrievedDTO | null>> = jest.fn();
+  findAllByLocationId: jest.MockedFunction<(locationId: string) => Promise<HiveServiceRetrievedDTO[]>> = jest.fn();
+  delete: jest.MockedFunction<(id: string, locationId?: string) => Promise<number>> = jest.fn();
+  deleteAll: jest.MockedFunction<(locationId: string) => Promise<number>> = jest.fn();
+
+  // Helper properties and methods for test setup
+  public static mockHiveRetrieved = mockHiveRetrieved;
+  public static mockHiveCreated = mockHiveCreated;
+  public static mockHiveCreatedAfter = mockHiveCreatedAfter;
+  public static mockHiveUpdate = mockHiveUpdated;
+  public static mockHiveUpdatedAfter = mockHiveUpdatedAfter;
+  public static mockHiveId: string = hiveId;
+  public static mockLocationId: string = locationId;
+
+  // Use a factory method to create an instance and set default behaviors (optional, but clean)
+  public static createMockInstance(): MockHiveRepository {
+    // class members
+    const mockRepo = new MockHiveRepository();
+
+    // Default mock implementation: always resolve with the mock hive
+    mockRepo.create.mockResolvedValue(this.mockHiveRetrieved);
+
+    mockRepo.findById.mockResolvedValue(this.mockHiveRetrieved);
+
+    mockRepo.findAllByLocationId.mockResolvedValue([this.mockHiveRetrieved]);
+    mockRepo.update.mockResolvedValue([1, [this.mockHiveUpdatedAfter]]);
+    mockRepo.delete.mockResolvedValue(1);
+    mockRepo.deleteAll.mockResolvedValue(1);
+
+    return mockRepo;
+  }
+}
+
+
+// filepath: unit-tests\mocks\MockLocationRepository.ts
+import { jest } from '@jest/globals';
+import { ILocationRepository } from '../../../src/repositories/interfaces/i-location-repository.ts';
+import { LocationServiceCreateDTO, LocationServiceUpdateDTO, LocationServiceRetrievedDTO } from '../../../src/services/dto/location-service.dto.ts';
+// --- Interfaces for Location DTOs (Mimicking the service DTOs) ---
+
+// export interface LocationServiceRetrievedDTO {
+//   location_id: string;
+//   user_id: string;
+//   name: string;
+//   address: string | null;
+//   latitude: number | null;
+//   longitude: number | null;
+//   created_at: Date;
+//   updated_at: Date;
+// }
+
+// export interface LocationServiceCreateDTO {
+//   user_id: string;
+//   name: string;
+//   address?: string;
+//   latitude?: number;
+//   longitude?: number;
+// }
+
+// export type LocationServiceUpdateDTO = Partial<LocationServiceCreateDTO>;
+
+// --- Interface for Repository Contract ---
+
+// export interface ILocationRepository {
+//   create(location: LocationServiceCreateDTO): Promise<LocationServiceRetrievedDTO>;
+//   readById(id: string): Promise<LocationServiceRetrievedDTO | null>;
+//   readAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]>;
+//   update(id: string, location: LocationServiceUpdateDTO): Promise<[number, LocationServiceRetrievedDTO[]]>;
+//   delete(id: string): Promise<number>;
+// }
+
+// --- Mock Data ---
+
+export const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+export const mockLocationId = '987c6543-f21a-4d9e-b876-1937c48f2111';
+
+export const mockLocation: LocationServiceRetrievedDTO = {
+  location_id: mockLocationId,
+  user_id: mockUserId,
+  name: 'Backyard Apiary',
+  address: '123 Bee Lane',
+  latitude: '46.0',
+  longitude: '14.5',
+  created_at: new Date('2025-01-01T10:00:00Z'),
+  updated_at: new Date('2025-01-01T10:00:00Z'),
+};
+
+// --- Mock Repository Implementation ---
+
+/**
+ * Mock implementation of ILocationRepository for unit testing the LocationService.
+ */
+export class MockLocationRepository implements ILocationRepository {
+  // Static properties for convenient access in tests
+  static mockLocation = mockLocation;
+  static mockUserId = mockUserId;
+  static mockLocationId = mockLocationId;
+
+  // Jest Mocks for Repository methods
+  create: jest.MockedFunction<(location: LocationServiceCreateDTO) => Promise<LocationServiceRetrievedDTO>> = jest.fn();
+  findById: jest.MockedFunction<(id: string) => Promise<LocationServiceRetrievedDTO | null>> = jest.fn();
+  findAllByUserId: jest.MockedFunction<(userId: string) => Promise<LocationServiceRetrievedDTO[]>> = jest.fn();
+  update: jest.MockedFunction<(id: string, location: LocationServiceUpdateDTO) => Promise<[number, LocationServiceRetrievedDTO[]]>> = jest.fn();
+  delete: jest.MockedFunction<(id: string) => Promise<number>> = jest.fn();
+  //create = jest.fn<ILocationRepository['create']>();
+  //readById = jest.fn<ILocationRepository['readById']>();
+  // readAllByUserId = jest.fn<ILocationRepository['readAllByUserId']>();
+  // update = jest.fn<ILocationRepository['update']>();
+  //delete = jest.fn<ILocationRepository['delete']>();
+
+  /**
+   * Helper function to create a new mock instance with clear mocks.
+   */
+  static createMockInstance(): MockLocationRepository {
+    return new MockLocationRepository();
+  }
+}
+
+
+// filepath: unit-tests\mocks\MockMajorInspectionRepository.ts
+// tests/unit-tests/mocks/MockMajorInspectionRepository.ts
+
+import { IMajorInspectionRepository } from '../../../src/repositories/interfaces/i-major-inspection-repository.js';
+import {
+  MajorInspectionServiceRetrievedDTO,
+  MajorInspectionServiceCreateDTO,
+  MajorInspectionServiceUpdateDTO,
+} from '../../../src/services/dto/major-inspection-service.dto.js';
+import { jest } from '@jest/globals';
+
+const inspectionId = 'major-inspection-uuid-789';
+const locationId = 'location-uuid-456';
+const userId = 'user-uuid-123';
+
+// Define the shape of a mock major inspection for testing purposes
+const mockInspectionRetrieved: MajorInspectionServiceRetrievedDTO = {
+  major_inspection_id: inspectionId,
+  location_id: locationId,
+  inspection_date: new Date('2024-10-20'),
+  inspection_type: 'Spring',
+  description: 'First spring inspection of the season.',
+  created_at: new Date(),
+  updated_at: new Date(),
+};
+
+const mockInspectionCreated: MajorInspectionServiceCreateDTO = {
+  location_id: locationId,
+  inspection_date: new Date('2024-10-20'),
+  inspection_type: 'Autumn',
+  description: 'Preparation for winter.',
+};
+
+const mockInspectionUpdated: MajorInspectionServiceUpdateDTO = {
+  description: 'Updated description for Spring 2024.',
+};
+
+// Implement the interface with Jest mock functions
+export class MockMajorInspectionRepository implements IMajorInspectionRepository {
+  // CRUD Methods
+  create: jest.MockedFunction<(inspection: MajorInspectionServiceCreateDTO) => Promise<MajorInspectionServiceRetrievedDTO>> = jest.fn();
+  update: jest.MockedFunction<
+    (majorInspectionId: string, locationId: string, inspection: MajorInspectionServiceUpdateDTO) => Promise<[number, MajorInspectionServiceRetrievedDTO[]]>
+  > = jest.fn();
+
+  findById: jest.MockedFunction<(majorInspectionId: string, locationId?: string) => Promise<MajorInspectionServiceRetrievedDTO | null>> = jest.fn();
+  findAllByLocationId: jest.MockedFunction<(locationId: string) => Promise<MajorInspectionServiceRetrievedDTO[]>> = jest.fn();
+  delete: jest.MockedFunction<(majorInspectionId: string, locationId?: string) => Promise<number>> = jest.fn();
+
+  // Custom Ownership Check Method (For service to call before some operations, or for full ownership check)
+  findInspectionByLocationAndUser: jest.MockedFunction<
+    (majorInspectionId: string, locationId: string, userId: string) => Promise<MajorInspectionServiceRetrievedDTO | null>
+  > = jest.fn();
+
+  // Helper properties and methods for test setup
+  public static mockInspectionRetrieved = mockInspectionRetrieved;
+  public static mockInspectionCreated = mockInspectionCreated;
+  public static mockInspectionUpdated = mockInspectionUpdated;
+  public static mockMajorInspectionId: string = inspectionId;
+  public static mockLocationId: string = locationId;
+  public static mockUserId: string = userId;
+
+  // Static method to create an instance and set default behaviors
+  public static createMockInstance(): MockMajorInspectionRepository {
+    const mockRepo = new MockMajorInspectionRepository();
+
+    // Default mock implementations for successful scenarios
+    mockRepo.create.mockResolvedValue(this.mockInspectionRetrieved);
+    mockRepo.findById.mockResolvedValue(this.mockInspectionRetrieved);
+    mockRepo.findAllByLocationId.mockResolvedValue([this.mockInspectionRetrieved]);
+    mockRepo.update.mockResolvedValue([1, [this.mockInspectionRetrieved]]);
+    mockRepo.delete.mockResolvedValue(1);
+
+    // Default implementation for the ownership check (returns the inspection if owner)
+    mockRepo.findInspectionByLocationAndUser.mockResolvedValue(this.mockInspectionRetrieved);
+
+    return mockRepo;
+  }
+}
+
+
+// filepath: unit-tests\mocks\MockUserRepository.ts
+// Import the interface and DTOs to ensure the mock signature is correct
+//import { IUserRepository } from '../../../src/repositories/interfaces/IUserRepository.js';
+import { IUserRepository } from '../../../src/repositories/interfaces/i-user-repository.js';
+import { UserRetrievedDTO, UserCreationDTO, UserUpdateDTO } from '../../../src/services/dto/user-service.dto.js';
+import { jest } from '@jest/globals';
+
+// Define the shape of a mock user for testing purposes
+const mockUser: UserRetrievedDTO = {
+  user_id: 'test-uuid-123',
+  username: 'TestUser',
+  email: 'test@example.com',
+  password_hash: 'hashedPassword123',
+  created_at: new Date(),
+  updated_at: new Date(),
+};
+
+// Implement the interface with Jest mock functions
+export class MockUserRepository implements IUserRepository {
+  // Use jest.fn() for methods you want to track or control
+
+  // readByEmail must return Promise<UserRetrievedDTO | null>
+  readByEmail: jest.MockedFunction<(email: string) => Promise<UserRetrievedDTO | null>> = jest.fn();
+
+  readById: jest.MockedFunction<(id: string) => Promise<UserRetrievedDTO | null>> = jest.fn();
+
+  create: jest.MockedFunction<(data: UserCreationDTO) => Promise<UserRetrievedDTO>> = jest.fn();
+
+  readAll: jest.MockedFunction<() => Promise<UserRetrievedDTO[]>> = jest.fn();
+
+  update: jest.MockedFunction<(id: string, data: UserUpdateDTO) => Promise<[number, UserRetrievedDTO[]]>> = jest.fn();
+
+  delete: jest.MockedFunction<(id: string) => Promise<number>> = jest.fn();
+
+  // Helper properties and methods for test setup
+  public static mockUser = mockUser;
+  public static mockUserId: string = mockUser.user_id as string;
+
+  // Use a factory method to create an instance and set default behaviors (optional, but clean)
+  public static createMockInstance(): MockUserRepository {
+    const mockRepo = new MockUserRepository();
+
+    // Default mock implementation: always resolve with the mock user
+    mockRepo.readById.mockResolvedValue(MockUserRepository.mockUser);
+    mockRepo.readByEmail.mockResolvedValue(null); // Default to not finding a user by email to allow creation tests
+    mockRepo.create.mockImplementation((userData: UserCreationDTO) => Promise.resolve({ ...MockUserRepository.mockUser, ...userData, user_id: 'new-id-' + Math.random() }));
+    mockRepo.update.mockResolvedValue([1, [MockUserRepository.mockUser]]);
+    mockRepo.delete.mockResolvedValue(1);
+
+    return mockRepo;
+  }
+}
+
+
+// filepath: unit-tests\services\hiveInspectionService.test.ts
+// Use the actual service class and MajorInspectionService dependency
+import { HiveInspectionService } from '../../../src/services/hive-inspection-service.ts'; // Adjust path as needed
+import { MajorInspectionService } from '../../../src/services/major-inspection-service.ts'; // Adjust path as needed
+
+// Import necessary types and mock implementation
+import { IHiveInspectionRepository } from '../../../src/repositories/interfaces/i-hive-inspection-repository.ts';
+import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../../../src/services/dto/hive-inspection-service.dto.ts';
+import { MockHiveInspectionRepository } from '../mocks/MockHiveInspectionRepository.ts'; // Adjust path as needed
+
+import { beforeEach, describe, it, expect, jest } from '@jest/globals';
+
+// --- MOCK DEPENDENCIES SETUP ---
+// Create a Jest mock for MajorInspectionService
+// We only mock the methods that HiveInspectionService depends on.
+const mockMajorInspectionService: jest.Mocked<MajorInspectionService> = {
+  checkMajorInspectionOwnership: jest.fn(),
+} as unknown as jest.Mocked<MajorInspectionService>;
+
+// --- CONSTANTS AND TEST DATA ---
+// --- CONSTANTS AND TEST DATA (Retrieved from the mock repository for consistency) ---
+const mockRetrieved = MockHiveInspectionRepository.mockHiveInspectionRetrieved;
+const mockCreateData = MockHiveInspectionRepository.mockHiveInspectionCreationData;
+const mockUpdateData = MockHiveInspectionRepository.mockHiveInspectionUpdateData;
+const mockMajorInspectionId = MockHiveInspectionRepository.mockHiveMajorInspectionId;
+const mockHiveId = MockHiveInspectionRepository.mockHiveId;
+const mockUserId = MockHiveInspectionRepository.mockUserId;
+const mockInspectionId = mockRetrieved.hive_inspection_id;
+
+// --- TEST SUITE ---
+describe('HiveInspectionService Unit Tests', () => {
+  let mockRepository: MockHiveInspectionRepository;
+  let service: HiveInspectionService;
+
+  beforeEach(() => {
+    // 1. Create a fresh instance of the mock repository with default successful behavior
+    mockRepository = MockHiveInspectionRepository.createMockInstance();
+
+    // 2. Clear all mock function calls before each test
+    jest.clearAllMocks();
+
+    // 3. Set default mock responses for non-repository dependencies
+    // Assuming ownership checks pass by default for happy path tests
+    mockMajorInspectionService.checkMajorInspectionOwnership.mockResolvedValue(true);
+
+    // 4. Instantiate the service with mock dependencies
+    service = new HiveInspectionService(mockRepository, mockMajorInspectionService);
+  });
+
+  // ------------------------------------------------------------------
+  // createHiveInspection
+  // ------------------------------------------------------------------
+  describe('createHiveInspection', () => {
+    it('should successfully call the repository create method and return the created DTO', async () => {
+      const result = await service.createHiveInspection(mockCreateData);
+
+      // 1. Verify repository was called correctly
+      expect(mockRepository.create).toHaveBeenCalledWith(mockCreateData);
+      expect(mockRepository.create).toHaveBeenCalledTimes(1);
+
+      // 2. Verify the returned object matches the mock success response
+      expect(result).toEqual(mockRetrieved);
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // getHiveInspectionById
+  // ------------------------------------------------------------------
+  describe('getHiveInspectionById', () => {
+    it('should successfully retrieve an inspection by its ID and Hive ID', async () => {
+      const result = await service.getHiveInspectionById(mockInspectionId, mockHiveId);
+
+      // 1. Verify repository was called correctly
+      expect(mockRepository.findById).toHaveBeenCalledWith(mockInspectionId, mockHiveId);
+      expect(mockRepository.findById).toHaveBeenCalledTimes(1);
+
+      // 2. Verify the returned object
+      expect(result).toEqual(mockRetrieved);
+    });
+
+    it('should return null if the repository returns null', async () => {
+      // Override default mock behavior for this test
+      mockRepository.findById.mockResolvedValue(null);
+
+      const result = await service.getHiveInspectionById('non-existent-id', mockHiveId);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // getAllHiveInspectionsByMajorInspectionId
+  // ------------------------------------------------------------------
+  describe('getAllHiveInspectionsByMajorInspectionId', () => {
+    it('should successfully retrieve all inspections for a major inspection if user owns it', async () => {
+      const expectedArray = [mockRetrieved];
+
+      const result = await service.getHiveInspectionsByMajorInspectionId(mockMajorInspectionId, 'mock-location-1', mockUserId);
+
+      // 1. Verify ownership check was performed
+      expect(mockMajorInspectionService.checkMajorInspectionOwnership).toHaveBeenCalledWith(mockMajorInspectionId, 'mock-location-1', mockUserId);
+
+      // 2. Verify repository was called
+      expect(mockRepository.findAllByMajorInspectionId).toHaveBeenCalledWith(mockMajorInspectionId);
+
+      // 3. Verify the returned array
+      expect(result).toEqual(expectedArray);
+    });
+
+    it('should return an empty array if the major inspection ownership check fails', async () => {
+      // Override ownership check failure
+      mockMajorInspectionService.checkMajorInspectionOwnership.mockResolvedValue(false);
+
+      const result = await service.getHiveInspectionsByMajorInspectionId('not-owned-id', 'mock-location-1', mockUserId);
+
+      // Should return an empty array (or throw, depending on service design, but empty array is safer for lists)
+      expect(result).toEqual(null);
+
+      // Repository should NOT have been called if ownership failed first
+      expect(mockRepository.findAllByMajorInspectionId).not.toHaveBeenCalled();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // updateHiveInspection
+  // ------------------------------------------------------------------
+  describe('updateHiveInspection', () => {
+    it('should successfully call the repository update method and return the updated DTO', async () => {
+      const expectedUpdatedData = {
+        ...mockRetrieved,
+        ...mockUpdateData, // Merge the mock update data
+      };
+      // Override the default mock return value to reflect the actual update logic
+      mockRepository.update.mockResolvedValue([1, [expectedUpdatedData]]);
+
+      const result = await service.updateHiveInspection(mockInspectionId, mockHiveId, mockUpdateData);
+
+      // 1. Verify repository was called correctly
+      expect(mockRepository.update).toHaveBeenCalledWith(mockInspectionId, mockHiveId, mockUpdateData);
+
+      // 2. Verify the returned object
+      expect(result).toEqual(expectedUpdatedData);
+      expect(result.raising_new_queen).toBe(true);
+      expect(result.queen_cell_age_days).toBe(33);
+    });
+
+    it('should return null if the update operation affects zero rows', async () => {
+      // Mock the repository to indicate no rows were updated
+      mockRepository.update.mockResolvedValue([0, []]);
+
+      const result = await service.updateHiveInspection('non-existent-id', mockHiveId, mockUpdateData);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // deleteHiveInspection
+  // ------------------------------------------------------------------
+  describe('deleteHiveInspection', () => {
+    it('should successfully delete an inspection if owned by the user and return true', async () => {
+      // Ensure the service can first find the inspection to check ownership/existence
+      mockRepository.findHiveInspectionByHiveAndUser.mockResolvedValue(mockRetrieved);
+      // Ensure the delete call succeeds
+      mockRepository.delete.mockResolvedValue(1);
+
+      const result = await service.deleteHiveInspection(mockInspectionId, mockHiveId, mockUserId);
+
+      // 1. Verify ownership check was called
+      expect(mockRepository.findHiveInspectionByHiveAndUser).toHaveBeenCalledWith(mockInspectionId, mockHiveId, mockUserId);
+
+      // 2. Verify repository delete was called
+      expect(mockRepository.delete).toHaveBeenCalledWith(mockInspectionId, mockHiveId);
+
+      // 3. Verify the final result
+      expect(result).toBe(true);
+    });
+
+    it('should return false if the inspection is not found or not owned', async () => {
+      // Setup mock to fail the ownership/existence check
+      mockRepository.findHiveInspectionByHiveAndUser.mockResolvedValue(null);
+
+      const result = await service.deleteHiveInspection('not-owned-id', mockHiveId, mockUserId);
+
+      expect(result).toBe(false);
+
+      // Verify delete was NOT called
+      expect(mockRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('should return false if the delete operation affects zero rows', async () => {
+      // Ensure the service can find the inspection initially
+      mockRepository.findHiveInspectionByHiveAndUser.mockResolvedValue(mockRetrieved);
+      // Mock the repository to indicate no rows were deleted
+      mockRepository.delete.mockResolvedValue(0);
+
+      const result = await service.deleteHiveInspection(mockInspectionId, mockHiveId, mockUserId);
+
+      expect(result).toBe(false);
+      expect(mockRepository.delete).toHaveBeenCalledTimes(1);
+    });
+  });
+});
 
 
 // filepath: unit-tests\services\hiveService.test.ts

@@ -1,12 +1,8 @@
 import { Sequelize } from 'sequelize';
 import { IMajorInspectionRepository } from '../interfaces/i-major-inspection-repository.js';
-import { major_inspections } from '../../database/models-ts/major-inspections.js';
-import { locations } from 'database/models-ts/locations.js';
-import {
-  MajorInspectionServiceCreateDTO,
-  MajorInspectionServiceRetrievedDTO,
-  MajorInspectionServiceUpdateDTO,
-} from '../../services/dto/major-inspection-service.dto.js';
+import { Major_inspections } from '../../database/models-ts/major-inspections.js';
+import { Locations } from 'database/models-ts/locations.js';
+import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from '../../services/dto/major-inspection-service.dto.js';
 
 export class MajorInspectionRepository implements IMajorInspectionRepository {
   private readonly db: Sequelize; // Dependency for Sequelize instance (for transactions)
@@ -16,7 +12,7 @@ export class MajorInspectionRepository implements IMajorInspectionRepository {
   }
 
   async create(inspection: MajorInspectionServiceCreateDTO): Promise<MajorInspectionServiceRetrievedDTO> {
-    const newInspection = await major_inspections.create(inspection);
+    const newInspection = await Major_inspections.create(inspection);
 
     return newInspection.toJSON() as MajorInspectionServiceRetrievedDTO;
   }
@@ -24,7 +20,7 @@ export class MajorInspectionRepository implements IMajorInspectionRepository {
   async update(inspectionId: string, locationId: string, inspection: MajorInspectionServiceUpdateDTO): Promise<[number, MajorInspectionServiceRetrievedDTO[]]> {
     // We use the managed transaction pattern for safety, guaranteeing rollback if necessary.
     return this.db.transaction(async (t) => {
-      const [updatedCount, updatedInspections] = await major_inspections.update(inspection, {
+      const [updatedCount, updatedInspections] = await Major_inspections.update(inspection, {
         where: { major_inspection_id: inspectionId, location_id: locationId },
         returning: true,
         transaction: t, // Pass the transaction object
@@ -34,30 +30,30 @@ export class MajorInspectionRepository implements IMajorInspectionRepository {
   }
 
   async findById(inspectionId: string, location_id?: string): Promise<MajorInspectionServiceRetrievedDTO | null> {
-    const inspection = await major_inspections.findOne({
+    const inspection = await Major_inspections.findOne({
       where: location_id ? { major_inspection_id: inspectionId, location_id: location_id } : { major_inspection_id: inspectionId },
     });
     return inspection ? (inspection.toJSON() as MajorInspectionServiceRetrievedDTO) : null;
   }
 
   async findAllByLocationId(locationId: string): Promise<MajorInspectionServiceRetrievedDTO[]> {
-    const allInspections = await major_inspections.findAll({ where: { location_id: locationId } });
+    const allInspections = await Major_inspections.findAll({ where: { location_id: locationId } });
     return allInspections.map((insp) => insp.toJSON() as MajorInspectionServiceRetrievedDTO);
   }
 
   public async delete(inspectionId: string, locationId?: string): Promise<number> {
-    const deleteCount = await major_inspections.destroy({
+    const deleteCount = await Major_inspections.destroy({
       where: locationId ? { major_inspection_id: inspectionId, location_id: locationId } : { major_inspection_id: inspectionId },
     });
     return deleteCount;
   }
 
   public async findInspectionByLocationAndUser(inspectionId: string, locationId: string, userId: string): Promise<MajorInspectionServiceRetrievedDTO | null> {
-    const inspection = await major_inspections.findOne({
+    const inspection = await Major_inspections.findOne({
       where: { major_inspection_id: inspectionId },
       include: [
         {
-          model: locations,
+          model: Locations,
           as: 'majorInspection_location', // Use your correct association alias
           attributes: [],
           where: {

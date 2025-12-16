@@ -194,4 +194,37 @@ export class AuthController {
       next(error);
     }
   };
+
+  public googleLoginCallback = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log('Google login callback called');
+      // The user info should be in req.user set by passport
+      const googleProfile = req.user as any; // Adjust type as needed based on your passport setup
+      console.log('Google profile in callback:', googleProfile);
+      if (!googleProfile) {
+        const error = new Error('Google authentication failed.') as CustomError;
+        error.statusCode = 401;
+        throw error;
+      }
+      // Generate token
+      const token: string = generateToken({ userId: googleProfile.user_id! });
+
+      res.cookie('jwtcookie', token, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        maxAge: 1000 * 3600 * 24 * 7, // 7 days in milliseconds
+      });
+      res.status(200).json({
+        success: true,
+        message: 'Logged in with Google successfully!',
+        token,
+        user: {
+          id: googleProfile.user_id!,
+          username: googleProfile.username,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

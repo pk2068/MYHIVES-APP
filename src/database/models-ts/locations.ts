@@ -1,5 +1,5 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { users } from './users.js';
+import { Users } from './users.js';
 // import { hives } from './hives.js'; // Import hives model
 // import { major_inspections } from './major_inspections.js'; // Import major_inspections model
 
@@ -21,7 +21,7 @@ export interface locationsAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class locations extends Model<locationsAttributes, locationsAttributes> implements locationsAttributes {
+export class Locations extends Model<locationsAttributes, locationsAttributes> implements locationsAttributes {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -29,7 +29,7 @@ export class locations extends Model<locationsAttributes, locationsAttributes> i
   })
   location_id?: string;
 
-  @ForeignKey(() => users)
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.UUID,
   })

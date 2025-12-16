@@ -1,7 +1,7 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'sequelize-typescript';
 
-import { hives } from './hives.js'; // Import hives model
-import { major_inspections } from './major-inspections.js'; // Import major_inspections model
+import { Hives } from './hives.js'; // Import hives model
+import { Major_inspections } from './major-inspections.js'; // Import major_inspections model
 
 export interface hive_inspectionsAttributes {
   hive_inspection_id?: string;
@@ -37,7 +37,7 @@ export interface hive_inspectionsAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class hive_inspections extends Model<hive_inspectionsAttributes, hive_inspectionsAttributes> implements hive_inspectionsAttributes {
+export class Hive_inspections extends Model<hive_inspectionsAttributes, hive_inspectionsAttributes> implements hive_inspectionsAttributes {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -45,13 +45,13 @@ export class hive_inspections extends Model<hive_inspectionsAttributes, hive_ins
   })
   hive_inspection_id?: string;
 
-  @ForeignKey(() => major_inspections) // Indicates that major_inspection_id is a foreign key
+  @ForeignKey(() => Major_inspections) // Indicates that major_inspection_id is a foreign key
   @Column({
     type: DataType.UUID,
   })
   major_inspection_id!: string;
 
-  @ForeignKey(() => hives) // Indicates that hive_id is a foreign key
+  @ForeignKey(() => Hives) // Indicates that hive_id is a foreign key
   @Column({
     type: DataType.UUID,
   })

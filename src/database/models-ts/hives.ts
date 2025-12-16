@@ -1,6 +1,6 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { locations } from './locations.js';
-import { hive_inspections } from './hive_inspections.js'; // Import hive_inspections model
+import { Locations } from './locations.js';
+import { Hive_inspections } from './hive_inspections.js'; // Import hive_inspections model
 
 export interface hivesAttributes {
   hive_id?: string;
@@ -17,7 +17,7 @@ export interface hivesAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class hives extends Model<hivesAttributes, hivesAttributes> implements hivesAttributes {
+export class Hives extends Model<hivesAttributes, hivesAttributes> implements hivesAttributes {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -25,14 +25,14 @@ export class hives extends Model<hivesAttributes, hivesAttributes> implements hi
   })
   hive_id?: string;
 
-  @ForeignKey(() => locations) // Indicates that location_id is a foreign key referencing the locations model
+  @ForeignKey(() => Locations) // Indicates that location_id is a foreign key referencing the locations model
   @Column({
     type: DataType.UUID,
   })
   location_id!: string;
 
-  @BelongsTo(() => locations) // This establishes the BelongsTo relationship with locations
-  location?: locations; // Property to hold the associated location
+  @BelongsTo(() => Locations) // This establishes the BelongsTo relationship with locations
+  location?: Locations; // Property to hold the associated location
 
   @Column({
     type: DataType.STRING(255),

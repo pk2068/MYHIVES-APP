@@ -12,6 +12,7 @@ import { RegisterUserIncomingDTO, LoginUserIncomingDTO, UpdateUserIncomingDTO } 
 import { AuthController } from '../controllers/auth-controller.js';
 
 import { isAuthenticated } from '../middleware/auth.js';
+import passport from '@config/passport.js';
 
 const authRouter = Router();
 
@@ -73,6 +74,9 @@ authRouter.post(
   validate({ body: loginSchema }), // Apply Joi validation middleware
   authController.login // Call the controller function here
 );
+
+authRouter.get('/google-login', passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRouter.get('/google-login/callback', passport.authenticate('google', { session: false }), authController.googleLoginCallback);
 
 authRouter.get('/me', isAuthenticated, authController.getMe);
 

@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { ILocationRepository } from '../interfaces/i-location-repository.js';
-import { locations } from '../../database/models-ts/locations.js'; // Assuming model is imported like this
+import { Locations } from '../../database/models-ts/locations.js'; // Assuming model is imported like this
 import { LocationServiceCreateDTO, LocationServiceUpdateDTO, LocationServiceRetrievedDTO } from '../../services/dto/location-service.dto.js';
 
 export class LocationRepository implements ILocationRepository {
@@ -11,24 +11,24 @@ export class LocationRepository implements ILocationRepository {
   }
 
   async create(location: LocationServiceCreateDTO): Promise<LocationServiceRetrievedDTO> {
-    const newLocation = await locations.create(location);
+    const newLocation = await Locations.create(location);
     return newLocation.toJSON() as LocationServiceRetrievedDTO;
   }
 
   async findById(id: string): Promise<LocationServiceRetrievedDTO | null> {
-    const location = await locations.findByPk(id);
+    const location = await Locations.findByPk(id);
     return location ? (location.toJSON() as LocationServiceRetrievedDTO) : null;
   }
 
   async findAllByUserId(userId: string): Promise<LocationServiceRetrievedDTO[]> {
-    const allLocations = await locations.findAll({ where: { user_id: userId } });
+    const allLocations = await Locations.findAll({ where: { user_id: userId } });
     return allLocations.map((location) => location.toJSON() as LocationServiceRetrievedDTO);
   }
 
   async update(id: string, location: LocationServiceUpdateDTO): Promise<[number, LocationServiceRetrievedDTO[]]> {
     // We use the managed transaction pattern for safety, guaranteeing rollback if necessary.
     return this.db.transaction(async (t) => {
-      const [updatedCount, updatedLocations] = await locations.update(location, {
+      const [updatedCount, updatedLocations] = await Locations.update(location, {
         where: { location_id: id },
         returning: true,
         transaction: t, // Pass the transaction object
@@ -45,6 +45,6 @@ export class LocationRepository implements ILocationRepository {
   }
 
   async delete(id: string): Promise<number> {
-    return locations.destroy({ where: { location_id: id } });
+    return Locations.destroy({ where: { location_id: id } });
   }
 }

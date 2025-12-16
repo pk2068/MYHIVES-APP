@@ -1,57 +1,57 @@
-import { users } from './users.js';
-import { locations } from './locations.js';
-import { major_inspections } from './major-inspections.js';
-import { hives } from './hives.js';
-import { hive_inspections } from './hive_inspections.js';
+import { Users } from './users.js';
+import { Locations } from './locations.js';
+import { Major_inspections } from './major-inspections.js';
+import { Hives } from './hives.js';
+import { Hive_inspections } from './hive_inspections.js';
 
 export function associateModels() {
   // User to Location (one-to-many)
-  users.hasMany(locations, {
+  Users.hasMany(Locations, {
     foreignKey: 'user_id',
     as: 'locations',
   });
-  locations.belongsTo(users, {
+  Locations.belongsTo(Users, {
     foreignKey: 'user_id',
     as: 'user',
   });
 
   // Location to MajorInspection (one-to-many)
-  locations.hasMany(major_inspections, {
+  Locations.hasMany(Major_inspections, {
     foreignKey: 'location_id',
     as: 'locations_majorInspections',
   });
-  major_inspections.belongsTo(locations, {
+  Major_inspections.belongsTo(Locations, {
     foreignKey: 'location_id',
     as: 'majorInspection_location',
   });
 
   // Location to Hives (one-to-many)
-  locations.hasMany(hives, {
+  Locations.hasMany(Hives, {
     foreignKey: 'location_id',
     as: 'locations_hives',
   });
-  hives.belongsTo(locations, {
+  Hives.belongsTo(Locations, {
     foreignKey: 'location_id',
     as: 'hives_location',
   });
 
   // MajorInspection to HiveInspection (one-to-many)
-  major_inspections.hasMany(hive_inspections, {
+  Major_inspections.hasMany(Hive_inspections, {
     foreignKey: 'major_inspection_id',
     as: 'majors_hiveInspections',
   });
-  hive_inspections.belongsTo(major_inspections, {
+  Hive_inspections.belongsTo(Major_inspections, {
     foreignKey: 'major_inspection_id',
     as: 'hiveInspections_majorInspection',
   });
 
   // Hive to HiveInspection (one-to-many)
-  hives.hasMany(hive_inspections, {
+  Hives.hasMany(Hive_inspections, {
     foreignKey: 'hive_id',
     as: 'hives_hiveInspections',
   });
 
-  hive_inspections.belongsTo(hives, {
+  Hive_inspections.belongsTo(Hives, {
     foreignKey: 'hive_id',
     as: 'hiveInspections_hive',
   });

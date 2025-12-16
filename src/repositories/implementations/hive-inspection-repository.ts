@@ -2,15 +2,11 @@
 
 import { Sequelize } from 'sequelize';
 import { IHiveInspectionRepository } from '../interfaces/i-hive-inspection-repository.js';
-import { hive_inspections } from '../../database/models-ts/hive_inspections.js';
-import { major_inspections } from '../../database/models-ts/major-inspections.js';
-import { hives } from '../../database/models-ts/hives.js'; // Needed for ownership check
-import { locations } from '../../database/models-ts/locations.js';
-import {
-  HiveInspectionServiceCreateDTO,
-  HiveInspectionServiceRetrievedDTO,
-  HiveInspectionServiceUpdateDTO,
-} from '../../services/dto/hive-inspection-service.dto.js';
+import { Hive_inspections } from '../../database/models-ts/hive_inspections.js';
+import { Major_inspections } from '../../database/models-ts/major-inspections.js';
+import { Hives } from '../../database/models-ts/hives.js'; // Needed for ownership check
+import { Locations } from '../../database/models-ts/locations.js';
+import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../../services/dto/hive-inspection-service.dto.js';
 
 /**
  * Concrete implementation of the IHiveInspectionRepository using Sequelize.
@@ -23,13 +19,13 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
   }
 
   async create(inspection: HiveInspectionServiceCreateDTO): Promise<HiveInspectionServiceRetrievedDTO> {
-    const newInspection = await hive_inspections.create(inspection as any); // Cast as any to resolve potential DTO/Model mismatch
+    const newInspection = await Hive_inspections.create(inspection as any); // Cast as any to resolve potential DTO/Model mismatch
     return newInspection.toJSON() as HiveInspectionServiceRetrievedDTO;
   }
 
   async update(inspectionId: string, hiveId: string, inspection: HiveInspectionServiceUpdateDTO): Promise<[number, HiveInspectionServiceRetrievedDTO[]]> {
     return this.db.transaction(async (t) => {
-      const [updatedCount, updatedInspections] = await hive_inspections.update(inspection, {
+      const [updatedCount, updatedInspections] = await Hive_inspections.update(inspection, {
         where: { hive_inspection_id: inspectionId, hive_id: hiveId },
         returning: true,
         transaction: t,
@@ -43,14 +39,14 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
   async findById(inspectionId: string, hiveId?: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
     const whereClause = hiveId ? { hive_inspection_id: inspectionId, hive_id: hiveId } : { hive_inspection_id: inspectionId };
 
-    const inspection = await hive_inspections.findOne({
+    const inspection = await Hive_inspections.findOne({
       where: whereClause,
     });
     return inspection ? (inspection.toJSON() as HiveInspectionServiceRetrievedDTO) : null;
   }
 
   async findAllByHiveId(hiveId: string): Promise<HiveInspectionServiceRetrievedDTO[]> {
-    const allInspections = await hive_inspections.findAll({
+    const allInspections = await Hive_inspections.findAll({
       where: { hive_id: hiveId },
       order: [['inspection_date', 'DESC']], // Assuming you want them ordered by date
     });
@@ -60,7 +56,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
   async delete(inspectionId: string, hiveId?: string): Promise<number> {
     const whereClause = hiveId ? { hive_inspection_id: inspectionId, hive_id: hiveId } : { hive_inspection_id: inspectionId };
 
-    const deleteCount = await hive_inspections.destroy({
+    const deleteCount = await Hive_inspections.destroy({
       where: whereClause,
     });
     return deleteCount;
@@ -70,11 +66,11 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
    * Performs a JOIN query to check if a user owns a hive, and that hive owns the inspection.
    */
   async findHiveInspectionByHiveAndUser(inspectionId: string, hiveId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const inspection = await hive_inspections.findOne({
+    const inspection = await Hive_inspections.findOne({
       where: { hive_inspection_id: inspectionId, hive_id: hiveId },
       include: [
         {
-          model: hives,
+          model: Hives,
           as: 'hive', // Must match your Sequelize association alias for HiveInspection.belongsTo(Hive)
           attributes: [],
           where: {
@@ -85,7 +81,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
 
           include: [
             {
-              model: locations,
+              model: Locations,
               as: 'location', // Assuming the association from Hive to Location is 'location'
               attributes: [], // Don't select any location columns
               where: {
@@ -109,7 +105,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
    */
   public async findAllByMajorInspectionId(majorInspectionId: string): Promise<HiveInspectionServiceRetrievedDTO[]> {
     // Use Sequelize's findAll method to retrieve all records matching the foreign key.
-    const allInspections = await hive_inspections.findAll({
+    const allInspections = await Hive_inspections.findAll({
       where: {
         major_inspection_id: majorInspectionId,
       },
@@ -125,7 +121,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
     locationId: string,
     userId: string
   ): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const inspection = await hive_inspections.findOne({
+    const inspection = await Hive_inspections.findOne({
       // 1. Filter by the main Hive Inspection ID
       where: {
         hive_inspection_id: hiveInspectionId,
@@ -133,7 +129,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
       // 2. Perform INNER JOIN to MajorInspection
       include: [
         {
-          model: major_inspections,
+          model: Major_inspections,
           as: 'hiveInspections_majorInspection',
           required: true, // Forces an INNER JOIN
           // Filter by the Major Inspection ID
@@ -143,7 +139,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
           // 3. Perform INNER JOIN to Location
           include: [
             {
-              model: locations,
+              model: Locations,
               as: 'majorInspection_location',
               required: true, // Forces an INNER JOIN
               // Filter by Location ID AND User ID

@@ -1,7 +1,7 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 
-import { locations } from './locations.js'; // Import locations model
-import { hive_inspections } from './hive_inspections.js'; // Import hive_inspections model
+import { Locations } from './locations.js'; // Import locations model
+import { Hive_inspections } from './hive_inspections.js'; // Import hive_inspections model
 
 export interface major_inspectionsAttributes {
   major_inspection_id?: string;
@@ -17,7 +17,7 @@ export interface major_inspectionsAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class major_inspections extends Model<major_inspectionsAttributes, major_inspectionsAttributes> implements major_inspectionsAttributes {
+export class Major_inspections extends Model<major_inspectionsAttributes, major_inspectionsAttributes> implements major_inspectionsAttributes {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -25,7 +25,7 @@ export class major_inspections extends Model<major_inspectionsAttributes, major_
   })
   major_inspection_id?: string;
 
-  @ForeignKey(() => locations) // Indicates that location_id is a foreign key referencing the locations model
+  @ForeignKey(() => Locations) // Indicates that location_id is a foreign key referencing the locations model
   @Column({
     type: DataType.UUID,
   })

@@ -1,5 +1,5 @@
 import { Model, Table, Column, DataType, Index, Sequelize, HasMany } from 'sequelize-typescript';
-import { locations } from './locations.js';
+import { Locations } from './locations.js';
 
 export interface usersAttributes {
   user_id?: string;
@@ -17,7 +17,7 @@ export interface usersAttributes {
   schema: 'public',
   timestamps: false,
 })
-export class users extends Model<usersAttributes, usersAttributes> implements usersAttributes {
+export class Users extends Model<usersAttributes, usersAttributes> implements usersAttributes {
   @Column({
     primaryKey: true,
     type: DataType.UUID,

@@ -1,5 +1,5 @@
 import { IUserRepository } from '../interfaces/i-user-repository.js';
-import { users } from '../../database/models-ts/users.js';
+import { Users } from '../../database/models-ts/users.js';
 import { sequelizeInstance as database } from '../../database/connect.js';
 import { UserRetrievedDTO, UserUpdateDTO, UserCreationDTO } from '../../services/dto/user-service.dto.js';
 
@@ -7,29 +7,29 @@ export class UserRepository implements IUserRepository {
   private readonly db = database;
 
   async create(user: UserCreationDTO): Promise<UserRetrievedDTO> {
-    const newUser = await users.create(user);
+    const newUser = await Users.create(user);
     return newUser.toJSON() as UserRetrievedDTO;
   }
 
   async readById(id: string): Promise<UserRetrievedDTO | null> {
-    const user = await users.findByPk(id);
+    const user = await Users.findByPk(id);
     return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
 
   async readByEmail(email: string): Promise<UserRetrievedDTO | null> {
-    const user = await users.findOne({ where: { email } });
+    const user = await Users.findOne({ where: { email } });
     return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
 
   async readAll(): Promise<UserRetrievedDTO[]> {
-    const allUsers = await users.findAll();
+    const allUsers = await Users.findAll();
     return allUsers.map((user) => user.toJSON() as UserRetrievedDTO);
   }
 
   async update(id: string, user: UserUpdateDTO): Promise<[number, UserRetrievedDTO[]]> {
     const transaction = await this.db.transaction();
     try {
-      const [updatedCount, updatedUsers] = await users.update(user, {
+      const [updatedCount, updatedUsers] = await Users.update(user, {
         where: { user_id: id },
         returning: true,
         transaction: transaction,
@@ -53,7 +53,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async delete(id: string): Promise<number> {
-    const deletedCount = await users.destroy({ where: { user_id: id } });
+    const deletedCount = await Users.destroy({ where: { user_id: id } });
     return deletedCount;
   }
 }

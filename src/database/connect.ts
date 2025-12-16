@@ -1,10 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
 import config from '../config/index.js';
-import { users } from './models-ts/users.js'; // To be created
-import { locations } from './models-ts/locations.js'; // To be created
-import { hive_inspections } from './models-ts/hive_inspections.js';
-import { major_inspections } from './models-ts/major-inspections.js';
-import { hives } from './models-ts/hives.js'; // To be created
+import { Users } from './models-ts/users.js'; // To be created
+import { Locations } from './models-ts/locations.js'; // To be created
+import { Hive_inspections } from './models-ts/hive_inspections.js';
+import { Major_inspections } from './models-ts/major-inspections.js';
+import { Hives } from './models-ts/hives.js'; // To be created
 import { associateModels } from './models-ts/associations.js'; // Adjust path if you placed it elsewhere, e.g., './models-obsolete/associations.js'
 
 console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);
@@ -36,7 +36,7 @@ const sequelize = new Sequelize({
   port: DB_PORT,
   dialect: DB_DIALECT,
   logging: false, // Enable logging to see SQL queries
-  models: [users, locations, hive_inspections, major_inspections, hives], // Add all models here
+  models: [Users, Locations, Hive_inspections, Major_inspections, Hives], // Add all models here
   pool: {
     max: 5,
     min: 0,
