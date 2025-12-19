@@ -8,4 +8,6 @@ export interface IUserRepository {
   readAll(): Promise<UserRetrievedDTO[]>;
   update(id: string, user: UserUpdateDTO): Promise<[number, UserRetrievedDTO[]]>;
   delete(id: string): Promise<number>;
+
+  readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null>;
 }

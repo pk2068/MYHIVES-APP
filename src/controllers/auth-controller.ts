@@ -197,32 +197,37 @@ export class AuthController {
 
   public googleLoginCallback = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Google login callback called');
+      console.log('');
+      console.log('Google login callback called ----------------------', req.user, req.currentUser);
       // The user info should be in req.user set by passport
-      const googleProfile = req.user as any; // Adjust type as needed based on your passport setup
-      console.log('Google profile in callback:', googleProfile);
-      if (!googleProfile) {
+      const dbUser = req.user as any; // Adjust type as needed based on your passport setup
+      console.log('Google profile in callback:', dbUser);
+      if (!dbUser) {
         const error = new Error('Google authentication failed.') as CustomError;
         error.statusCode = 401;
         throw error;
       }
       // Generate token
-      const token: string = generateToken({ userId: googleProfile.user_id! });
+      const token: string = generateToken({ userId: dbUser.user_id! });
 
       res.cookie('jwtcookie', token, {
         httpOnly: true,
         secure: config.nodeEnv === 'production',
         maxAge: 1000 * 3600 * 24 * 7, // 7 days in milliseconds
       });
-      res.status(200).json({
+
+      const responseObj: LoginUserOutgoingDTO = {
         success: true,
         message: 'Logged in with Google successfully!',
         token,
         user: {
-          id: googleProfile.user_id!,
-          username: googleProfile.username,
+          id: dbUser.user_id!,
+          username: dbUser.username,
+          email: dbUser.email,
         },
-      });
+      };
+
+      res.status(200).json(responseObj);
     } catch (error) {
       next(error);
     }

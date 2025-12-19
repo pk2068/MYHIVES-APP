@@ -1,4 +1,4 @@
-import { usersAttributes } from '../database/models-ts/users.js';
+import { IUsersAttributes } from '../database/models-ts/users.js';
 
 declare global {
   namespace Express {

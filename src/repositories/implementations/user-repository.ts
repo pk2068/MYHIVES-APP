@@ -21,6 +21,11 @@ export class UserRepository implements IUserRepository {
     return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
 
+  async readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null> {
+    const user = await Users.findOne({ where: { google_id: googleId } });
+    return user ? (user.toJSON() as UserRetrievedDTO) : null;
+  }
+
   async readAll(): Promise<UserRetrievedDTO[]> {
     const allUsers = await Users.findAll();
     return allUsers.map((user) => user.toJSON() as UserRetrievedDTO);

@@ -1,6 +1,12 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Users } from '../database/models-ts/users.js';
+import { IUsersAttributes, Users } from '../database/models-ts/users.js';
+
+import { UserService } from '../services/user-service.js';
+import { UserRetrievedDTO } from '../services/dto/user-service.dto.js';
+import { UserRepository } from '../repositories/implementations/user-repository.js';
+
+const userService = new UserService(new UserRepository());
 
 passport.use(
   new GoogleStrategy(
@@ -16,33 +22,14 @@ passport.use(
         console.log('Access Token:', accessToken);
         console.log('Refresh Token:', refreshToken);
 
-        // Find user by Google ID or email
-        let user = await Users.findOne({ where: { google_id: profile.id } });
-
-        if (!user) {
-          // Optional: Also check by email if you want to link existing accounts
-          user = await Users.findOne({ where: { email: profile.emails?.[0].value } });
-
-          if (user) {
-            // Link existing account
-            user.google_id = profile.id;
-            await user.save();
-          } else {
-            // Create new user
-            user = await Users.create({
-              google_id: profile.id,
-              email: profile.emails?.[0].value || '',
-              username: profile.displayName,
-            });
-          }
-        }
-
-        return done(null, user);
-      } catch (err) {
-        return done(err);
+        const currentUser: UserRetrievedDTO = await userService.handleGoogleUser({ id: profile.id, emails: profile.emails, displayName: profile.displayName });
+        currentUser.username += '= logged in with Google';
+        return done(null, currentUser);
+      } catch (error) {
+        return done(error as Error, undefined);
       }
     }
-  )
+  ) // end of strategy
 );
 
 export default passport;
