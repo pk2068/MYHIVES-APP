@@ -20,6 +20,19 @@ export const generateToken = (payload: JwtPayload): string => {
   });
 };
 
+// Access Token: Short-lived for API calls
+export const generateAccessToken = (payload: JwtPayload): string => {
+  return jwt.sign(payload, config.jwtSecret, { expiresIn: '15m' });
+};
+
+// Refresh Token: Long-lived to get new access tokens
+export const generateRefreshToken = (payload: JwtPayload): string => {
+  return jwt.sign(payload, config.refreshTokenSecret, { expiresIn: '7d' });
+};
+
+export const verifyAccessToken = (token: string) => jwt.verify(token, config.jwtSecret) as JwtPayload;
+export const verifyRefreshToken = (token: string) => jwt.verify(token, config.refreshTokenSecret) as JwtPayload;
+
 /**
  * Verifies a JWT token.
  * @param token The JWT token string.
