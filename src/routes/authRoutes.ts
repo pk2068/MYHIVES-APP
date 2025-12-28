@@ -77,6 +77,7 @@ authRouter.post(
 
 authRouter.get('/google-login', passport.authenticate('google', { scope: ['profile', 'email'] }));
 authRouter.get('/google-login/callback', passport.authenticate('google', { session: false }), authController.googleLoginCallback);
+authRouter.get('/refresh-token', authController.refreshToken);
 
 authRouter.get('/me', isAuthenticated, authController.getMe);
 

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, generateAccessToken, verifyAccessToken, verifyRefreshToken } from '../utils/jwt.js';
 import { CustomError } from '../middleware/errorHandler.js';
 import { UserService } from '../services/user-service.js'; // New service
 
@@ -230,6 +230,28 @@ export class AuthController {
       res.status(200).json(responseObj);
     } catch (error) {
       next(error);
+    }
+  };
+
+  public refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.cookies['refreshToken'] || req.headers['x-refresh-token'];
+      if (!refreshToken) {
+        const error = new Error('No refresh token provided.') as CustomError;
+        error.statusCode = 401;
+        throw error;
+      }
+
+      const decoded = verifyRefreshToken(refreshToken);
+      const newAccessToken = generateAccessToken({ userId: decoded.userId });
+
+      // Optional: Generate a NEW refresh token here for "Rotation"
+      res.json({ accessToken: newAccessToken });
+    } catch (error) {
+      //res.status(401).json({ success: false, message: 'Invalid or expired refresh token.' });
+      const _error = new Error('Invalid or expired refresh token.') as CustomError;
+      _error.statusCode = 401;
+      next(_error);
     }
   };
 }
