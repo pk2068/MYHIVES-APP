@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { generateToken, generateRefreshToken, generateAccessToken, verifyAccessToken, verifyRefreshToken } from '../utils/jwt.js';
 import { CustomError } from '../middleware/errorHandler.js';
 import { UserService } from '../services/user-service.js'; // New service
+import redisClient from '../utils/redis.js';
 
 import config from '../config/index.js';
 import httpStatus from 'http-status'; // Good practice for error codes
@@ -107,7 +108,10 @@ export class AuthController {
       // In a stateless JWT system, the server doesn't need to do much for logout.
       // The client simply discards the token.
       // However, it's good practice to send a success message.
+      const token = req.cookies['jwtcookie'];
 
+      // Store token in Redis for 7 days (matching JWT expiry) to "blacklist" it
+      await redisClient.set(`blacklist_${token}`, 'true', { EX: 60 * 60 * 24 * 7 });
       // If using HTTP-only cookies for tokens, you'd clear the cookie here.
       // For example:
       res.clearCookie('jwtcookie'); // Assuming your JWT is in a cookie named 'jwtcookie'

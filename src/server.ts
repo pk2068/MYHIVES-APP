@@ -3,6 +3,8 @@
 import app from './appExpressInstance.js';
 import config from './config/index.js';
 import { connectDB } from './database/connect.js'; // You'll create this function later
+import { connectRedis } from './utils/redis.js';
+
 
 const startServer = async () => {
   try {
@@ -12,7 +14,12 @@ const startServer = async () => {
     await connectDB();
     console.log('Database connected successfully.');
 
-    // 2. Start the Express server
+    // 2. Run the redis from src/utils/redis.ts
+    console.log('Attempting to connect to Redis...');
+    await connectRedis(); // 2. Call it here!
+    console.log('Redis client initialized.');
+
+    // 3. Start the Express server
     console.log('Starting BeeHive API server... with app.listen');
     app.listen(config.port, () => {
       console.log(`⚡️[server]: Server is running on port ${config.port}`);

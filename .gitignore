@@ -22,4 +22,6 @@ Thumbs.db # Windows specific
 # VS Code
 .vscode/
 src/src-summary.txt
+src/src-summary2txt
+src/src-summary*txt
 src/sumarize-src.ts

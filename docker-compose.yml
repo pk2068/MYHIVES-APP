@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  # This matches your Postgres setup eventually, but let's add Redis now
+  cache:
+    image: redis:alpine
+    container_name: myhives-redis
+    ports:
+      - "6379:6379" # Maps Windows 6379 to Container 6379
+    restart: always
