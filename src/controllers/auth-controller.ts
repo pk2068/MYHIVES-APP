@@ -105,10 +105,21 @@ export class AuthController {
 
   public logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // In a stateless JWT system, the server doesn't need to do much for logout.
-      // The client simply discards the token.
-      // However, it's good practice to send a success message.
-      const token = req.cookies['jwtcookie'];
+      console.log('logout called');
+      // req.user is set by the `authenticate` middleware
+      if (!req.currentUser || !req.currentUser.id) {
+        console.error('No currentUser found in request:', req.currentUser);
+        const error = new Error('User not authenticated. - no currentUser') as CustomError;
+        error.statusCode = 401;
+        throw error;
+      }
+
+      const token = req.headers.authorization?.split(' ')[1]; // i know its there from isAuthenticated middleware
+      if (!token) {
+        const error = new Error('No token provided for logout.') as CustomError;
+        error.statusCode = 400;
+        throw error;
+      }
 
       // Store token in Redis for 7 days (matching JWT expiry) to "blacklist" it
       await redisClient.set(`blacklist_${token}`, 'true', { EX: 60 * 60 * 24 * 7 });

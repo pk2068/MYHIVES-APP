@@ -54,7 +54,7 @@ export const connectDB = async () => {
   try {
     console.log('PostgreSQL connection trying.');
     await sequelize.authenticate();
-    console.log('PostgreSQL connection has been established successfully.');
+    console.log('✅ PostgreSQL connection has been established successfully.');
 
     // Set up associations between models
     associateModels();
@@ -65,7 +65,7 @@ export const connectDB = async () => {
       console.log('Syncing database models (development mode)...');
       //await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
       await sequelize.sync({ alter: false });
-      console.log('Database models synchronized.');
+      console.log('✅Database models synchronized.');
     } else {
       // In production, rely on migrations. If you haven't run migrations,
       // you might still want a simple sync without alter.
