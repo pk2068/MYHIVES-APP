@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   # This matches your Postgres setup eventually, but let's add Redis now
   cache:
@@ -7,3 +6,20 @@ services:
     ports:
       - '6379:6379' # Maps Windows 6379 to Container 6379
     restart: always
+
+  db:
+    image: postgres:latest
+    container_name: myhives_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Cada_2068_new # Matches your .env
+      POSTGRES_DB: myhives_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  # --- THIS PART WAS MISSING ---
+volumes:
+  postgres_data:
