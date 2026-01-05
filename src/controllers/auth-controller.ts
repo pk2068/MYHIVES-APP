@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { generateToken, generateRefreshToken, generateAccessToken, verifyAccessToken, verifyRefreshToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, generateAccessToken, verifyAccessToken, verifyRefreshToken, calculateTokenExpiry } from '../utils/jwt.js';
+import { getSecondsFromConfig, getRemainingSeconds } from '../utils/time-utils.js';
 import { CustomError } from '../middleware/errorHandler.js';
 import { UserService } from '../services/user-service.js'; // New service
 import redisClient from '../utils/redis.js';
@@ -121,8 +122,9 @@ export class AuthController {
         throw error;
       }
 
-      // Store token in Redis for 7 days (matching JWT expiry) to "blacklist" it
-      await redisClient.set(`blacklist_${token}`, 'true', { EX: 60 * 60 * 24 * 7 });
+      // Store token in Redis "blacklist" it
+      const tokenExpiryTime = calculateTokenExpiry(token);
+      await redisClient.set(`blacklist_${token}`, 'true', { EX: tokenExpiryTime ?? getSecondsFromConfig(config.tokenExpiry) });
       // If using HTTP-only cookies for tokens, you'd clear the cookie here.
       // For example:
       res.clearCookie('jwtcookie'); // Assuming your JWT is in a cookie named 'jwtcookie'

@@ -28,6 +28,8 @@ interface IConfig {
   linkedinClientSecret: string;
   frontendUrl: string; // For CORS and OAuth redirects
   redisUrl: string; // Optional Redis URL
+  tokenExpiry: string; // e.g., '1h', '15m'
+  refreshTokenExpiry: string; // e.g., '7d'
 }
 
 // Map environment variables to the IConfig interface
@@ -43,6 +45,8 @@ const config: IConfig = {
   linkedinClientSecret: process.env.LINKEDIN_CLIENT_SECRET || '',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173', // My React default port
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379', // Default Redis URL
+  tokenExpiry: process.env.TOKEN_EXPIRY || '1h',
+  refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || '7d',
 };
 
 // console.log('Config loaded:', config);

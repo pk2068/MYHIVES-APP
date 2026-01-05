@@ -45,7 +45,7 @@ Content-Type: application/json
 
 {
   "email": "tonyclark@gmail.com",
-  "password": "password1234"
+  "password": "password12345"
 } 
 
 ### Login with Non-Existent Email (Expected: 401 Unauthorized)

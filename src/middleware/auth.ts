@@ -1,39 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt.js';
 import { CustomError } from './errorHandler.js'; // Import the CustomError interface
+import redisClient from '../utils/redis.js';
 
-// Middleware for authenticating requests using JWT
-// export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     // 1. Get the token from the Authorization header
-//     const authHeader = req.headers.authorization;
-
-//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//       const error = new Error('No token provided or invalid token format.') as CustomError;
-//       error.statusCode = 401; // Unauthorized
-//       throw error;
-//     }
-
-//     const token = authHeader.split(' ')[1]; // Extract the token part
-
-//     // 2. Verify the token
-//     const decoded = verifyToken(token); // This will throw if invalid/expired
-
-//     // 3. Attach the user ID to the request object for later use in controllers
-//     // The `express.d.ts` file ensures `req.user` is recognized.
-//     req.user = { id: decoded.userId };
-
-//     // 4. Continue to the next middleware or route handler
-//     next();
-//   } catch (error: any) {
-//     // Catch errors from verifyToken or initial checks
-//     const err = error as CustomError;
-//     err.statusCode = err.statusCode || 401; // Default to 401 Unauthorized
-//     next(err); // Pass the error to the error handling middleware
-//   }
-// };
-
-export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Middleware to authenticate requests.
+ * Now includes a Redis check to verify if the token has been blacklisted (logged out).
+ */
+export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log('Authentication middleware called');
     const authHeader = req.headers.authorization;
@@ -46,6 +20,16 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     }
 
     const token = authHeader.split(' ')[1];
+
+    // We check if the key 'blacklist_TOKEN' exists in our cache
+    const isBlacklisted = await redisClient.get(`blacklist_${token}`);
+
+    if (isBlacklisted) {
+      console.warn('Blocked a request using a blacklisted token.');
+      const error = new Error('This session has expired. Please log in again.') as CustomError;
+      error.statusCode = 401;
+      throw error;
+    }
 
     // Ensure 'verifyToken' is imported correctly and handles token verification,
     // returning an object with 'userId' or throwing an error.
