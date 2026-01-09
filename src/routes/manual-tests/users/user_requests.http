@@ -11,9 +11,9 @@ POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "username": "TonyClark",
-  "email": "tonyclark@gmail.com",
-  "password": "password1234"
+  "username": "TonyClark7",
+  "email": "tonyclark7@gmail.com",
+  "password": "password123467"
 }
 
 ### Register a User with Existing Email (Expected: 409 Conflict)
