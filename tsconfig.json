@@ -18,7 +18,7 @@
       "@utils/*": ["utils/*"]
       // Add other aliases as needed
     },
-    //"allowImportingTsExtensions": true, // Allow .ts extensions in imports during development
+    "allowImportingTsExtensions": false, // Allow .ts extensions in imports during development
     "resolveJsonModule": true, // Allow importing .json files
     "isolatedModules": true,
 

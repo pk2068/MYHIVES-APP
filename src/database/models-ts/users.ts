@@ -1,5 +1,7 @@
-import { Model, Table, Column, DataType, Index, Sequelize, HasMany } from 'sequelize-typescript';
-import { Locations } from './locations.js';
+import { Model, Table, Column, DataType, Index, Sequelize } from 'sequelize-typescript';
+// import { Locations } from './locations.js';
+// import { UserRoles } from './user_roles.js';
+import { Roles } from './roles.js';
 
 export interface IUsersAttributes {
   user_id?: string;
@@ -72,4 +74,6 @@ export class Users extends Model<IUsersAttributes, IUsersAttributes> implements 
 	@HasMany(() => locations, { foreignKey: 'user_id' })
     locations?: locations[]; // This property would hold an array of associated locations
 	*/
+  //@BelongsToMany(() => Roles, () => UserRoles)
+  declare roles?: Roles[];
 }

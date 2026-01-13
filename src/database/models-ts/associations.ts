@@ -3,8 +3,25 @@ import { Locations } from './locations.js';
 import { Major_inspections } from './major-inspections.js';
 import { Hives } from './hives.js';
 import { Hive_inspections } from './hive_inspections.js';
+import { Roles } from './roles.js';
+import { UserRoles } from './user_roles.js';
 
 export function associateModels() {
+  // --- User to Roles (Many-to-Many) ---
+  Users.belongsToMany(Roles, {
+    through: UserRoles,
+    foreignKey: 'user_id',
+    otherKey: 'role_id',
+    as: 'roles', // This alias will be used in your eager loading
+  });
+
+  Roles.belongsToMany(Users, {
+    through: UserRoles,
+    foreignKey: 'role_id',
+    otherKey: 'user_id',
+    as: 'users',
+  });
+
   // User to Location (one-to-many)
   Users.hasMany(Locations, {
     foreignKey: 'user_id',
