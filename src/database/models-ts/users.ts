@@ -12,6 +12,7 @@ export interface IUsersAttributes {
   linkedin_id?: string;
   created_at?: Date;
   updated_at?: Date;
+  roles?: string[];
 }
 
 @Table({
@@ -75,5 +76,7 @@ export class Users extends Model<IUsersAttributes, IUsersAttributes> implements 
     locations?: locations[]; // This property would hold an array of associated locations
 	*/
   //@BelongsToMany(() => Roles, () => UserRoles)
-  declare roles?: Roles[];
+  declare roles_association?: Roles[];
+
+  roles?: string[];
 }

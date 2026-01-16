@@ -5,6 +5,8 @@ import config from '../config/index.js'; // Import your application configuratio
 
 interface JwtPayload {
   userId: string;
+  username: string;
+  roles: string;
   // Add any other user-specific data you want to include in the token payload
   // e.g., email: string; username: string; roles: string[];
 }

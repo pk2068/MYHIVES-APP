@@ -14,6 +14,7 @@
     "rebuild": "npm run clean && cls && node -e \"console.log('\\n\\n\\n\\n\\n\\n\\n\\n')\" &&  echo %time% &&npm run build",
     "clean": "rimraf dist",
     "start": "node --enable-source-maps dist/server.js",
+    "start2": "node --loader ts-node/esm -r tsconfig-paths/register dist/server.js",
     "restart": "npm run rebuild && npm run start",
     "dev2": "npm run clean && npm run build && concurrently \"tsc --watch\" \"nodemon --exec 'node --enable-source-maps' dist/server.js\"",
     "dev": "nodemon --watch src --exec tsx src/server.ts",
@@ -41,7 +42,8 @@
     "redis": "^5.10.0",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.7",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

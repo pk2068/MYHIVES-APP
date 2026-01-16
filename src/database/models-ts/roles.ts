@@ -20,20 +20,20 @@ export class Roles extends Model<IRoleAttributes, IRoleAttributes> implements IR
     autoIncrement: true,
     type: DataType.INTEGER,
   })
-  role_id?: number;
+  declare role_id?: number;
 
   @Column({
     type: DataType.STRING(50),
     unique: true,
     allowNull: false,
   })
-  role_name!: string;
+  declare role_name: string;
 
   @Column({
     type: DataType.STRING(255),
     allowNull: true,
   })
-  description?: string;
+  declare description?: string;
 
   //@BelongsToMany(() => Users, () => UserRoles)
   declare users?: Users[];

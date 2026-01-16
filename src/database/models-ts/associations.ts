@@ -12,7 +12,7 @@ export function associateModels() {
     through: UserRoles,
     foreignKey: 'user_id',
     otherKey: 'role_id',
-    as: 'roles', // This alias will be used in your eager loading
+    as: 'roles_association', // This alias will be used in your eager loading
   });
 
   Roles.belongsToMany(Users, {

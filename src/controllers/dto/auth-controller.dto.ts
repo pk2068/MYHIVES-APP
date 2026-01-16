@@ -14,6 +14,7 @@ export interface UserOutgoingDTO {
     id: string;
     username: string;
     email: string;
+    roles: string[];
   };
 }
 // DTO for user update (all fields optional)

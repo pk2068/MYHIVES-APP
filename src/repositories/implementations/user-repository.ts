@@ -1,7 +1,14 @@
 import { IUserRepository } from '../interfaces/i-user-repository.js';
 import { Users } from '../../database/models-ts/users.js';
+import { Roles } from '../../database/models-ts/roles.js';
 import { sequelizeInstance as database } from '../../database/connect.js';
 import { UserRetrievedDTO, UserUpdateDTO, UserCreationDTO } from '../../services/dto/user-service.dto.js';
+import { IUsersAttributes } from '../../database/models-ts/users.js';
+
+// 1. Define an internal type that extends your base attributes with the association
+type UserWithRoles = IUsersAttributes & {
+  roles_association?: { role_name: string }[];
+};
 
 export class UserRepository implements IUserRepository {
   private readonly db = database;
@@ -17,8 +24,34 @@ export class UserRepository implements IUserRepository {
   }
 
   async readByEmail(email: string): Promise<UserRetrievedDTO | null> {
-    const user = await Users.findOne({ where: { email } });
-    return user ? (user.toJSON() as UserRetrievedDTO) : null;
+    const user = await Users.findOne({
+      where: { email },
+      include: [
+        {
+          model: Roles,
+          as: 'roles_association', // Matches the alias in associations.ts
+          attributes: ['role_name'], // Only get the names
+          through: { attributes: [] }, // Exclude junction table data
+        },
+      ],
+    });
+    //return user ? (user.toJSON() as UserRetrievedDTO) : null;
+    if (!user) return null;
+
+    // 1. Convert the Model Instance to a plain JavaScript object immediately
+    const userData = user.get({ plain: true }) as UserWithRoles;
+
+    // 2. Map the data from the association alias to the 'roles' property
+    const returnData: UserRetrievedDTO = {
+      ...userData,
+      // Accessing from the plain object is 100% reliable
+      roles: userData.roles_association?.map((r: any) => r.role_name) || [],
+    };
+
+    // console.log('User with roles retrieved:', returnData.roles);
+    // console.log('User with roles_association retrieved:', returnData.roles_association);
+
+    return returnData;
   }
 
   async readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null> {

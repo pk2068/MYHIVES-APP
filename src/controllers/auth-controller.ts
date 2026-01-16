@@ -79,7 +79,11 @@ export class AuthController {
       }
 
       // Generate token
-      const token: string = generateToken({ userId: user.user_id! });
+      const token: string = generateToken({
+        userId: user.user_id!,
+        username: user.username,
+        roles: user.roles?.join(',') || '',
+      });
 
       res.cookie('jwtcookie', token, {
         httpOnly: true,
@@ -95,6 +99,7 @@ export class AuthController {
           id: user.user_id!,
           username: user.username,
           email: user.email,
+          roles: user.roles || [],
         },
       };
 
@@ -225,7 +230,11 @@ export class AuthController {
         throw error;
       }
       // Generate token
-      const token: string = generateToken({ userId: dbUser.user_id! });
+      const token: string = generateToken({
+        userId: dbUser.user_id!,
+        username: dbUser.username,
+        roles: dbUser.roles.join(','),
+      });
 
       res.cookie('jwtcookie', token, {
         httpOnly: true,
@@ -260,7 +269,7 @@ export class AuthController {
       }
 
       const decoded = verifyRefreshToken(refreshToken);
-      const newAccessToken = generateAccessToken({ userId: decoded.userId });
+      const newAccessToken = generateAccessToken({ userId: decoded.userId, username: decoded.username, roles: decoded.roles });
 
       // Optional: Generate a NEW refresh token here for "Rotation"
       res.json({ accessToken: newAccessToken });
