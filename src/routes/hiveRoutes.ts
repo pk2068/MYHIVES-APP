@@ -3,13 +3,13 @@ import { Router } from 'express';
 import Joi from 'joi';
 
 import { HiveController } from '../controllers/hive-controller.js';
-import { HiveRepository } from 'repositories/implementations/hive-repository.js';
-import { HiveService } from 'services/hive-service.js';
+import { HiveRepository } from '../repositories/implementations/hive-repository.js';
+import { HiveService } from '../services/hive-service.js';
 //import { hivesAttributes } from '../database/models-ts/hives.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { validate } from '../middleware/validation.js';
-import { HiveControllerCreateDTO, HiveControllerCreateStrongDTO, HiveControllerUpdateDTO } from 'controllers/dto/hive-controller.dto.js';
+import { HiveControllerCreateDTO, HiveControllerCreateStrongDTO, HiveControllerUpdateDTO } from '../controllers/dto/hive-controller.dto.js';
 
 const hiveRouter = Router({ mergeParams: true });
 // --- DI SETUP ---

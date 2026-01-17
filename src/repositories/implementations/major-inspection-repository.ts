@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { IMajorInspectionRepository } from '../interfaces/i-major-inspection-repository.js';
 import { Major_inspections } from '../../database/models-ts/major-inspections.js';
-import { Locations } from 'database/models-ts/locations.js';
+import { Locations } from '../../database/models-ts/locations.js';
 import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from '../../services/dto/major-inspection-service.dto.js';
 
 export class MajorInspectionRepository implements IMajorInspectionRepository {

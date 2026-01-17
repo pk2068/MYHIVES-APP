@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { IHiveRepository } from '../interfaces/i-hive-repository.js';
 import { Hives } from '../../database/models-ts/hives.js'; //'../ database/models-ts/hives.js';
-import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from 'services/dto/hive-service.dto.js';
+import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from '../../services/dto/hive-service.dto.js';
 
 /**
  * Concrete Hive repository.

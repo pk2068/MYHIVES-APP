@@ -49,6 +49,7 @@ export class AuthController {
           id: newUser.user_id!,
           username: newUser.username,
           email: newUser.email,
+          roles: newUser.roles || [],
         },
       };
 
@@ -208,6 +209,7 @@ export class AuthController {
           id: user.user_id!,
           username: user.username,
           email: user.email,
+          roles: user.roles || [],
         },
       };
 
@@ -250,6 +252,7 @@ export class AuthController {
           id: dbUser.user_id!,
           username: dbUser.username,
           email: dbUser.email,
+          roles: dbUser.roles || [],
         },
       };
 

@@ -19,8 +19,18 @@ export class UserRepository implements IUserRepository {
   }
 
   async readById(id: string): Promise<UserRetrievedDTO | null> {
-    const user = await Users.findByPk(id);
-    return user ? (user.toJSON() as UserRetrievedDTO) : null;
+    const user = await Users.findByPk(id, {
+      include: [
+        {
+          model: Roles,
+          as: 'roles_association',
+          attributes: ['role_name'],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return user ? this.mapUserWithRoles(user) : null;
   }
 
   async readByEmail(email: string): Promise<UserRetrievedDTO | null> {
@@ -35,33 +45,44 @@ export class UserRepository implements IUserRepository {
         },
       ],
     });
-    //return user ? (user.toJSON() as UserRetrievedDTO) : null;
-    if (!user) return null;
-
-    // 1. Convert the Model Instance to a plain JavaScript object immediately
-    const userData = user.get({ plain: true }) as UserWithRoles;
-
-    // 2. Map the data from the association alias to the 'roles' property
-    const returnData: UserRetrievedDTO = {
-      ...userData,
-      // Accessing from the plain object is 100% reliable
-      roles: userData.roles_association?.map((r: any) => r.role_name) || [],
-    };
-
-    // console.log('User with roles retrieved:', returnData.roles);
-    // console.log('User with roles_association retrieved:', returnData.roles_association);
-
-    return returnData;
+    return user ? this.mapUserWithRoles(user) : null;
   }
 
   async readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null> {
-    const user = await Users.findOne({ where: { google_id: googleId } });
-    return user ? (user.toJSON() as UserRetrievedDTO) : null;
+    const user = await Users.findOne({
+      where: { google_id: googleId },
+      include: [
+        {
+          model: Roles,
+          as: 'roles_association',
+          attributes: ['role_name'],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return user ? this.mapUserWithRoles(user) : null;
   }
 
   async readAll(): Promise<UserRetrievedDTO[]> {
-    const allUsers = await Users.findAll();
-    return allUsers.map((user) => user.toJSON() as UserRetrievedDTO);
+    const allUsers = await Users.findAll({
+      include: [
+        {
+          model: Roles,
+          as: 'roles_association',
+          attributes: ['role_name'],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return allUsers.map((user) => {
+      const userData = user.get({ plain: true }) as UserWithRoles;
+      return {
+        ...userData,
+        roles: userData.roles_association?.map((r) => r.role_name) || [],
+      } as UserRetrievedDTO;
+    });
   }
 
   async update(id: string, user: UserUpdateDTO): Promise<[number, UserRetrievedDTO[]]> {
@@ -94,4 +115,14 @@ export class UserRepository implements IUserRepository {
     const deletedCount = await Users.destroy({ where: { user_id: id } });
     return deletedCount;
   }
+
+  //#region Private Methods
+  private mapUserWithRoles(user: Users): UserRetrievedDTO {
+    const userData = user.get({ plain: true }) as UserWithRoles;
+    return {
+      ...userData,
+      roles: userData.roles_association?.map((r) => r.role_name) || [],
+    } as UserRetrievedDTO;
+  }
+  //#endregion Private Methods
 }

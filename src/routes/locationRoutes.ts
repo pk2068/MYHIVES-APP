@@ -16,7 +16,7 @@ import { LocationControllerUpdateInputDTO, LocationControllerCreateInputDTO } fr
 
 import majorInspectionRouter from './majorInspectionRoutes.js';
 import hiveRouter from './hiveRoutes.js';
-import { checkLocationOwnership } from 'middleware/ownership.js';
+import { checkLocationOwnership } from '../middleware/ownership.js';
 
 const locationRouter = Router();
 
