@@ -12,6 +12,7 @@ import { RegisterUserIncomingDTO, LoginUserIncomingDTO, UpdateUserIncomingDTO } 
 import { AuthController } from '../controllers/auth-controller.js';
 
 import { isAuthenticated } from '../middleware/auth.js';
+
 import passport from '../config/passport.js';
 
 const authRouter = Router();

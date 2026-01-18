@@ -4,6 +4,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 //import { LocationService } from '../services/locationService.js';
 import { isAuthenticated } from '../middleware/auth.js';
+import { authorizeRole } from '../middleware/permission.js';
 import { validate } from '../middleware/validation.js';
 import { LocationController } from '../controllers/location-controller.js';
 import { LocationService } from '../services/location-service.js';
@@ -61,20 +62,22 @@ locationRouter.use('/:locationId/hives', isAuthenticated, ownershipLocationMiddl
 locationRouter.post(
   '/',
   isAuthenticated,
+  authorizeRole(['user', 'admin']), // Example role-based authorization
   validate({ body: createLocationSchema }), // <--- Body validation
   locationController.createLocation
 );
 
 // GET /api/locations/map - Get map data
-locationRouter.get('/map', isAuthenticated, locationController.getMapData);
+locationRouter.get('/map', isAuthenticated, authorizeRole(['spectator', 'admin', 'vet']), locationController.getMapData);
 
 // GET /api/locations - Get all locations for the authenticated user
-locationRouter.get('/', isAuthenticated, locationController.getAllLocations);
+locationRouter.get('/', isAuthenticated, authorizeRole(['spectator', 'admin', 'vet']), locationController.getAllLocations);
 
 // GET /api/locations/:locationId - Get a specific location by ID
 locationRouter.get(
   '/:locationId',
   isAuthenticated,
+  authorizeRole(['admin', 'vet', 'user', 'spectator']),
   validate({ params: locationIdParamSchema }), // <--- Params validation
   ownershipLocationMiddleware,
   locationController.getLocationById
@@ -84,6 +87,7 @@ locationRouter.get(
 locationRouter.put(
   '/:locationId',
   isAuthenticated,
+  authorizeRole(['admin', 'user']),
   validate({ params: locationIdParamSchema, body: updateLocationSchema }), // <--- Both params and body validation
   ownershipLocationMiddleware,
   locationController.updateLocation
@@ -93,6 +97,7 @@ locationRouter.put(
 locationRouter.delete(
   '/:locationId',
   isAuthenticated,
+  authorizeRole(['admin']),
   validate({ params: locationIdParamSchema }), // <--- Params validation
   ownershipLocationMiddleware,
   locationController.deleteLocation
