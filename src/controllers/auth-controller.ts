@@ -235,7 +235,7 @@ export class AuthController {
       const token: string = generateToken({
         userId: dbUser.user_id!,
         username: dbUser.username,
-        roles: dbUser.roles.join(','),
+        roles: dbUser.roles.join(',') || '',
       });
 
       res.cookie('jwtcookie', token, {

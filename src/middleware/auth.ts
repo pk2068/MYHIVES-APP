@@ -38,7 +38,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
 
     // This line requires your 'express.d.ts' or 'custom-request.d.ts'
     // to extend the Request interface with a 'user' property.
-    req.currentUser = { id: decoded.userId }; // Ensure 'user_id' is set for compatibility};
+    req.currentUser = { id: decoded.userId, username: decoded.username, roles: decoded.roles }; // Ensure 'user_id' is set for compatibility};
 
     next();
   } catch (error: any) {

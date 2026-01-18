@@ -6,6 +6,8 @@ declare global {
     // This interface merges your usersAttributes with the Express.User expectation of an 'id' property.
     interface DedicatedUser {
       id: string; // The required 'id' property, which will be populated by usersAttributes.user_id
+      username: string;
+      roles: string; // Assuming roles are stored as an array of strings
     }
 
     // Extend the Request interface to correctly type the 'user' property.
