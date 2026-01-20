@@ -15,6 +15,10 @@ export class UserService {
     return this._userRepository.readByEmail(email);
   }
 
+  public async findUserByEmailWithRoles(email: string): Promise<UserRetrievedDTO | null> {
+    return this._userRepository.findUserWithRoles(email);
+  }
+
   public async findUserById(id: string): Promise<UserRetrievedDTO | null> {
     return this._userRepository.readById(id);
   }

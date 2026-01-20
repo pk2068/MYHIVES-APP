@@ -19,23 +19,29 @@ export class UserRepository implements IUserRepository {
   }
 
   async readById(id: string): Promise<UserRetrievedDTO | null> {
-    const user = await Users.findByPk(id, {
-      include: [
-        {
-          model: Roles,
-          as: 'roles_association',
-          attributes: ['role_name'],
-          through: { attributes: [] },
-        },
-      ],
-    });
+    const user = await Users.findByPk(id);
 
-    return user ? this.mapUserWithRoles(user) : null;
+    console.log('UserRepository.readByID - found user:', user);
+    console.log('UserRepository.readByID - found user.toJSON():', user?.toJSON());
+    console.log('UserRepository.readByID - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
+
+    return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
 
   async readByEmail(email: string): Promise<UserRetrievedDTO | null> {
     const user = await Users.findOne({
       where: { email },
+    });
+
+    console.log('UserRepository.readByEmail - found user:', user);
+    console.log('UserRepository.readByEmail - found user.toJSON():', user?.toJSON());
+    console.log('UserRepository.readByEmail - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
+    return user ? (user.toJSON() as UserRetrievedDTO) : null;
+  }
+
+  async readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null> {
+    const user = await Users.findOne({
+      where: { google_id: googleId },
       include: [
         {
           model: Roles,
@@ -48,41 +54,27 @@ export class UserRepository implements IUserRepository {
     return user ? this.mapUserWithRoles(user) : null;
   }
 
-  async readByGoogleId(googleId: string): Promise<UserRetrievedDTO | null> {
+  async findUserWithRoles(email: string): Promise<UserRetrievedDTO | null> {
     const user = await Users.findOne({
-      where: { google_id: googleId },
+      where: { email },
       include: [
         {
           model: Roles,
-          as: 'roles_association',
-          attributes: ['role_name'],
-          through: { attributes: [] },
+          as: 'roles_association', // Matches the alias in associations.ts
+          attributes: ['role_name'], // Only get the names
+          through: { attributes: [] }, // Exclude junction table data
         },
       ],
     });
 
+    console.log('UserRepository.findUserWithRoles - found user.toJSON():', user?.toJSON());
     return user ? this.mapUserWithRoles(user) : null;
   }
 
   async readAll(): Promise<UserRetrievedDTO[]> {
-    const allUsers = await Users.findAll({
-      include: [
-        {
-          model: Roles,
-          as: 'roles_association',
-          attributes: ['role_name'],
-          through: { attributes: [] },
-        },
-      ],
-    });
+    const allUsers = await Users.findAll();
 
-    return allUsers.map((user) => {
-      const userData = user.get({ plain: true }) as UserWithRoles;
-      return {
-        ...userData,
-        roles: userData.roles_association?.map((r) => r.role_name) || [],
-      } as UserRetrievedDTO;
-    });
+    return allUsers.map((user) => user.toJSON() as UserRetrievedDTO);
   }
 
   async update(id: string, user: UserUpdateDTO): Promise<[number, UserRetrievedDTO[]]> {

@@ -1,7 +1,7 @@
 ### Check HEALTH Endpoint
 # @name checkHealth
 GET http://localhost:3000/api/v1/health
-Content-Type: application/json    
+# Content-Type: application/json    
 
 
 ### Register a New User
@@ -75,3 +75,8 @@ Authorization: Bearer {{token2}}
 POST http://localhost:3000/api/v1/auth/logout
 Accept: application/json
 Authorization: Bearer {{token2}}
+
+### Google Login
+# This request simulates a Google OAuth login.
+GET http://localhost:3000/api/v1/auth/google-login
+Content-Type: application/json    

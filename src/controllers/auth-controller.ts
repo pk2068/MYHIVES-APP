@@ -63,7 +63,8 @@ export class AuthController {
     try {
       const { email, password } = req.body;
 
-      const user: UserRetrievedDTO | null = await this._userService.findUserByEmail(email);
+      const user: UserRetrievedDTO | null = await this._userService.findUserByEmailWithRoles(email);
+      //const user: UserRetrievedDTO | null = await this._userService.findUserByEmail(email);
       if (!user || !user.password_hash) {
         // Check for user existence and if they have a password (for traditional login)
         const error = new Error('Invalid credentials.') as CustomError;
@@ -86,10 +87,14 @@ export class AuthController {
         roles: user.roles?.join(',') || '',
       });
 
+      const timeoutSeconds = getSecondsFromConfig(config.tokenExpiry);
+      console.log(`⌚ Token expiry time in seconds : ${timeoutSeconds}`);
+
       res.cookie('jwtcookie', token, {
         httpOnly: true,
         secure: config.nodeEnv === 'production',
-        maxAge: 1000 * 3600 * 24 * 7, // 7 days in milliseconds
+        sameSite: 'strict',
+        maxAge: getSecondsFromConfig(config.tokenExpiry) * 1000, // in milliseconds
       });
 
       const responseObj: LoginUserOutgoingDTO = {
@@ -241,7 +246,8 @@ export class AuthController {
       res.cookie('jwtcookie', token, {
         httpOnly: true,
         secure: config.nodeEnv === 'production',
-        maxAge: 1000 * 3600 * 24 * 7, // 7 days in milliseconds
+        sameSite: 'strict',
+        maxAge: getSecondsFromConfig(config.tokenExpiry) * 1000, // in milliseconds
       });
 
       const responseObj: LoginUserOutgoingDTO = {

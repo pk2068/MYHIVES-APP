@@ -46,7 +46,7 @@ const config: IConfig = {
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173', // My React default port
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379', // Default Redis URL
   tokenExpiry: process.env.TOKEN_EXPIRY || '1h',
-  refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || '7d',
+  refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || '1d',
 };
 
 // console.log('Config loaded:', config);
