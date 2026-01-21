@@ -6,7 +6,7 @@ import { CustomError } from './errorHandler.js';
  * AuthorizeRole Middleware Factory
  *
  * Validates that the authenticated user possesses one of the required roles.
- * Must be mounted after the isAuthenticated middleware.
+ * Must be mounted after the isAuthenticated middleware, couse that one fills the req.currentUser with roles
  */
 export const authorizeRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +26,10 @@ export const authorizeRole = (allowedRoles: string[]) => {
       // 3. Permission Validation
       // Check if any of the user's roles match the allowedRoles list.
       const hasPermission = allowedRoles.some((role) => userRoles.includes(role));
+
+      // console.log('authorizeRole Middleware - User Roles from JWT:', userRoles);
+      // console.log('authorizeRole Middleware - Allowed Roles for this route:', allowedRoles);
+      // console.log('authorizeRole Middleware - Permission Granted:', hasPermission);
 
       if (!hasPermission) {
         const error = new Error('Forbidden: Insufficient permissions to access this resource.') as CustomError;

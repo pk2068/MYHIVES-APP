@@ -21,9 +21,9 @@ export class UserRepository implements IUserRepository {
   async readById(id: string): Promise<UserRetrievedDTO | null> {
     const user = await Users.findByPk(id);
 
-    console.log('UserRepository.readByID - found user:', user);
-    console.log('UserRepository.readByID - found user.toJSON():', user?.toJSON());
-    console.log('UserRepository.readByID - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
+    // console.log('UserRepository.readByID - found user:', user);
+    // console.log('UserRepository.readByID - found user.toJSON():', user?.toJSON());
+    // console.log('UserRepository.readByID - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
 
     return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
@@ -33,9 +33,9 @@ export class UserRepository implements IUserRepository {
       where: { email },
     });
 
-    console.log('UserRepository.readByEmail - found user:', user);
-    console.log('UserRepository.readByEmail - found user.toJSON():', user?.toJSON());
-    console.log('UserRepository.readByEmail - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
+    // console.log('UserRepository.readByEmail - found user:', user);
+    // console.log('UserRepository.readByEmail - found user.toJSON():', user?.toJSON());
+    // console.log('UserRepository.readByEmail - found user as UserRetrievedDTO:', user as UserRetrievedDTO);
     return user ? (user.toJSON() as UserRetrievedDTO) : null;
   }
 
@@ -67,7 +67,7 @@ export class UserRepository implements IUserRepository {
       ],
     });
 
-    console.log('UserRepository.findUserWithRoles - found user.toJSON():', user?.toJSON());
+    // console.log('UserRepository.findUserWithRoles - found user.toJSON():', user?.toJSON());
     return user ? this.mapUserWithRoles(user) : null;
   }
 

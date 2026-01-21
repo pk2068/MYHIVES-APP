@@ -163,16 +163,12 @@ export class AuthController {
         throw error;
       }
 
-      console.log('Current user ID:', req.currentUser.id);
-
       const user: UserRetrievedDTO | null = await this._userService.findUserById(req.currentUser.id);
       if (!user) {
         const error = new Error('User not found.') as CustomError;
         error.statusCode = 404;
         throw error;
       }
-
-      console.log('User found:', user);
 
       // Return user data (excluding password)
       const { password_hash: password, ...userData } = user;

@@ -14,6 +14,7 @@ import { AuthController } from '../controllers/auth-controller.js';
 import { isAuthenticated } from '../middleware/auth.js';
 
 import passport from '../config/passport.js';
+import { authorizeRole } from '../middleware/permission.js';
 
 const authRouter = Router();
 
@@ -80,7 +81,7 @@ authRouter.get('/google-login', passport.authenticate('google', { scope: ['profi
 authRouter.get('/google-login/callback', passport.authenticate('google', { session: false }), authController.googleLoginCallback);
 authRouter.get('/refresh-token', authController.refreshToken);
 
-authRouter.get('/me', isAuthenticated, authController.getMe);
+authRouter.get('/me', isAuthenticated, authorizeRole(['admin', 'vet', 'spectator']), authController.getMe);
 
 authRouter.post(
   '/logout',
