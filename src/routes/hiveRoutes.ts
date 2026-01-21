@@ -7,6 +7,7 @@ import { HiveRepository } from '../repositories/implementations/hive-repository.
 import { HiveService } from '../services/hive-service.js';
 //import { hivesAttributes } from '../database/models-ts/hives.js';
 import { isAuthenticated } from '../middleware/auth.js';
+import { authorizeRole } from '../middleware/permission.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { validate } from '../middleware/validation.js';
 import { HiveControllerCreateDTO, HiveControllerCreateStrongDTO, HiveControllerUpdateDTO } from '../controllers/dto/hive-controller.dto.js';
@@ -55,10 +56,11 @@ const updateHiveParamSchema = Joi.object({
 hiveRouter.get(
   '/',
   isAuthenticated,
-  (req, res, next) => {
-    console.log('Router : Fetching hives...', req.params);
-    next();
-  },
+  // (req, res, next) => {
+  //   console.log('Router : Fetching hives...', req.params);
+  //   next();
+  // },
+  authorizeRole(['admin', 'vet', 'spectator', 'user']),
   validate({ params: createHiveParamSchema }),
   hiveController.getAllHives
 );
@@ -69,10 +71,11 @@ hiveRouter.post('/', isAuthenticated, validate({ params: createHiveParamSchema, 
 hiveRouter.get(
   '/:hive_id',
   isAuthenticated,
-  (req, res, next) => {
-    console.log('Router : Fetching specific hive ...', req.params);
-    next();
-  },
+  authorizeRole(['admin', 'vet', 'user']),
+  // (req, res, next) => {
+  //   console.log('Router : Fetching specific hive ...', req.params);
+  //   next();
+  // },
   validate({ params: updateHiveParamSchema }),
   hiveController.getHiveById
 );
@@ -81,10 +84,11 @@ hiveRouter.get(
 hiveRouter.put(
   '/:hive_id',
   isAuthenticated,
-  (req, res, next) => {
-    console.log('Router : Updating specific hive ...', req.params);
-    next();
-  },
+  authorizeRole(['user']),
+  // (req, res, next) => {
+  //   console.log('Router : Updating specific hive ...', req.params);
+  //   next();
+  // },
   validate({ params: updateHiveParamSchema, body: updateHivesBodySchema }),
   hiveController.updateHive
 );
@@ -93,20 +97,22 @@ hiveRouter.put(
 hiveRouter.delete(
   '/:hive_id',
   isAuthenticated,
-  (req, res, next) => {
-    console.log('Router : Deleting specific hive ...', req.params);
-    next();
-  },
+  authorizeRole(['user']),
+  // (req, res, next) => {
+  //   console.log('Router : Deleting specific hive ...', req.params);
+  //   next();
+  // },
   validate({ params: updateHiveParamSchema }),
   hiveController.deleteHive
 );
 hiveRouter.delete(
   '/',
   isAuthenticated,
-  (req, res, next) => {
-    console.log('Router : Deleting all hives ...', req.params);
-    next();
-  },
+  authorizeRole(['user', 'admin']),
+  // (req, res, next) => {
+  //   console.log('Router : Deleting all hives ...', req.params);
+  //   next();
+  // },
   validate({ params: createHiveParamSchema }),
   hiveController.deleteAllHives
 );

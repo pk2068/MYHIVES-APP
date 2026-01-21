@@ -11,8 +11,9 @@ import { IMajorInspectionRepository } from '../repositories/interfaces/i-major-i
 import { MajorInspectionRepository } from '../repositories/implementations/major-inspection-repository.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { checkMajorInspectionOwnership } from '../middleware/ownership.js';
+import { authorizeRole } from '../middleware/permission.js';
 
-import { checkLocationOwnership } from '../middleware/ownership.js';
+// import { checkLocationOwnership } from '../middleware/ownership.js'; // is already handled in parent route
 import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
 import hiveInspectionRouter from './hive-inspection-routes.js';
 
@@ -66,6 +67,7 @@ majorInspectionRouter.use('/:majorInspectionId/hive-inspections', majorInspectio
 // POST /api/locations/:locationId/major-inspections - Create a major inspection
 majorInspectionRouter.post(
   '/',
+  authorizeRole(['user', 'admin']),
   validate({
     params: Joi.object({
       locationId: Joi.string()
@@ -74,20 +76,22 @@ majorInspectionRouter.post(
     }),
     body: createMajorInspectionSchema,
   }),
-  //majorInspectionOwnershipMiddleware, // Verify only location ownership for creation
+  //majorInspectionOwnershipMiddleware, // Verify only location ownership for creation ... you can not check what does not exist yet
   majorInspectionController.createMajorInspection
 );
 
 // GET /api/locations/:locationId/major-inspections - Get all major inspections for a specific location
 majorInspectionRouter.get(
   '/',
-  //majorInspectionOwnershipMiddleware, // Verify location ownership
+  authorizeRole(['admin', 'vet', 'user']),
+  //majorInspectionOwnershipMiddleware, // -
   majorInspectionController.getMajorInspections
 );
 
 // GET /api/locations/:locationId/major-inspections/:majorInspectionId - Get a specific major inspection
 majorInspectionRouter.get(
   '/:majorInspectionId',
+  authorizeRole(['admin', 'vet', 'user']),
   validate({ params: majorInspectionParamsSchema }),
   majorInspectionOwnershipMiddleware,
   majorInspectionController.getSpecificMajorInspectionById
@@ -96,6 +100,7 @@ majorInspectionRouter.get(
 // PUT /api/locations/:locationId/major-inspections/:majorInspectionId - Update a specific major inspection
 majorInspectionRouter.put(
   '/:majorInspectionId',
+  authorizeRole(['user', 'admin']),
   validate({
     params: majorInspectionParamsSchema,
     body: updateMajorInspectionSchema,
@@ -107,6 +112,7 @@ majorInspectionRouter.put(
 // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId - Delete a specific major inspection
 majorInspectionRouter.delete(
   '/:majorInspectionId',
+  authorizeRole(['user', 'admin']),
   validate({ params: majorInspectionParamsSchema }),
   majorInspectionOwnershipMiddleware,
   majorInspectionController.deleteMajorInspection

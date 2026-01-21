@@ -11,7 +11,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
   try {
     console.log('Authentication middleware called');
     const authHeader = req.headers.authorization;
-    console.log('Token received:', req.headers.authorization);
+    // console.log('Token received:', req.headers.authorization);
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       const error = new Error('No token provided or invalid token format.') as CustomError;

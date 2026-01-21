@@ -81,7 +81,7 @@ authRouter.get('/google-login', passport.authenticate('google', { scope: ['profi
 authRouter.get('/google-login/callback', passport.authenticate('google', { session: false }), authController.googleLoginCallback);
 authRouter.get('/refresh-token', authController.refreshToken);
 
-authRouter.get('/me', isAuthenticated, authorizeRole(['admin', 'vet', 'spectator']), authController.getMe);
+authRouter.get('/me', isAuthenticated, authorizeRole(['admin', 'vet', 'spectator', 'user']), authController.getMe);
 
 authRouter.post(
   '/logout',

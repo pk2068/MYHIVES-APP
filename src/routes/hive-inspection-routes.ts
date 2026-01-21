@@ -7,6 +7,7 @@ import { HiveInspectionRepository } from '../repositories/implementations/hive-i
 import { MajorInspectionRepository } from '../repositories/implementations/major-inspection-repository.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { hive_inspectionsAttributes } from '../database/models-ts/hive_inspections.js';
+import { authorizeRole } from 'middleware/permission.js';
 // import { isAuthenticated } from '../middleware/auth.js';
 import { checkHiveInspectionOwnership } from '../middleware/ownership.js';
 import { validate } from '../middleware/validation.js';
@@ -120,21 +121,18 @@ const rootHiveInspectionParamsSchema = Joi.object({
 // POST /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections - Create a hive inspection
 hiveInspectionRouter.post(
   '/',
+  authorizeRole(['user', 'admin']),
   validate({
     params: rootHiveInspectionParamsSchema,
     body: createHiveInspectionSchema,
   }),
-  // (req, res, next) => {
-  //   console.log('Validation successful');
-  //   next();
-  // },
-
   hiveInspectionController.createHiveInspection
 );
 
 // GET /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections - Get all hive inspections
 hiveInspectionRouter.get(
   '/',
+  authorizeRole(['user', 'admin', 'vet']),
   validate({
     params: rootHiveInspectionParamsSchema,
   }),
@@ -144,6 +142,7 @@ hiveInspectionRouter.get(
 // GET /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Get a specific hive inspection
 hiveInspectionRouter.get(
   '/:hiveInspectionId',
+  authorizeRole(['user', 'admin', 'vet']),
   validate({ params: specificHiveInspectionParamsSchema }),
   hiveInspectionOwnershipMiddleware,
   hiveInspectionController.getHiveInspectionById
@@ -152,10 +151,7 @@ hiveInspectionRouter.get(
 // PUT /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Update a specific hive inspection
 hiveInspectionRouter.put(
   '/:hiveInspectionId',
-  // (req, res, next) => {
-  //   console.log('****** PUT /:hiveInspectionId  *****');
-  //   next();
-  // },
+  authorizeRole(['user', 'admin']),
   validate({
     params: specificHiveInspectionParamsSchema,
     body: updateHiveInspectionSchema,
@@ -167,10 +163,7 @@ hiveInspectionRouter.put(
 // DELETE /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Delete a specific hive inspection
 hiveInspectionRouter.delete(
   '/:hiveInspectionId',
-  // (req, res, next) => {
-  //   console.log('****** DELETE /:hiveInspectionId  *****');
-  //   next();
-  // },
+  authorizeRole(['admin']),
   validate({ params: specificHiveInspectionParamsSchema }),
   hiveInspectionOwnershipMiddleware,
   hiveInspectionController.deleteHiveInspection
