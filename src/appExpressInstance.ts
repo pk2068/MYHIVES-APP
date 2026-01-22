@@ -65,6 +65,7 @@ console.log('Health check route added');
 // Mount your API routes here
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/locations', locationRoutes);
+apiRouter.use('/admin', adminRoutes/); // Uncomment and add adminRoutes when available
 
 console.log('API routes mounted');
 // --- Error Handling Middleware ---

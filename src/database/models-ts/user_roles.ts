@@ -1,4 +1,3 @@
-// filepath: database/models-ts/user_roles.ts
 import { Model, Table, Column, DataType, ForeignKey } from 'sequelize-typescript';
 import { Users } from './users.js';
 import { Roles } from './roles.js';
