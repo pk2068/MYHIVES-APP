@@ -36,6 +36,15 @@ export class AdminService {
     return await this._adminRepository.findAllUsersWithRoles();
   }
 
+  /**
+   *
+   * @param id - user id
+   * @returns the user with its associated roles
+   */
+  public async getUserDetails(id: string) {
+    return await this._adminRepository.findUserById(id);
+  }
+
   // --- User-Role Junction Management ---
 
   /**

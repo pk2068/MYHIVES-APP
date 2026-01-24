@@ -7,6 +7,7 @@ export interface IAdminRepository {
 
   // User Management
   findAllUsersWithRoles(): Promise<AdminUserRetrievedDTO[]>;
+  findUserById(id: string): Promise<AdminUserRetrievedDTO | null>;
 
   // User-Role Management (Composite Key logic)
   assignRoleToUser(link: UserRoleLinkDTO): Promise<UserRoleRetrievedDTO>;

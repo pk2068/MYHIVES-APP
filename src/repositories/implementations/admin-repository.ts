@@ -59,6 +59,34 @@ export class AdminRepository implements IAdminRepository {
     });
   }
 
+  async findUserById(id: string): Promise<AdminUserRetrievedDTO | null> {
+    const user = await Users.findByPk(id, {
+      include: [
+        {
+          model: Roles,
+          as: 'roles', // Ensure this matches your model association alias
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    if (!user) return null;
+
+    const userData = user.get({ plain: true }) as any;
+
+    return {
+      user_id: userData.user_id,
+      username: userData.username,
+      email: userData.email,
+      created_at: userData.created_at,
+      roles: (userData.roles || []).map((role: any) => ({
+        role_id: role.role_id,
+        role_name: role.role_name,
+        description: role.description,
+      })),
+    };
+  }
+
   // --- User-Role Management ---
 
   async assignRoleToUser(link: UserRoleLinkDTO): Promise<UserRoleRetrievedDTO> {
