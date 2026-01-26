@@ -12,6 +12,8 @@ const mockUser: UserRetrievedDTO = {
   password_hash: 'hashedPassword123',
   created_at: new Date(),
   updated_at: new Date(),
+  roles: ['user'],
+  google_id: 'test-google-id-456',
 };
 
 // Implement the interface with Jest mock functions
@@ -31,6 +33,10 @@ export class MockUserRepository implements IUserRepository {
 
   delete: jest.MockedFunction<(id: string) => Promise<number>> = jest.fn();
 
+  findUserWithRoles: jest.MockedFunction<(email: string) => Promise<UserRetrievedDTO | null>> = jest.fn();
+
+  readByGoogleId: jest.MockedFunction<(googleId: string) => Promise<UserRetrievedDTO | null>> = jest.fn();
+
   // Helper properties and methods for test setup
   public static mockUser = mockUser;
   public static mockUserId: string = mockUser.user_id as string;
@@ -45,6 +51,9 @@ export class MockUserRepository implements IUserRepository {
     mockRepo.create.mockImplementation((userData: UserCreationDTO) => Promise.resolve({ ...MockUserRepository.mockUser, ...userData, user_id: 'new-id-' + Math.random() }));
     mockRepo.update.mockResolvedValue([1, [MockUserRepository.mockUser]]);
     mockRepo.delete.mockResolvedValue(1);
+    mockRepo.readAll.mockResolvedValue([MockUserRepository.mockUser]);
+    mockRepo.findUserWithRoles.mockResolvedValue(MockUserRepository.mockUser);
+    mockRepo.readByGoogleId.mockResolvedValue(MockUserRepository.mockUser);
 
     return mockRepo;
   }

@@ -1,11 +1,7 @@
 import { MajorInspectionService } from '../../../src/services/major-inspection-service.ts'; // Adjust path as needed
 import { MockMajorInspectionRepository } from '../mocks/MockMajorInspectionRepository.ts';
 import { IMajorInspectionRepository } from '../../../src/repositories/interfaces/i-major-inspection-repository.ts';
-import {
-  MajorInspectionServiceCreateDTO,
-  MajorInspectionServiceRetrievedDTO,
-  MajorInspectionServiceUpdateDTO,
-} from '../../../src/services/dto/major-inspection-service.dto.ts';
+import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from '../../../src/services/dto/major-inspection-service.dto.ts';
 import { beforeEach, describe, it, expect, jest } from '@jest/globals';
 
 // --- MOCK DATA ---
@@ -23,7 +19,7 @@ const MOCK_INSPECTION_LIST: MajorInspectionServiceRetrievedDTO[] = [
   { ...MOCK_INSPECTION_RETRIEVED, major_inspection_id: 'inspection-uuid-999', description: 'Summer Check' },
 ];
 
-describe('MajorInspectionService', () => {
+describe('MajorInspectionService testing', () => {
   let majorInspectionService: MajorInspectionService;
   let mockRepository: MockMajorInspectionRepository;
 
@@ -175,7 +171,7 @@ describe('MajorInspectionService', () => {
         const deleteSpy = mockRepository.delete.mockResolvedValue(0);
 
         // Act
-        const result = await majorInspectionService.deleteMajorInspection('wrong-location-id', 'non-owned-major-insp-id');
+        const result = await majorInspectionService.deleteMajorInspection('wrong-location-id', 'non-owned-major-insp-id', MOCK_USER_ID);
 
         // Assert
         expect(mockRepository.findInspectionByLocationAndUser).toHaveBeenCalled();

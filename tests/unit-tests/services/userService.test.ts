@@ -26,7 +26,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('UserService', () => {
+describe('UserService testing', () => {
   // --- findUserByEmail tests ---
   describe('findUserByEmail', () => {
     it('should return a user if found by email', async () => {
@@ -81,6 +81,40 @@ describe('UserService', () => {
     });
   });
 
+  // --- findUserByGoogleId tests ---
+  describe('readByGoogleId', () => {
+    it('should return user details when a valid Google ID is provided', async () => {
+      // Arrange
+      const googleId = 'google-oauth-id-999';
+      const mockUser: UserRetrievedDTO = {
+        user_id: 'user-uuid-456',
+        username: 'google_user',
+        email: 'google@test.com',
+        created_at: new Date(),
+        roles: [], // Usually roles are empty or default for new OAuth users
+      };
+      mockUserRepository.readByGoogleId.mockResolvedValueOnce(mockUser);
+
+      // Act
+      const result = await userService.findUserByGoogleId(googleId);
+
+      // Assert
+      expect(result).toEqual(mockUser);
+      expect(mockUserRepository.readByGoogleId).toHaveBeenCalledWith(googleId);
+    });
+
+    it('should return null if the Google ID is not registered in the system', async () => {
+      // Arrange
+      mockUserRepository.readByGoogleId.mockResolvedValueOnce(null);
+
+      // Act
+      const result = await userService.findUserByGoogleId('unknown-id');
+
+      // Assert
+      expect(result).toBeNull();
+    });
+  });
+
   // --- createUser tests ---
   describe('createUser', () => {
     const newUser: UserCreationDTO = {
@@ -124,6 +158,41 @@ describe('UserService', () => {
 
       // Assert that create was never called
       expect(mockUserRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  // --- find user with roles tests ---
+  describe('findUserWithRoles', () => {
+    it('should return a user with their roles when given a valid email', async () => {
+      // Arrange
+      const email = 'tonyclark@gmail.com';
+      const mockUserWithRoles: UserRetrievedDTO = {
+        user_id: 'user-uuid-123',
+        username: 'tonyclark',
+        email: email,
+        created_at: new Date(),
+        roles: ['admin', 'user'],
+      };
+      mockUserRepository.findUserWithRoles.mockResolvedValueOnce(mockUserWithRoles);
+
+      // Act
+      const result = await userService.findUserByEmailWithRoles(email);
+
+      // Assert
+      expect(result).toEqual(mockUserWithRoles);
+      expect(mockUserRepository.findUserWithRoles).toHaveBeenCalledWith(email);
+      expect(mockUserRepository.findUserWithRoles).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null if no user is found with the provided email', async () => {
+      // Arrange
+      mockUserRepository.findUserWithRoles.mockResolvedValueOnce(null);
+
+      // Act
+      const result = await userService.findUserByEmailWithRoles('nonexistent@test.com');
+
+      // Assert
+      expect(result).toBeNull();
     });
   });
 

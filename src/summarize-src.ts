@@ -13,6 +13,9 @@ const OUTPUT_FILE = path.join(__dirname, 'src-summary3.txt');
 function walkDir(dir: string, fileList: string[] = []) {
   fs.readdirSync(dir).forEach((file) => {
     const fullPath = path.join(dir, file);
+
+    if (fullPath === OUTPUT_FILE) return; // Skip the output file to avoid including it
+
     if (fs.statSync(fullPath).isDirectory()) {
       walkDir(fullPath, fileList);
     } else {
