@@ -15,8 +15,8 @@ import { LocationControllerUpdateInputDTO, LocationControllerCreateInputDTO } fr
 
 //import { locationsAttributes } from '../database/models-ts/locations.js';
 
-import majorInspectionRouter from './majorInspectionRoutes.js';
-import hiveRouter from './hiveRoutes.js';
+import majorInspectionRouter from './major-inspection-routes.js';
+import hiveRouter from './hive-routes.js';
 import { checkLocationOwnership } from '../middleware/ownership.js';
 
 const locationRouter = Router();

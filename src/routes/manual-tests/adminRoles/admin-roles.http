@@ -1,0 +1,72 @@
+### Variables
+@baseUrl = http://localhost:3000/api/v1
+@userId = 608167c3-35ce-4bb2-acc8-a616dd63a05d
+@roleId = 3
+
+### Login with Valid Credentials
+# @name loginValidUser
+# This request authenticates a user and retrieves a JWT token.
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email" : "tonyclark@gmail.com",    
+    "password" : "password1234"
+}
+
+### Assign the token from the response to a local variable
+@adminToken = {{loginValidUser.response.body.token}}
+
+
+### 1. Get All Roles
+# @name getAllRoles
+GET {{baseUrl}}/admin/roles
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+### 2. Get All Users with Roles (Dashboard)
+# @name getUsersDashboard
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+### 3. Get Specific User Details
+# @name getUserDetails
+GET {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+### 4. Assign a Role to a User
+# @name assignRole
+POST {{baseUrl}}/admin/user-roles
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "userId": "{{userId}}",
+    "roleId": "{{roleId}}"
+}
+
+### 5. Update User Role (Re-assign/Ensure)
+# Uses the :id param as roleId and body for userId based on your controller
+# PUT /api/v1/admin/user-roles/:id
+# @name updateUserRole
+PUT {{baseUrl}}/admin/user-roles/{{roleId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "userId": "{{userId}}"
+}
+
+### 6. Remove a Role from a User
+# DELETE /api/v1/admin/user-roles/:id
+# @name removeUserRole
+DELETE {{baseUrl}}/admin/user-roles/{{roleId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "userId": "{{userId}}"
+}

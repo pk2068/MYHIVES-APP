@@ -7,8 +7,9 @@ import config from './config/index.js';
 import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Import the error handler
 
 // You'll import your routes here as you create them
-import authRoutes from './routes/authRoutes.js';
-import locationRoutes from './routes/locationRoutes.js';
+import authRoutes from './routes/auth-routes.js';
+import locationRoutes from './routes/location-routes.js';
+import adminRoutes from './routes/admin-routes.js';
 //import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 //  import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 // import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
@@ -65,7 +66,7 @@ console.log('Health check route added');
 // Mount your API routes here
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/locations', locationRoutes);
-apiRouter.use('/admin', adminRoutes/); // Uncomment and add adminRoutes when available
+apiRouter.use('/admin', adminRoutes); // Uncomment and add adminRoutes when available
 
 console.log('API routes mounted');
 // --- Error Handling Middleware ---

@@ -1,8 +1,8 @@
 // filepath: src/routes/adminRoutes.ts
 import { Router } from 'express';
-// import { AdminController } from '../controllers/admin-controller.js';
-// import { AdminService } from '../services/admin-service.js';
-// import { AdminRepository } from '../repositories/implementations/admin-repository.js';
+import { AdminController } from '../controllers/admin-controller.js';
+import { AdminService } from '../services/admin-service.js';
+import { AdminRepository } from '../repositories/implementations/admin-repository.js';
 import { isAuthenticated } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/permission.js';
 

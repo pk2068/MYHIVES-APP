@@ -1,5 +1,5 @@
 // filepath: src/repositories/implementations/admin-repository.ts
-import { Sequelize } from 'sequelize';
+//import { Sequelize } from 'sequelize';
 import { IAdminRepository } from '../interfaces/i-admin-repository.js';
 import { Users } from '../../database/models-ts/users.js';
 import { Roles } from '../../database/models-ts/roles.js';
@@ -7,11 +7,11 @@ import { UserRoles } from '../../database/models-ts/user_roles.js';
 import { RoleCreateDTO, RoleRetrievedDTO, AdminUserRetrievedDTO, UserRoleLinkDTO, UserRoleRetrievedDTO } from '../../services/dto/admin-role-service.dto.js';
 
 export class AdminRepository implements IAdminRepository {
-  private readonly db: Sequelize;
+  // private readonly db: Sequelize;
 
-  constructor(db: Sequelize) {
-    this.db = db;
-  }
+  // constructor(db: Sequelize) {
+  //   this.db = db;
+  // }
 
   // --- Role Management ---
 
@@ -32,7 +32,7 @@ export class AdminRepository implements IAdminRepository {
       include: [
         {
           model: Roles,
-          as: 'roles', // Must match the association name in your Users model
+          as: 'roles_association', // Must match the association name in your Users model
           through: { attributes: [] }, // Exclude junction table fields from the 'roles' array
         },
       ],
@@ -48,7 +48,7 @@ export class AdminRepository implements IAdminRepository {
         email: userData.email,
         created_at: userData.created_at!,
         // Map the included Roles models to RoleRetrievedDTO
-        roles: (userData.roles || []).map(
+        roles: (userData.roles_association || []).map(
           (role: any): RoleRetrievedDTO => ({
             role_id: role.role_id,
             role_name: role.role_name,
@@ -64,7 +64,7 @@ export class AdminRepository implements IAdminRepository {
       include: [
         {
           model: Roles,
-          as: 'roles', // Ensure this matches your model association alias
+          as: 'roles_association', // roles // Ensure this matches your model association alias
           through: { attributes: [] },
         },
       ],
@@ -79,7 +79,7 @@ export class AdminRepository implements IAdminRepository {
       username: userData.username,
       email: userData.email,
       created_at: userData.created_at,
-      roles: (userData.roles || []).map((role: any) => ({
+      roles: (userData.roles_association || []).map((role: any) => ({
         role_id: role.role_id,
         role_name: role.role_name,
         description: role.description,
