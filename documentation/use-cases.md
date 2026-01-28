@@ -3,27 +3,27 @@
 This diagram provides a high-level overview of the functional requirements and actor interactions within the MyHives application.
 
 ```mermaid
-usecaseDiagram
-    actor User as "Beekeeper"
-    actor Admin as "System Admin"
+flowchart TD
+    subgraph Authentication["Authentication"]
+        UC1["Register"]
+        UC2["Login (Local/OAuth)"]
+        UC3["Logout"]
+    end
 
-    package "Authentication" {
-        usecase UC1 as "Register"
-        usecase UC2 as "Login (Local/OAuth)"
-        usecase UC3 as "Logout"
-    }
+    subgraph HiveManagement["Hive Management"]
+        UC4["Manage Locations"]
+        UC5["Manage Hives"]
+        UC6["Record Inspections"]
+        UC7["View Map"]
+    end
 
-    package "Hive Management" {
-        usecase UC4 as "Manage Locations"
-        usecase UC5 as "Manage Hives"
-        usecase UC6 as "Record Inspections"
-        usecase UC7 as "View Map"
-    }
+    subgraph Administration["Administration"]
+        UC8["Manage Users"]
+        UC9["Manage Roles"]
+    end
 
-    package "Administration" {
-        usecase UC8 as "Manage Users"
-        usecase UC9 as "Manage Roles"
-    }
+    User["Beekeeper"]
+    Admin["System Admin"]
 
     User --> UC1
     User --> UC2
