@@ -8,7 +8,7 @@ services:
     restart: always
 
   db:
-    image: postgres:latest
+    image: postgres:14-alpine
     container_name: myhives_postgres
     restart: always
     environment:
@@ -16,10 +16,15 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - '${DB_PORT}:${DB_NAME}'
+      - '${DB_PORT}:${DB_PORT}'
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
 
   # --- THIS PART WAS MISSING ---
 volumes:
   postgres_data:
+
+
+networks:
+  default:
+    name: myhives-network

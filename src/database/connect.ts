@@ -65,8 +65,8 @@ export const connectDB = async () => {
     // `alter: true` is good for development but can cause data loss in production.
     if (config.nodeEnv === 'development') {
       console.log('Syncing database models (development mode)...');
-      //await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
-      await sequelize.sync({ alter: false });
+      await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
+      // await sequelize.sync({ alter: false });
       console.log('✅Database models synchronized.');
     } else {
       // In production, rely on migrations. If you haven't run migrations,

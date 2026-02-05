@@ -16,6 +16,7 @@ build/
 # Environment variables
 .env
 .env.*
+.env-test
 .DS_Store # macOS specific
 Thumbs.db # Windows specific
 

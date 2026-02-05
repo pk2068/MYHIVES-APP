@@ -1,0 +1,62 @@
+services:
+  db: # your dev DB (optional if you already run dev DB separately)
+    image: postgres:14-alpine
+    container_name: myhives_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  db_test:
+    image: postgres:14-alpine
+    container_name: myhives_postgres_test
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}-test
+    ports:
+      - "${DB_PORT_TEST:-5433}:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}-test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # db_migrator:
+  #   image: postgres:14-alpine
+  #   container_name: myhives_db_migrator
+  #   depends_on:
+  #     - db
+  #     - db_test
+  #   entrypoint: ["/bin/sh", "-c"]
+  #   environment:
+  #     PGPASSWORD: "${DB_PASSWORD}"
+  #   # Wait for both DBs and stream dump from dev db to test db
+  #   command: >
+  #     "
+  #     until pg_isready -h db -U ${DB_USER} -d ${DB_NAME}; do sleep 1; done;
+  #     until pg_isready -h db_test -U ${DB_USER} -d ${DB_NAME}-test; do sleep 1; done;
+  #     echo 'Starting dump from db -> restore to db_test';
+  #     pg_dump -h db -U ${DB_USER} -Fc ${DB_NAME} | pg_restore -h db_test -U ${DB_USER} -d ${DB_NAME}-test --no-owner --no-privileges;
+  #     echo 'Migration complete';
+  #     "
+  #   # run only once, then container will exit
+
+volumes:
+  postgres_data:
+  postgres_test_data:
+
+  networks:
+  default:
+    name: myhives-network
