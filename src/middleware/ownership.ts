@@ -101,10 +101,9 @@ export const checkHiveInspectionOwnership = (hiveInspectionService: HiveInspecti
       const majorInspectionId = req.params.majorInspectionId as string;
       const hiveInspectionId = req.params.hiveInspectionId as string;
       const userId = req.currentUser?.id;
-      const hiveId = req.body.hiveId as string;
+      // const hiveId = req.body.hiveId as string; //
 
-      if (!userId || !locationId || !majorInspectionId || !hiveInspectionId || !hiveId) {
-        // If any ID is missing, something is wrong with the preceding middleware or routing.
+      if (!userId || !locationId || !majorInspectionId || !hiveInspectionId) {
         const error = new Error('Missing authentication or resource IDs.') as CustomError;
         error.statusCode = httpStatus.BAD_REQUEST; // 400
         throw error;
@@ -112,10 +111,12 @@ export const checkHiveInspectionOwnership = (hiveInspectionService: HiveInspecti
 
       // --- 🔑 The Core Check (Service/Repository Delegation) ---
       // The MajorInspectionService should have a dedicated method for this.
-      const isOwner = await hiveInspectionService.checkHiveInspectionOwnership(hiveInspectionId, hiveId, userId);
+      // ✅ Check ownership using params only (no body dependency)
+      const isOwner = await hiveInspectionService.checkHiveInspectionOwnership(hiveInspectionId, majorInspectionId, locationId, userId);
+      //const isOwner = await hiveInspectionService.checkHiveInspectionOwnership(hiveInspectionId, majorInspectionId, userId);
 
       if (!isOwner) {
-        const error = new Error('Forbidden. You do not own this Hive Inspection for this hive or it does not exist.') as CustomError;
+        const error = new Error('Forbidden. You do not own this Hive Inspection or it does not exist.') as CustomError;
         error.statusCode = httpStatus.FORBIDDEN; // 403
         throw error;
       }

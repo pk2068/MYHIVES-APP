@@ -63,7 +63,7 @@ export class LocationController {
         throw custErr;
       }
       const userId = req.currentUser.id;
-      const { locationId } = req.params;
+      const { locationId } = req.params as { [key: string]: string };
 
       const specificLocation: LocationServiceRetrievedDTO | null = await this._locationService.getLocationById(locationId);
 
@@ -89,7 +89,7 @@ export class LocationController {
         throw custErr;
       }
       const userId = req.currentUser.id;
-      const { locationId } = req.params;
+      const { locationId } = req.params as { [key: string]: string };
 
       const updateDataRaw: LocationControllerUpdateInputDTO = req.body;
 
@@ -121,7 +121,7 @@ export class LocationController {
         throw custErr;
       }
 
-      const { locationId } = req.params;
+      const { locationId } = req.params as { [key: string]: string };
       const deleted: number = await this._locationService.deleteLocation(locationId);
 
       if (deleted === 0) {

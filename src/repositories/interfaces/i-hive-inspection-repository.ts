@@ -1,10 +1,6 @@
 // src/repositories/interfaces/i-hive-inspection-repository.ts
 
-import {
-  HiveInspectionServiceCreateDTO,
-  HiveInspectionServiceRetrievedDTO,
-  HiveInspectionServiceUpdateDTO,
-} from '../../services/dto/hive-inspection-service.dto.js';
+import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../../services/dto/hive-inspection-service.dto.js';
 
 /**
  * Defines the contract for all data access operations related to Hive Inspections.
@@ -30,10 +26,10 @@ export interface IHiveInspectionRepository {
   /**
    * Finds a specific hive inspection by its ID.
    * @param inspectionId The ID of the inspection.
-   * @param hiveId Optional: The ID of the hive (for scoped lookups).
+   * @param majorInspectionId Optional: The ID of the major inspection
    * @returns The inspection DTO or null if not found.
    */
-  findById(inspectionId: string, hiveId?: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
+  findById(inspectionId: string, majorInspectionId?: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
 
   /**
    * Finds all hive inspections for a specific hive.
@@ -58,12 +54,19 @@ export interface IHiveInspectionRepository {
   delete(inspectionId: string, hiveId?: string): Promise<number>;
 
   /**
-   * CRITICAL: Checks for ownership via a JOIN.
-   * Checks if a Hive Inspection exists, belongs to a specific Hive, AND that Hive belongs to a specific User.
-   * @param inspectionId The ID of the inspection.
-   * @param hiveId The ID of the parent hive.
+   * CRITICAL: Checks for ownership via INNER JOINs.
+   * Verifies the Hive Inspection exists, belongs to a specific Major Inspection,
+   * and that Major Inspection belongs to a Location owned by the user.
+   * @param hiveInspectionId The ID of the inspection.
+   * @param majorInspectionId The ID of the major inspection.
+   * @param locationId The ID of the location.
    * @param userId The ID of the owning user.
    * @returns The inspection DTO if owned and exists, otherwise null.
    */
-  findHiveInspectionByHiveAndUser(inspectionId: string, hiveId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
+  findHiveInspectionByMajorInspectionLocationAndUser(
+    hiveInspectionId: string,
+    majorInspectionId: string,
+    locationId: string,
+    userId: string
+  ): Promise<HiveInspectionServiceRetrievedDTO | null>;
 }

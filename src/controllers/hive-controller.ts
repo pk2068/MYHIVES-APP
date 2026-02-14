@@ -13,9 +13,9 @@ export class HiveController {
   // Get all hives
   public getAllHives = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Controller : Fetching hives...', req.params);
+      //console.log('Controller : Fetching hives...', req.params);
 
-      const location_id = req.params.locationId;
+      const location_id = req.params.locationId as string;
 
       const hives = await this._hiveService.getHivesByLocationId(location_id);
 
@@ -33,10 +33,10 @@ export class HiveController {
   // Get hive by ID
   public getHiveById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Controller : Fetching hive...', req.params);
+      //console.log('Controller : Fetching hive...', req.params);
 
-      const location_id = req.params.locationId;
-      const hive_id = req.params.hive_id;
+      const location_id = req.params.locationId as string;
+      const hive_id = req.params.hive_id as string;
 
       const hive: HiveServiceRetrievedDTO | null = await this._hiveService.getHiveById(location_id, hive_id);
 
@@ -57,7 +57,7 @@ export class HiveController {
 
   public createHive = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      console.log('Creating hive...', req.params.locationId, req.body);
+      //console.log('Creating hive...', req.params.locationId, req.body);
       const location_id = req.params.locationId;
       const hiveBodyData = req.body;
 
@@ -76,8 +76,8 @@ export class HiveController {
   // Update a hive
   public updateHive = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const location_id = req.params.locationId;
-      const hive_id = req.params.hive_id;
+      const location_id = req.params.locationId as string;
+      const hive_id = req.params.hive_id as string;
       const updatedHiveData = req.body;
       const updateHivePayload: HiveServiceUpdateDTO = { ...updatedHiveData, location_id: location_id };
 
@@ -101,8 +101,8 @@ export class HiveController {
   // Delete a hive
   public deleteHive = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const location_id = req.params.locationId;
-      const hive_id = req.params.hive_id;
+      const location_id = req.params.locationId as string;
+      const hive_id = req.params.hive_id as string;
 
       console.log('Controller : Deleting hive...', req.params);
 
@@ -124,7 +124,7 @@ export class HiveController {
 
   public deleteAllHives = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const location_id = req.params.location_id;
+      const location_id: string = req.params.location_id as string;
 
       const deleted = await this._hiveService.deleteAllHives(location_id);
       if (!deleted) {

@@ -56,7 +56,7 @@ export class HiveInspectionController {
   // ------------------------------------------------------------------
   public async getHiveInspectionsByMajorInspectionId(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { locationId, majorInspectionId } = req.params;
+      const { locationId, majorInspectionId } = req.params as { locationId: string; majorInspectionId: string };
       const userId = req.currentUser!.id;
 
       // Call the secure service method
@@ -87,9 +87,9 @@ export class HiveInspectionController {
   // GET /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
   public async getHiveInspectionById(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { locationId, majorInspectionId, hiveInspectionId } = req.params;
+      const { majorInspectionId, hiveInspectionId } = req.params;
 
-      const hiveInspection = await this._hiveInspectionService.getHiveInspectionById(hiveInspectionId, majorInspectionId);
+      const hiveInspection = await this._hiveInspectionService.getHiveInspectionById(hiveInspectionId as string, majorInspectionId as string);
       if (!hiveInspection) {
         const _err = new Error('Hive inspection not found under this major inspection.') as CustomError;
         _err.statusCode = httpStatus.NOT_FOUND;
@@ -105,7 +105,7 @@ export class HiveInspectionController {
   // PUT /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
   public async updateHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { locationId, majorInspectionId, hiveInspectionId } = req.params;
+      const { locationId, majorInspectionId, hiveInspectionId } = req.params as { [key: string]: string };
       const userId = req.currentUser!.id;
 
       // Access the object directly from res.locals, no new DB query needed
@@ -120,11 +120,11 @@ export class HiveInspectionController {
       const hiveId = req.body.hiveId as string;
       const updateData: HiveInspectionServiceUpdateDTO = req.body; // Joi validation should ensure valid partial data
 
-      console.log('------------------ Controller: Updating hive inspection with data:', updateData);
+      //console.log('------------------ Controller: Updating hive inspection with data:', updateData);
 
       const updatedHiveInspection = await this._hiveInspectionService.updateHiveInspection(hiveInspectionId, hiveId, updateData);
 
-      console.log('------------------ Controller: Updated hive inspection:', updatedHiveInspection);
+      //console.log('------------------ Controller: Updated hive inspection:', updatedHiveInspection);
 
       if (!updatedHiveInspection) {
         const _err = new Error('Hive inspection not found or could not be updated.') as CustomError;
@@ -141,7 +141,7 @@ export class HiveInspectionController {
   // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
   public async deleteHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { locationId, majorInspectionId, hiveInspectionId } = req.params;
+      const { locationId, majorInspectionId, hiveInspectionId } = req.params as { [key: string]: string };
       const userId = req.currentUser!.id;
       const hiveId = req.body.hiveId as string;
 

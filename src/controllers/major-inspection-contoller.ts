@@ -37,7 +37,7 @@ export class MajorInspectionController {
   public async getMajorInspections(req: Request, res: Response, next: NextFunction) {
     try {
       console.log('Fetching major inspections...');
-      const { locationId } = req.params;
+      const { locationId } = req.params as { [key: string]: string };
       const majorInspections = await this._majorInspectionService.getMajorInspectionsByLocationId(locationId);
       res.status(200).json({
         success: true,
@@ -50,7 +50,7 @@ export class MajorInspectionController {
 
   public async getSpecificMajorInspectionById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { majorInspectionId, locationId } = req.params;
+      const { majorInspectionId, locationId } = req.params as { [key: string]: string };
 
       const majorInspection = await this._majorInspectionService.getMajorInspectionById(majorInspectionId, locationId);
 
@@ -71,7 +71,7 @@ export class MajorInspectionController {
 
   public async updateMajorInspection(req: Request, res: Response, next: NextFunction) {
     try {
-      const { majorInspectionId, locationId } = req.params;
+      const { majorInspectionId, locationId } = req.params as { [key: string]: string };
       const updateData: MajorInspectionServiceUpdateDTO = { ...req.body, location_id: locationId };
       console.log('Updating major inspection controller...', majorInspectionId, locationId, updateData);
       const updatedMajorInspection = await this._majorInspectionService.updateMajorInspection(majorInspectionId, updateData);
@@ -91,9 +91,10 @@ export class MajorInspectionController {
       next(error);
     }
   }
+
   public async deleteMajorInspection(req: Request, res: Response, next: NextFunction) {
     try {
-      const { majorInspectionId, locationId } = req.params;
+      const { majorInspectionId, locationId } = req.params as { [key: string]: string };
       const userId = req.currentUser!.id;
       const deleted = await this._majorInspectionService.deleteMajorInspection(locationId, majorInspectionId, userId);
 

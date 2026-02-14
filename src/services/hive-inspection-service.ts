@@ -30,16 +30,12 @@ export class HiveInspectionService {
     return inspections;
   }
 
-  public async getHiveInspectionById(inspectionId: string, hiveId: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const inspection = await this._hiveInspectionRepository.findById(inspectionId, hiveId);
+  public async getHiveInspectionById(inspectionId: string, majorInspection?: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
+    const inspection = await this._hiveInspectionRepository.findById(inspectionId, majorInspection);
     return inspection;
   }
 
-  public async updateHiveInspection(
-    inspectionId: string,
-    hiveId: string,
-    updateData: HiveInspectionServiceUpdateDTO
-  ): Promise<HiveInspectionServiceRetrievedDTO | null> {
+  public async updateHiveInspection(inspectionId: string, hiveId: string, updateData: HiveInspectionServiceUpdateDTO): Promise<HiveInspectionServiceRetrievedDTO | null> {
     const [numberOfAffectedRows, affectedRows] = await this._hiveInspectionRepository.update(inspectionId, hiveId, updateData);
 
     if (numberOfAffectedRows === 0) {
@@ -58,7 +54,7 @@ export class HiveInspectionService {
   public async deleteHiveInspection(inspectionId: string, hiveId: string, userId: string): Promise<boolean> {
     // is the user authorized to delete this inspection on this hive?
 
-    const inspection = await this._hiveInspectionRepository.findHiveInspectionByHiveAndUser(inspectionId, hiveId, userId);
+    const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(inspectionId, hiveId, hiveId, userId);
     if (!inspection) {
       return false;
     }
@@ -71,11 +67,7 @@ export class HiveInspectionService {
   // ------------------------------------------------------------------
   // NEW: Get all Hive Inspections for a Major Inspection, with Security
   // ------------------------------------------------------------------
-  public async getHiveInspectionsByMajorInspectionId(
-    majorInspectionId: string,
-    locationId: string,
-    userId: string
-  ): Promise<HiveInspectionServiceRetrievedDTO[] | null> {
+  public async getHiveInspectionsByMajorInspectionId(majorInspectionId: string, locationId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO[] | null> {
     // 1. Security Gate: Check if the Major Inspection is owned by the user/location
     const isOwned = await this._majorInspectionService.checkMajorInspectionOwnership(majorInspectionId, locationId, userId);
 
@@ -93,12 +85,13 @@ export class HiveInspectionService {
   }
 
   /**
-   * Checks if a Hive Inspection exists at a specific Hive owned by a specific User.
-   * This is a crucial security check typically used by middleware/controllers.
+   * Checks if a Hive Inspection is owned by the user through the ownership chain.
+   * Location → MajorInspection → HiveInspection
+   * @returns True if the user owns this inspection, false otherwise.
    */
-  public async checkHiveInspectionOwnership(inspectionId: string, hiveId: string, userId: string): Promise<boolean> {
-    // Delegates the triple-check to the Repository for a single, efficient database query.
-    const inspection = await this._hiveInspectionRepository.findHiveInspectionByHiveAndUser(inspectionId, hiveId, userId);
+  public async checkHiveInspectionOwnership(hiveInspectionId: string, majorInspectionId: string, locationId: string, userId: string): Promise<boolean> {
+    // Use the repo's JOIN-based method to verify the entire ownership chain
+    const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(hiveInspectionId, majorInspectionId, locationId, userId);
     return inspection !== null;
   }
 }

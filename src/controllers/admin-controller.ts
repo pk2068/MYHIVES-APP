@@ -49,7 +49,7 @@ export class AdminController {
    */
   public getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await this._adminService.getUserDetails(req.params.id);
+      const user = await this._adminService.getUserDetails(req.params.id as string);
       if (!user) {
         const error = new Error('User not found') as CustomError;
         error.statusCode = httpStatus.NOT_FOUND;
@@ -108,7 +108,7 @@ export class AdminController {
   public removeRoleFromUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.body;
-      const deleted = await this._adminService.removeRoleFromUser(userId, req.params.id);
+      const deleted = await this._adminService.removeRoleFromUser(userId, req.params.id as string);
       if (!deleted) {
         const error = new Error('User-role assignment not found') as CustomError;
         error.statusCode = httpStatus.NOT_FOUND;

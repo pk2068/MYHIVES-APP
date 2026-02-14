@@ -36,8 +36,8 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
     });
   }
 
-  async findById(inspectionId: string, hiveId?: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const whereClause = hiveId ? { hive_inspection_id: inspectionId, hive_id: hiveId } : { hive_inspection_id: inspectionId };
+  async findById(inspectionId: string, majorInspectionId?: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
+    const whereClause = majorInspectionId ? { hive_inspection_id: inspectionId, major_inspection_id: majorInspectionId } : { hive_inspection_id: inspectionId };
 
     const inspection = await Hive_inspections.findOne({
       where: whereClause,
@@ -65,16 +65,16 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
   /**
    * Performs a JOIN query to check if a user owns a hive, and that hive owns the inspection.
    */
-  async findHiveInspectionByHiveAndUser(inspectionId: string, hiveId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
+  async findHiveInspectionByMajorInspectionAndUser(inspectionId: string, majorInspectionId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
     const inspection = await Hive_inspections.findOne({
-      where: { hive_inspection_id: inspectionId, hive_id: hiveId },
+      where: { hive_inspection_id: inspectionId, major_inspection_id: majorInspectionId },
       include: [
         {
           model: Hives,
           as: 'hive', // Must match your Sequelize association alias for HiveInspection.belongsTo(Hive)
           attributes: [],
           where: {
-            hive_id: hiveId, // Redundant but explicit
+            hive_id: majorInspectionId, // Redundant but explicit
             user_id: userId, // Ensure the hive belongs to the user
           },
           required: true, // INNER JOIN  - Must find a matching hive
