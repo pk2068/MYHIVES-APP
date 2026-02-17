@@ -31,12 +31,12 @@ export class HiveInspectionService {
   }
 
   public async getHiveInspectionById(inspectionId: string, majorInspection?: string): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const inspection = await this._hiveInspectionRepository.findById(inspectionId, majorInspection);
+    const inspection = await this._hiveInspectionRepository.findById(inspectionId);
     return inspection;
   }
 
   public async updateHiveInspection(inspectionId: string, hiveId: string, updateData: HiveInspectionServiceUpdateDTO): Promise<HiveInspectionServiceRetrievedDTO | null> {
-    const [numberOfAffectedRows, affectedRows] = await this._hiveInspectionRepository.update(inspectionId, hiveId, updateData);
+    const [numberOfAffectedRows, affectedRows] = await this._hiveInspectionRepository.update(inspectionId, updateData);
 
     if (numberOfAffectedRows === 0) {
       return null;
@@ -48,18 +48,20 @@ export class HiveInspectionService {
   /**
    * Deletes a hive inspection, requiring the hiveId for scoping/ownership.
    * @param inspectionId The ID of the inspection to delete.
-   * @param hiveId The ID of the parent hive.
+   * @param majorInspectionId The ID of the parent major inspection.
+   * @param locationId The ID of the location for ownership verification.
+   * @param userId The ID of the user attempting the deletion.
    * @returns True if the inspection was deleted (deletedRows > 0), false otherwise.
    */
-  public async deleteHiveInspection(inspectionId: string, hiveId: string, userId: string): Promise<boolean> {
+  public async deleteHiveInspection(inspectionId: string, majorInspectionId: string, locationId: string, userId: string): Promise<boolean> {
     // is the user authorized to delete this inspection on this hive?
 
-    const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(inspectionId, hiveId, hiveId, userId);
+    const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(inspectionId, majorInspectionId, locationId, userId);
     if (!inspection) {
       return false;
     }
     // The repository handles the deletion logic.
-    const deletedRows = await this._hiveInspectionRepository.delete(inspectionId, hiveId);
+    const deletedRows = await this._hiveInspectionRepository.delete(inspectionId);
 
     return deletedRows > 0;
   }

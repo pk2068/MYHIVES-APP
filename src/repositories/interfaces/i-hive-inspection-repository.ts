@@ -1,67 +1,81 @@
-// src/repositories/interfaces/i-hive-inspection-repository.ts
-
 import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../../services/dto/hive-inspection-service.dto.js';
 
 /**
- * Defines the contract for all data access operations related to Hive Inspections.
- * This interface is crucial for implementing the Dependency Injection pattern.
+ * Core CRUD operations for Hive Inspections.
+ * Minimal interface for basic data persistence operations.
  */
-export interface IHiveInspectionRepository {
-  /**
-   * Creates a new hive inspection record.
-   * @param inspection The data for the new hive inspection.
-   * @returns The created hive inspection DTO.
-   */
+export interface IHiveInspectionCRUD {
   create(inspection: HiveInspectionServiceCreateDTO): Promise<HiveInspectionServiceRetrievedDTO>;
 
+  findById(inspectionId: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
+
+  update(inspectionId: string, inspection: HiveInspectionServiceUpdateDTO): Promise<[number, HiveInspectionServiceRetrievedDTO[]]>;
+
+  delete(inspectionId: string): Promise<number>;
+}
+
+/**
+ * Query operations scoped by Major Inspection context.
+ * Used when working within a major inspection event.
+ */
+export interface IHiveInspectionMajorInspectionQueries {
   /**
-   * Updates an existing hive inspection record.
-   * @param inspectionId The ID of the inspection to update.
-   * @param hiveId The ID of the hive the inspection belongs to (for security/scoping).
-   * @param inspection The data to update.
-   * @returns A tuple [number of affected rows, array of updated records].
+   * Finds a hive inspection within a specific major inspection.
    */
-  update(inspectionId: string, hiveId: string, inspection: HiveInspectionServiceUpdateDTO): Promise<[number, HiveInspectionServiceRetrievedDTO[]]>;
+  findByIdInMajorInspection(inspectionId: string, majorInspectionId: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
 
   /**
-   * Finds a specific hive inspection by its ID.
-   * @param inspectionId The ID of the inspection.
-   * @param majorInspectionId Optional: The ID of the major inspection
-   * @returns The inspection DTO or null if not found.
-   */
-  findById(inspectionId: string, majorInspectionId?: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
-
-  /**
-   * Finds all hive inspections for a specific hive.
-   * @param hiveId The ID of the hive.
-   * @returns An array of inspection DTOs.
-   */
-  findAllByHiveId(hiveId: string): Promise<HiveInspectionServiceRetrievedDTO[]>;
-
-  /**
-   * Finds all hive inspections for a specific major-inspection.
-   * @param majorInspectionId The ID of the major inspection.
-   * @returns An array of hive-inspection DTOs.
+   * Finds all hive inspections for a specific major inspection.
    */
   findAllByMajorInspectionId(majorInspectionId: string): Promise<HiveInspectionServiceRetrievedDTO[]>;
 
   /**
-   * Deletes a hive inspection record.
-   * @param inspectionId The ID of the inspection to delete.
-   * @param hiveId Optional: The ID of the hive (for scoped deletion).
-   * @returns The number of destroyed rows (1 for success, 0 for failure).
+   * Updates a hive inspection within a major inspection context.
    */
-  delete(inspectionId: string, hiveId?: string): Promise<number>;
+  updateInMajorInspection(inspectionId: string, majorInspectionId: string, inspection: HiveInspectionServiceUpdateDTO): Promise<[number, HiveInspectionServiceRetrievedDTO[]]>;
 
   /**
-   * CRITICAL: Checks for ownership via INNER JOINs.
-   * Verifies the Hive Inspection exists, belongs to a specific Major Inspection,
-   * and that Major Inspection belongs to a Location owned by the user.
-   * @param hiveInspectionId The ID of the inspection.
-   * @param majorInspectionId The ID of the major inspection.
-   * @param locationId The ID of the location.
-   * @param userId The ID of the owning user.
-   * @returns The inspection DTO if owned and exists, otherwise null.
+   * Deletes a hive inspection within a major inspection context.
+   */
+  deleteInMajorInspection(inspectionId: string, majorInspectionId: string): Promise<number>;
+}
+
+/**
+ * Query operations scoped by Hive context.
+ * Used for hive history, trending, and analysis across multiple inspections.
+ */
+export interface IHiveInspectionHiveHistoryQueries {
+  /**
+   * Finds all inspections for a specific hive.
+   * Useful for historical trending and analysis.
+   */
+  findAllByHiveId(hiveId: string): Promise<HiveInspectionServiceRetrievedDTO[]>;
+
+  /**
+   * Finds all inspections for a specific hive within a date range.
+   * Used for time-series analysis and health trending.
+   */
+  findAllByHiveIdAndDateRange(hiveId: string, startDate: Date, endDate: Date): Promise<HiveInspectionServiceRetrievedDTO[]>;
+
+  /**
+   * Updates an inspection in hive history context.
+   */
+  updateInHive(inspectionId: string, hiveId: string, inspection: HiveInspectionServiceUpdateDTO): Promise<[number, HiveInspectionServiceRetrievedDTO[]]>;
+
+  /**
+   * Deletes an inspection in hive history context.
+   */
+  deleteInHive(inspectionId: string, hiveId: string): Promise<number>;
+}
+
+/**
+ * Security/Ownership verification operations.
+ * Handles authorization checks for different contexts.
+ */
+export interface IHiveInspectionSecurityQueries {
+  /**
+   * Verifies ownership through the Major Inspection → Location chain.
+   * Used by middleware in major-inspection routes.
    */
   findHiveInspectionByMajorInspectionLocationAndUser(
     hiveInspectionId: string,
@@ -69,4 +83,16 @@ export interface IHiveInspectionRepository {
     locationId: string,
     userId: string
   ): Promise<HiveInspectionServiceRetrievedDTO | null>;
+
+  /**
+   * Verifies ownership through the Hive → Location chain.
+   * Used by middleware in hive routes.
+   */
+  findHiveInspectionByHiveLocationAndUser(inspectionId: string, hiveId: string, locationId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO | null>;
 }
+
+/**
+ * Complete repository interface combining all operations.
+ * Implemented by the concrete HiveInspectionRepository class.
+ */
+export interface IHiveInspectionRepository extends IHiveInspectionCRUD, IHiveInspectionMajorInspectionQueries, IHiveInspectionHiveHistoryQueries, IHiveInspectionSecurityQueries {}
