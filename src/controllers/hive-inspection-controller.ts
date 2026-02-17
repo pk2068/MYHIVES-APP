@@ -122,7 +122,7 @@ export class HiveInspectionController {
 
       //console.log('------------------ Controller: Updating hive inspection with data:', updateData);
 
-      const updatedHiveInspection = await this._hiveInspectionService.updateHiveInspection(hiveInspectionId, hiveId, updateData);
+      const updatedHiveInspection = await this._hiveInspectionService.updateHiveInspection(hiveInspectionId, updateData);
 
       //console.log('------------------ Controller: Updated hive inspection:', updatedHiveInspection);
 
@@ -145,7 +145,7 @@ export class HiveInspectionController {
       const userId = req.currentUser!.id;
       const hiveId = req.body.hiveId as string;
 
-      const deleted = await this._hiveInspectionService.deleteHiveInspection(hiveInspectionId, hiveId, userId);
+      const deleted = await this._hiveInspectionService.deleteHiveInspection(hiveInspectionId, majorInspectionId, locationId, userId);
 
       if (!deleted) {
         const _err = new Error('Hive inspection not found or could not be deleted.') as CustomError;

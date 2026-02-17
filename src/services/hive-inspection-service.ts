@@ -1,3 +1,4 @@
+import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';
 // src/services/hive-inspection-service.ts
 
 import { IHiveInspectionRepository } from '../repositories/interfaces/i-hive-inspection-repository.js';
@@ -35,7 +36,7 @@ export class HiveInspectionService {
     return inspection;
   }
 
-  public async updateHiveInspection(inspectionId: string, hiveId: string, updateData: HiveInspectionServiceUpdateDTO): Promise<HiveInspectionServiceRetrievedDTO | null> {
+  public async updateHiveInspection(inspectionId: string, updateData: HiveInspectionServiceUpdateDTO): Promise<HiveInspectionServiceRetrievedDTO | null> {
     const [numberOfAffectedRows, affectedRows] = await this._hiveInspectionRepository.update(inspectionId, updateData);
 
     if (numberOfAffectedRows === 0) {
@@ -51,15 +52,18 @@ export class HiveInspectionService {
    * @param majorInspectionId The ID of the parent major inspection.
    * @param locationId The ID of the location for ownership verification.
    * @param userId The ID of the user attempting the deletion.
+   * @param hiveId (Optional) The ID of the hive for extra ownership verification.
    * @returns True if the inspection was deleted (deletedRows > 0), false otherwise.
    */
-  public async deleteHiveInspection(inspectionId: string, majorInspectionId: string, locationId: string, userId: string): Promise<boolean> {
+  public async deleteHiveInspection(inspectionId: string, majorInspectionId: string, locationId: string, userId: string, hiveId?: string): Promise<boolean> {
     // is the user authorized to delete this inspection on this hive?
 
     const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(inspectionId, majorInspectionId, locationId, userId);
     if (!inspection) {
       return false;
     }
+
+    if (hiveId && inspection.hive_id !== hiveId) return false; // double check the hiveId if provided, for extra safety
     // The repository handles the deletion logic.
     const deletedRows = await this._hiveInspectionRepository.delete(inspectionId);
 
