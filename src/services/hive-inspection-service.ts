@@ -100,4 +100,60 @@ export class HiveInspectionService {
     const inspection = await this._hiveInspectionRepository.findHiveInspectionByMajorInspectionLocationAndUser(hiveInspectionId, majorInspectionId, locationId, userId);
     return inspection !== null;
   }
+
+  /**
+   * Checks if a user owns a specific hive inspection in a hive history context.
+   * Location → Hive → HiveInspection
+   * Used by middleware for history-based authorization.
+   */
+  public async checkHiveInspectionOwnershipInHive(inspectionId: string, hiveId: string, locationId: string, userId: string): Promise<boolean> {
+    const inspection = await this._hiveInspectionRepository.findHiveInspectionByHiveLocationAndUser(inspectionId, hiveId, locationId, userId);
+    return inspection !== null;
+  }
+
+  // ======================================================================
+  // HIVE HISTORY CONTEXT - Analytical queries for hive development
+  // (Can be extended with future routes: /hives/:hiveId/inspections)
+  // ======================================================================
+
+  /**
+   * Gets all historical inspections for a specific hive.
+   * for hive development trends and health analysis.
+   */
+  public async getHiveInspectionHistory(hiveId: string, locationId: string, userId: string): Promise<HiveInspectionServiceRetrievedDTO[] | null> {
+    const inspections = await this._hiveInspectionRepository.findAllByHiveId(hiveId);
+    return inspections;
+  }
+
+  public async getHiveInspectionHistoryByDateRange(
+    hiveId: string,
+    //locationId: string,
+    //userId: string,
+    startDate: string,
+    endDate?: string
+  ): Promise<HiveInspectionServiceRetrievedDTO[] | null> {
+    let endDate1: Date;
+    if (!endDate) endDate1 = new Date();
+    else {
+      const endDateTemp = new Date(endDate);
+      if (isNaN(endDateTemp.getTime())) {
+        throw new Error('Invalid end date');
+      }
+      endDate1 = endDateTemp;
+    }
+
+    let startDate1: Date;
+    if (startDate === '') {
+      startDate1 = new Date(new Date().getFullYear() - 1, 0, 1); // Default to start of last year
+    } else {
+      const startDateTemp = new Date(startDate);
+      if (isNaN(startDateTemp.getTime())) {
+        throw new Error('Invalid start date');
+      }
+      startDate1 = startDateTemp;
+    }
+
+    const inspections = await this._hiveInspectionRepository.findAllByHiveIdAndDateRange(hiveId, startDate1, endDate1);
+    return inspections;
+  }
 }

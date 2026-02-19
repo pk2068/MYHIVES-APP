@@ -3,7 +3,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 //import { LocationService } from '../services/locationService.js';
-import { isAuthenticated } from '../middleware/auth.js';
+// import { isAuthenticated } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/permission.js';
 import { validate } from '../middleware/validation.js';
 import { LocationController } from '../controllers/location-controller.js';
@@ -55,28 +55,26 @@ const locationIdParamSchema = Joi.object({
 const ownershipLocationMiddleware = checkLocationOwnership(locationService);
 
 // Mount nested major inspection routes
-locationRouter.use('/:locationId/major-inspections', isAuthenticated, ownershipLocationMiddleware, majorInspectionRouter);
-locationRouter.use('/:locationId/hives', isAuthenticated, ownershipLocationMiddleware, hiveRouter);
+locationRouter.use('/:locationId/major-inspections', ownershipLocationMiddleware, majorInspectionRouter);
+locationRouter.use('/:locationId/hives', ownershipLocationMiddleware, hiveRouter);
 
 // POST /api/locations - Create a new location
 locationRouter.post(
   '/',
-  isAuthenticated,
   authorizeRole(['user', 'admin']), // Example role-based authorization
   validate({ body: createLocationSchema }), // <--- Body validation
   locationController.createLocation
 );
 
 // GET /api/locations/map - Get map data
-locationRouter.get('/map', isAuthenticated, authorizeRole(['spectator', 'admin', 'vet']), locationController.getMapData);
+locationRouter.get('/map', authorizeRole(['spectator', 'admin', 'vet']), locationController.getMapData);
 
 // GET /api/locations - Get all locations for the authenticated user
-locationRouter.get('/', isAuthenticated, authorizeRole(['spectator', 'admin', 'vet']), locationController.getAllLocations);
+locationRouter.get('/', authorizeRole(['spectator', 'admin', 'vet']), locationController.getAllLocations);
 
 // GET /api/locations/:locationId - Get a specific location by ID
 locationRouter.get(
   '/:locationId',
-  isAuthenticated,
   authorizeRole(['admin', 'vet', 'user', 'spectator']),
   validate({ params: locationIdParamSchema }), // <--- Params validation
   ownershipLocationMiddleware,
@@ -86,7 +84,6 @@ locationRouter.get(
 // PUT /api/locations/:locationId - Update a specific location by ID
 locationRouter.put(
   '/:locationId',
-  isAuthenticated,
   authorizeRole(['admin', 'user']),
   validate({ params: locationIdParamSchema, body: updateLocationSchema }), // <--- Both params and body validation
   ownershipLocationMiddleware,
@@ -96,7 +93,6 @@ locationRouter.put(
 // DELETE /api/locations/:locationId - Delete a specific location by ID
 locationRouter.delete(
   '/:locationId',
-  isAuthenticated,
   authorizeRole(['admin']),
   validate({ params: locationIdParamSchema }), // <--- Params validation
   ownershipLocationMiddleware,

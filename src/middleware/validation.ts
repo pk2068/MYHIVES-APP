@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import Joi from 'joi';
+import Joi, { Schema } from 'joi';
+import httpStatus from 'http-status';
 import { CustomError } from './errorHandler.js';
 // import {
 //   validationResult,
@@ -122,3 +123,27 @@ export const updateHiveInspectionSchema = Joi.object({
   hiveNumber: Joi.string().optional(),
   // ... and so on for all fields, with .optional()
 }).min(1); // At least one field must be provided for update
+
+export const validateQuery = (schema: Schema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // abortEarly: false ensures we catch ALL errors, not just the first one
+    const { error, value } = schema.validate(req.query, {
+      abortEarly: false,
+      stripUnknown: true, // Removes fields not defined in schema
+    });
+
+    if (error) {
+      const errorMessage = error.details.map((details) => details.message).join(', ');
+
+      // Pass the error to your global error handler
+      return res.status(httpStatus.BAD_REQUEST).json({
+        status: 'error',
+        message: errorMessage,
+      });
+    }
+
+    // Replace req.query with the validated/stripped version
+    req.query = value;
+    return next();
+  };
+};

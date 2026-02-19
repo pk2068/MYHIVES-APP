@@ -6,11 +6,13 @@ import { HiveController } from '../controllers/hive-controller.js';
 import { HiveRepository } from '../repositories/implementations/hive-repository.js';
 import { HiveService } from '../services/hive-service.js';
 //import { hivesAttributes } from '../database/models-ts/hives.js';
-import { isAuthenticated } from '../middleware/auth.js';
+//import { isAuthenticated } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/permission.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { validate } from '../middleware/validation.js';
 import { HiveControllerCreateDTO, HiveControllerCreateStrongDTO, HiveControllerUpdateDTO } from '../controllers/dto/hive-controller.dto.js';
+import { HiveInspectionController } from 'controllers/hive-inspection-controller.js';
+import hiveInspectionRouter from './hive-inspection-routes.js';
 
 const hiveRouter = Router({ mergeParams: true });
 // --- DI SETUP ---
@@ -52,10 +54,30 @@ const updateHiveParamSchema = Joi.object({
     .required(),
 });
 
+hiveRouter.use('/:hive_id/inspections', authorizeRole(['admin', 'vet', 'user']), hiveInspectionRouter);
+// //GET /api/v1/locations/:locationId/hives/:hiveId/inspections - Get hive history for a specific hive (all hives and their inspections).
+// hiveRouter.get(
+//   '/:hive_id/inspections',
+//   isAuthenticated,
+//   authorizeRole(['admin', 'vet', 'user']),
+//   validate({ params: updateHiveParamSchema }),
+//   //checkHiveOwnershipMiddleware(hiveController._hiveService), // Custom middleware to check if the user owns the hive
+//   HiveInspectionController.getHiveInspectionHistory
+// );
+
+// // GET /api/v1/locations/:locationId/hives/:hiveId/inspections/range - get hive history for a specific hive within a date range (query params: startDate, endDate).
+// hiveRouter.get(
+//   '/:hive_id/inspections/range',
+//   isAuthenticated,
+//   authorizeRole(['admin', 'vet', 'user']),
+//   validate({ params: updateHiveParamSchema, query: Joi.object({ startDate: Joi.date().required(), endDate: Joi.date().optional() }) }),
+//   //checkHiveOwnershipMiddleware(hiveController._hiveService), // Custom middleware to check if the user owns the hive
+//   HiveInspectionController.getHiveInspectionHistoryByDateRange
+// );
+
 //GET /api/v1/locations/:locationId/hives - Get all hives for a specific location.
 hiveRouter.get(
   '/',
-  isAuthenticated,
   // (req, res, next) => {
   //   console.log('Router : Fetching hives...', req.params);
   //   next();
@@ -65,12 +87,11 @@ hiveRouter.get(
   hiveController.getAllHives
 );
 //POST /api/v1/locations/:locationId/hives - Create a new hive within a specific location.
-hiveRouter.post('/', isAuthenticated, validate({ params: createHiveParamSchema, body: createHivesBodySchema }), hiveController.createHive);
+hiveRouter.post('/', validate({ params: createHiveParamSchema, body: createHivesBodySchema }), hiveController.createHive);
 
 //GET /api/v1/locations/:locationId/hives/:hiveId - Get a specific hive.
 hiveRouter.get(
   '/:hive_id',
-  isAuthenticated,
   authorizeRole(['admin', 'vet', 'user']),
   // (req, res, next) => {
   //   console.log('Router : Fetching specific hive ...', req.params);
@@ -83,7 +104,6 @@ hiveRouter.get(
 //PUT /api/v1/locations/:locationId/hives/:hiveId - Update a specific hive.
 hiveRouter.put(
   '/:hive_id',
-  isAuthenticated,
   authorizeRole(['user']),
   // (req, res, next) => {
   //   console.log('Router : Updating specific hive ...', req.params);
@@ -96,7 +116,6 @@ hiveRouter.put(
 //DELETE /api/v1/locations/:locationId/hives/:hiveId - Delete a specific hive.
 hiveRouter.delete(
   '/:hive_id',
-  isAuthenticated,
   authorizeRole(['user']),
   // (req, res, next) => {
   //   console.log('Router : Deleting specific hive ...', req.params);
@@ -107,7 +126,6 @@ hiveRouter.delete(
 );
 hiveRouter.delete(
   '/',
-  isAuthenticated,
   authorizeRole(['user', 'admin']),
   // (req, res, next) => {
   //   console.log('Router : Deleting all hives ...', req.params);

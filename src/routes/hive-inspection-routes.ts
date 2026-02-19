@@ -19,8 +19,10 @@ const hiveInspectionRouter = Router({ mergeParams: true });
 // --- DI SETUP ---
 const hiveInspectionRepository = new HiveInspectionRepository(database);
 const majorInspectionRepository = new MajorInspectionRepository(database);
+
 const majorInspectionService = new MajorInspectionService(majorInspectionRepository); // For ownership checks
 const hiveInspectionService = new HiveInspectionService(hiveInspectionRepository, majorInspectionService);
+
 const hiveInspectionController = new HiveInspectionController(hiveInspectionService);
 // --- END DI SETUP ---
 
@@ -118,6 +120,30 @@ const rootHiveInspectionParamsSchema = Joi.object({
     .required(),
 });
 
+const rootHiveInspectionHistoryParamsSchema = Joi.object({
+  hiveId: Joi.string()
+    .guid({ version: ['uuidv4'] })
+    .required(),
+  // Add the locationId to the schema to allow it
+  locationId: Joi.string()
+    .guid({ version: ['uuidv4'] })
+    .required(),
+});
+
+const rootHiveInspectionHistoryQuerySchema = Joi.object({
+  startDate: Joi.date() // Changed from string()
+    .iso()
+    .required(),
+
+  endDate: Joi.date() // Changed from string()
+    .iso()
+    .optional()
+    .greater(Joi.ref('startDate')) // Now this works!
+    .messages({
+      'date.greater': 'endDate must be after the startDate',
+    }),
+});
+
 // POST /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections - Create a hive inspection
 hiveInspectionRouter.post(
   '/',
@@ -137,6 +163,25 @@ hiveInspectionRouter.get(
     params: rootHiveInspectionParamsSchema,
   }),
   hiveInspectionController.getHiveInspectionsByMajorInspectionId
+);
+
+hiveInspectionRouter.get(
+  '/history',
+  authorizeRole(['user', 'admin', 'vet']),
+  validate({
+    params: rootHiveInspectionHistoryParamsSchema,
+  }),
+  hiveInspectionController.getHiveInspectionHistory
+);
+
+hiveInspectionRouter.get(
+  '/history/range',
+  authorizeRole(['user', 'admin', 'vet']),
+  validate({
+    params: rootHiveInspectionHistoryParamsSchema,
+    query: rootHiveInspectionHistoryQuerySchema,
+  }),
+  hiveInspectionController.getHiveInspectionHistoryByDateRange
 );
 
 // GET /api/v1/locations/{locationId}/major-inspections/{majorInspectionId}/hive-inspections/{hiveInspectionId} - Get a specific hive inspection

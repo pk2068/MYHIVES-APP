@@ -6,9 +6,6 @@ import { HiveInspectionService } from '../services/hive-inspection-service.js';
 
 import { HiveInspectionServiceCreateDTO, HiveInspectionServiceRetrievedDTO, HiveInspectionServiceUpdateDTO } from '../services/dto/hive-inspection-service.dto.js';
 
-//import { CreateHiveInspectionDto, UpdateHiveInspectionDto } from '../types/dtos.js';
-
-//import { ApiError } from '../utils/ApiError';
 import { CustomError } from '../middleware/errorHandler.js';
 import httpStatus from 'http-status';
 import { major_inspectionsAttributes } from '../database/models-ts/major-inspections.js';
@@ -154,6 +151,35 @@ export class HiveInspectionController {
       }
 
       res.status(httpStatus.NO_CONTENT).send(); // 204 No Content for successful deletion
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /api/locations/:locationId/hives/:hiveId/hive-inspections/history
+  public async getHiveInspectionHistory(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { locationId, hiveId } = req.params as { locationId: string; hiveId: string };
+      const userId = req.currentUser!.id;
+
+      const hiveInspectionHistory = await this._hiveInspectionService.getHiveInspectionHistory(hiveId, locationId, userId);
+
+      res.status(httpStatus.OK).send(hiveInspectionHistory);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /api/locations/:locationId/hives/:hiveId/hive-inspections/history?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+  public async getHiveInspectionHistoryByDateRange(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { locationId, hiveId } = req.params as { locationId: string; hiveId: string };
+      const userId = req.currentUser!.id;
+      const { startDate, endDate } = req.query as { startDate: string; endDate?: string };
+
+      const hiveInspectionHistoryByDateRange = await this._hiveInspectionService.getHiveInspectionHistoryByDateRange(hiveId, startDate, endDate);
+
+      res.status(httpStatus.OK).send(hiveInspectionHistoryByDateRange);
     } catch (error) {
       next(error);
     }
