@@ -9,8 +9,10 @@ services:
 
   db:
     image: postgres:14-alpine
-    container_name: myhives_postgres
+    container_name: myhives-postgres
     restart: always
+    env_file:
+      - .env # This forces Docker to look for the file
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -23,7 +25,6 @@ services:
   # --- THIS PART WAS MISSING ---
 volumes:
   postgres_data:
-
 
 networks:
   default:

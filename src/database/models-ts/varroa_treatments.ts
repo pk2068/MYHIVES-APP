@@ -15,7 +15,7 @@ export class Varroa_treatments extends Model<varroa_treatmentsAttributes, varroa
     primaryKey: true,
     autoIncrement: true,
     type: DataType.INTEGER,
-    defaultValue: Sequelize.literal("nextval('varroa_treatments_treatment_id_seq'::regclass)"),
+    // defaultValue: Sequelize.literal("nextval('varroa_treatments_treatment_id_seq'::regclass)"),
   })
   treatment_id?: number;
 

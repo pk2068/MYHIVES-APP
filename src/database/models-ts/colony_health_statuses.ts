@@ -15,7 +15,7 @@ export class Colony_health_statuses extends Model<colony_health_statusesAttribut
     primaryKey: true,
     autoIncrement: true,
     type: DataType.INTEGER,
-    defaultValue: Sequelize.literal("nextval('colony_health_statuses_status_id_seq'::regclass)"),
+    // defaultValue: Sequelize.literal("nextval('colony_health_statuses_status_id_seq'::regclass)"),
   })
   status_id?: number;
 

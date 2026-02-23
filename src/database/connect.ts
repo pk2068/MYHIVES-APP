@@ -7,6 +7,10 @@ import { Major_inspections } from './models-ts/major-inspections.js';
 import { Hives } from './models-ts/hives.js'; // To be created
 import { Roles } from './models-ts/roles.js';
 import { UserRoles } from './models-ts/user_roles.js';
+import { Colony_health_statuses } from './models-ts/colony_health_statuses.js';
+import { Queen_cell_statuses } from './models-ts/queen-cell-statuses.js';
+import { Queen_statuses } from './models-ts/queen-statuses.js';
+import { Varroa_treatments } from './models-ts/varroa_treatments.js';
 import { associateModels } from './models-ts/associations.js'; // Adjust path if you placed it elsewhere, e.g., './models-obsolete/associations.js'
 
 console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);
@@ -38,7 +42,7 @@ const sequelize = new Sequelize({
   port: DB_PORT,
   dialect: DB_DIALECT,
   logging: false, // Enable logging to see SQL queries
-  models: [Users, Locations, Hive_inspections, Major_inspections, Hives, Roles, UserRoles], // Add all models here
+  models: [Users, Locations, Major_inspections, Hives, Roles, UserRoles, Colony_health_statuses, Queen_cell_statuses, Varroa_treatments, Queen_statuses, Hive_inspections], // Add all models here
   pool: {
     max: 5,
     min: 0,

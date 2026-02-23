@@ -15,7 +15,7 @@ export class Queen_statuses extends Model<queen_statusesAttributes, queen_status
     primaryKey: true,
     autoIncrement: true,
     type: DataType.INTEGER,
-    defaultValue: Sequelize.literal("nextval('queen_statuses_status_id_seq'::regclass)"),
+    // defaultValue: Sequelize.literal("nextval('queen_statuses_status_id_seq'::regclass)"),
   })
   status_id?: number;
 

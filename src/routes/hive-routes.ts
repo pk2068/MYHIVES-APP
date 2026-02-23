@@ -54,7 +54,7 @@ const updateHiveParamSchema = Joi.object({
     .required(),
 });
 
-hiveRouter.use('/:hive_id/inspections', authorizeRole(['admin', 'vet', 'user']), hiveInspectionRouter);
+hiveRouter.use('/:hive_id/inspections', hiveInspectionRouter);
 // //GET /api/v1/locations/:locationId/hives/:hiveId/inspections - Get hive history for a specific hive (all hives and their inspections).
 // hiveRouter.get(
 //   '/:hive_id/inspections',
