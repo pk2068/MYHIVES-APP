@@ -3,9 +3,20 @@
 // Replace these with your actual values
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
 
+### Login with Valid Credentials
+# @name loginValidUser
+# This request authenticates a user and retrieves a JWT token.
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email" : "tonyclark@gmail.com",    
+    "password" : "password1234"
+}
 
 ### Login with Valid Credentials
-# @name authenticate
+# @name authenticateJose
 # This request authenticates a user and retrieves a JWT token.
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -18,17 +29,18 @@ Content-Type: application/json
 ###
 # @name createLocation
 # Creates a new location.
-@token2 = {{authenticate.response.body.token}}
+@token2 = {{loginValidUser.response.body.token}}
+@token3  = {{authenticateJose.response.body.token}}
 POST {{baseUrl}}/locations
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token2}}
 
 {
-  "name": "Apiary 1",
-  "address": "123 Main St, Anytown",
-  "latitude": 46.0569,
-  "longitude": 14.5058,
-  "notes": "Main apiary location.",
+  "name": "Apiary 4",
+  "address": "Sladki Vrh 11F",
+  "latitude": 44.1569,
+  "longitude": 13.1058,
+  "notes": "Primarno stojisce",  
   "country": "Slovenia"
 }
 
@@ -36,7 +48,7 @@ Authorization: Bearer {{token}}
 # Get all locations for the authenticated user.
 # @name getLocations
 GET {{baseUrl}}/locations
-Authorization: Bearer {{authenticate.response.body.token}}
+Authorization: Bearer {{loginValidUser.response.body.token}}
 
 ###
 # Get map data for all beehive locations.
@@ -49,11 +61,12 @@ Authorization: Bearer {{token2}}
 #
 # To run this, first run the `createLocation` request and copy the `location_id` from the response.
 # @locationId = <paste_location_id_here>
-@locationId = {{createLocation.response.body.data.location_id}}
+@locationId = {{createLocation.response.body.location.id}}
+@firstlocationId = {{getLocations.response.body.locations[0].id}}
 # Use the commented line below if you prefer to set the ID manually
 # @locationId =
-GET {{baseUrl}}/locations/{{locationId}}
-Authorization: Bearer {{token}}
+GET {{baseUrl}}/locations/{{firstlocationId}}
+Authorization: Bearer {{token2}}
 
 ###
 # Update a specific location by ID.
@@ -61,7 +74,7 @@ Authorization: Bearer {{token}}
 # To run this, you must first have a valid `locationId` from the `createLocation` request.
 PUT {{baseUrl}}/locations/{{locationId}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token2}}
 
 {
   "name": "Main Apiary - Updated",

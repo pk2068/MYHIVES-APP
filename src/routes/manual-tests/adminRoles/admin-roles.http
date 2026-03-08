@@ -1,6 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:3000/api/v1
-@userId = 608167c3-35ce-4bb2-acc8-a616dd63a05d
+# Tony Clark's user ID (replace with actual ID from your database)
+@userId = 608167c3-35ce-4bb2-acc8-a616dd63a05d 
 @roleId = 3
 
 ### Login with Valid Credentials

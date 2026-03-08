@@ -19,7 +19,7 @@ export class HiveRepository implements IHiveRepository {
 
   async create(hiveData: HiveServiceCreateDTO): Promise<HiveServiceRetrievedDTO> {
     const newHive = await Hives.create(hiveData);
-    return newHive as HiveServiceRetrievedDTO;
+    return newHive.toJSON() as HiveServiceRetrievedDTO;
   }
 
   async update(id: string, hiveData: HiveServiceUpdateDTO): Promise<[number, HiveServiceRetrievedDTO[]]> {

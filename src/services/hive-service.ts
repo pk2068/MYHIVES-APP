@@ -47,6 +47,8 @@ export class HiveService {
     console.log('Service Creating hive...', hiveData);
 
     const newCreatedHive = await this._hiveRepository.create(hiveData);
+
+    console.log('Service Created hive:', newCreatedHive);
     return newCreatedHive; //.toJSON();
   }
 

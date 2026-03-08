@@ -21,7 +21,7 @@ export class HiveInspectionController {
   // ------------------------------------------------------------------
   // POST /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections
   // ------------------------------------------------------------------
-  public async createHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public createHiveInspection = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     console.log('Controller: Creating hive inspection');
     try {
       const { majorInspectionId } = req.params;
@@ -46,12 +46,12 @@ export class HiveInspectionController {
         next(error);
       }
     }
-  }
+  };
 
   // ------------------------------------------------------------------
   // GET /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections
   // ------------------------------------------------------------------
-  public async getHiveInspectionsByMajorInspectionId(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public getHiveInspectionsByMajorInspectionId = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { locationId, majorInspectionId } = req.params as { locationId: string; majorInspectionId: string };
       const userId = req.currentUser!.id;
@@ -79,10 +79,10 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   // GET /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
-  public async getHiveInspectionById(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public getHiveInspectionById = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { majorInspectionId, hiveInspectionId } = req.params;
 
@@ -97,27 +97,13 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   // PUT /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
-  public async updateHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public updateHiveInspection = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { locationId, majorInspectionId, hiveInspectionId } = req.params as { [key: string]: string };
-      const userId = req.currentUser!.id;
-
-      // Access the object directly from res.locals, no new DB query needed
-
-      const majorInspection = res.locals.majorInspectionOwned as major_inspectionsAttributes;
-      if (!majorInspection) {
-        const _err = new Error('Major inspection not found or not owned by user in this location.') as CustomError;
-        _err.statusCode = httpStatus.FORBIDDEN;
-        throw _err;
-      }
-
-      const hiveId = req.body.hiveId as string;
+      const { hiveInspectionId } = req.params as { [key: string]: string };
       const updateData: HiveInspectionServiceUpdateDTO = req.body; // Joi validation should ensure valid partial data
-
-      //console.log('------------------ Controller: Updating hive inspection with data:', updateData);
 
       const updatedHiveInspection = await this._hiveInspectionService.updateHiveInspection(hiveInspectionId, updateData);
 
@@ -133,10 +119,10 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   // DELETE /api/locations/:locationId/major-inspections/:majorInspectionId/hive-inspections/:hiveInspectionId
-  public async deleteHiveInspection(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public deleteHiveInspection = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { locationId, majorInspectionId, hiveInspectionId } = req.params as { [key: string]: string };
       const userId = req.currentUser!.id;
@@ -154,10 +140,10 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   // GET /api/locations/:locationId/hives/:hiveId/hive-inspections/history
-  public async getHiveInspectionHistory(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public getHiveInspectionHistory = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { locationId, hiveId } = req.params as { locationId: string; hiveId: string };
       const userId = req.currentUser!.id;
@@ -168,10 +154,10 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   // GET /api/locations/:locationId/hives/:hiveId/hive-inspections/history?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
-  public async getHiveInspectionHistoryByDateRange(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  public getHiveInspectionHistoryByDateRange = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { locationId, hiveId } = req.params as { locationId: string; hiveId: string };
       const userId = req.currentUser!.id;
@@ -183,7 +169,7 @@ export class HiveInspectionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
 
 // TODO : This controller is finished ... update the router accordingly so that i calls the ownership middleware where the hiveInspectionId is known!!!!!!aaavg

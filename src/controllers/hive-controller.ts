@@ -61,7 +61,7 @@ export class HiveController {
       const location_id = req.params.locationId;
       const hiveBodyData = req.body;
 
-      const hiveData: HiveServiceCreateDTO = { ...hiveBodyData, locationId: location_id };
+      const hiveData: HiveServiceCreateDTO = { ...hiveBodyData, location_id: location_id };
 
       console.log('Hive data:', hiveData);
 

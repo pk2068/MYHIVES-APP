@@ -1,12 +1,34 @@
 @baseUrl = http://localhost:3000/api/v1
 
 // Replace these with your actual values
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
-@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
-@hiveId = 01127c49-7230-4405-9ef3-bba06e71a968
+//@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
+@token = {{loginValidUser.response.body.token}}
+@locationId = ff73bffd-eb01-4805-bc6c-8c18169dfada
+@hiveId = 56952ada-1e79-4f9c-adce-d8674f0d4823
 
-// --- Helper Request: Create a Hive (if you need one) ---
-// @name createHive
+
+### Check HEALTH Endpoint
+# @name checkHealth
+GET {{baseUrl}}/health
+
+
+### Login with Valid Credentials
+
+# @name loginValidUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email" : "tonyclark@gmail.com",    
+    "password" : "password1234"
+}
+
+
+
+### --- Helper Request: Create a Location (if you need one) ---
+
+# --- Helper Request: Create a Hive (if you need one) ---
+# @name createHive
 POST {{baseUrl}}/locations/{{locationId}}/hives
 Content-Type: application/json
 Authorization: Bearer {{token}}

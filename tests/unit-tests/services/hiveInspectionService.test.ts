@@ -133,7 +133,7 @@ describe('HiveInspectionService Unit Tests', () => {
       // Override the default mock return value to reflect the actual update logic
       mockRepository.update.mockResolvedValue([1, [expectedUpdatedData]]);
 
-      const result = await service.updateHiveInspection(mockInspectionId, mockHiveId, mockUpdateData);
+      const result = await service.updateHiveInspection(mockInspectionId, mockUpdateData);
 
       // 1. Verify repository was called correctly
       expect(mockRepository.update).toHaveBeenCalledWith(mockInspectionId, mockUpdateData);
@@ -148,7 +148,7 @@ describe('HiveInspectionService Unit Tests', () => {
       // Mock the repository to indicate no rows were updated
       mockRepository.update.mockResolvedValue([0, []]);
 
-      const result = await service.updateHiveInspection('non-existent-id', mockHiveId, mockUpdateData);
+      const result = await service.updateHiveInspection('non-existent-id', mockUpdateData);
 
       expect(result).toBeNull();
     });

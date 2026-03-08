@@ -4,31 +4,34 @@
 # This file assumes you have already run the `major-inspections.http` tests and have a valid token, hive ID, and major inspection ID.
 # The Hive API tests might be useful for getting the hive_id.
 #
-@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
+
+@token = {{loginValidUser.response.body.token}}
+# @locationId = <paste_your_location_id_here>
+
+@locationId = ff73bffd-eb01-4805-bc6c-8c18169dfada
+//@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
 @baseUrl = http://localhost:3000/api/v1/locations/{{locationId}}
 # @token = <paste_your_token_here>
 # @majorInspectionId = <paste_your_major_inspection_id_here>
 # @hiveId = <paste_your_hive_id_here> 
 # @token =
-@majorInspectionId = 3dd79818-4e59-49d7-bb82-a65b0145d87c
+@majorInspectionId = 52f99f80-965f-4900-8196-a8354d79cf4d
 
-@hiveId = ec5ffc71-b700-4837-acdf-4dfa5b1b73e3
-
-
+@hiveId = cd7f3323-a9bf-4bc4-9523-e1521140bfc4
 
 ### Login with Valid Credentials
-# @name authenticate
-# This request authenticates a user and retrieves a JWT token.
+# @name loginValidUser
 POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-    "email" : "joseperez5@gmail.com",    
-    "password" : "Cada_73NUN5"
+    "email" : "tonyclark@gmail.com",    
+    "password" : "password1234"
 }
 
-### get token
-@token = {{authenticate.response.body.token}}
+
+
+
 
 ###
 # Create a new hive inspection for a major inspection.
@@ -38,7 +41,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "hive_id": "bfdd1ef0-0cc1-4886-9ba9-572e60a70ef0",
+  "hive_id": "{{hiveId}}",
   "inspection_time": "14:41",
   "colony_health_status_id": 1,
   "num_chambers": 3,

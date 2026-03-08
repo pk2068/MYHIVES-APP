@@ -72,7 +72,7 @@ export class HiveInspectionRepository implements IHiveInspectionRepository {
   async findAllByMajorInspectionId(majorInspectionId: string): Promise<HiveInspectionServiceRetrievedDTO[]> {
     const allInspections = await Hive_inspections.findAll({
       where: { major_inspection_id: majorInspectionId },
-      order: [['inspection_date', 'DESC']],
+      order: [['inspection_time', 'DESC']],
     });
     return allInspections.map((insp) => insp.toJSON() as HiveInspectionServiceRetrievedDTO);
   }

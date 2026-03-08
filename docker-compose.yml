@@ -21,6 +21,7 @@ services:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./myhives_golden_backup.sql:/docker-entrypoint-initdb.d/init.sql
 
   # --- THIS PART WAS MISSING ---
 volumes:

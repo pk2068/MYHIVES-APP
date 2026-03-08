@@ -4,10 +4,21 @@
 # This file assumes you have already run the `locations.http` tests and have a valid token and location ID.
 #
 @baseUrl = http://localhost:3000/api/v1
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTJmNGQwNy0xMWM2LTRhY2QtYTI3OS0zMDc4ZDE5ZDlmYTYiLCJpYXQiOjE3NTcyNzYzNzcsImV4cCI6MTc1Nzk2NzU3N30.YRIF5gNsfsR8E9FYCa0OrpRypbp13PxX5avt_lu5cgI
+@token = {{loginValidUser.response.body.token}}
 # @locationId = <paste_your_location_id_here>
 
-@locationId = a7bf2913-9609-400c-a8c9-10d9c8c302a8
+@locationId = ff73bffd-eb01-4805-bc6c-8c18169dfada
+
+### Login with Valid Credentials
+# @name loginValidUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email" : "tonyclark@gmail.com",    
+    "password" : "password1234"
+}
+
 
 ###
 # Create a new major inspection for a specific location.
