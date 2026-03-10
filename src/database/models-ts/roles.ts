@@ -1,6 +1,6 @@
 import { Model, Table, Column, DataType, BelongsToMany } from 'sequelize-typescript';
 import { Users } from './users.js';
-import { UserRoles } from './user_roles.js';
+import { UserRoles } from './user-roles.js';
 
 export interface IRoleAttributes {
   role_id?: number;

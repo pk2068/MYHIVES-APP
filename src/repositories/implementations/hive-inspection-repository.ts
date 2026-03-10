@@ -6,7 +6,7 @@ import {
   IHiveInspectionHiveHistoryQueries,
   IHiveInspectionSecurityQueries,
 } from '../interfaces/i-hive-inspection-repository.js';
-import { Hive_inspections } from '../../database/models-ts/hive_inspections.js';
+import { Hive_inspections } from '../../database/models-ts/hive-inspections.js';
 import { Major_inspections } from '../../database/models-ts/major-inspections.js';
 import { Hives } from '../../database/models-ts/hives.js';
 import { Locations } from '../../database/models-ts/locations.js';

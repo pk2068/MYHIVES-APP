@@ -1,7 +1,7 @@
 import { Attributes } from 'sequelize';
 import { IUsersAttributes } from '../../database/models-ts/users.js';
 import { Roles } from '../../database/models-ts/roles.js';
-import { UserRoles } from '../../database/models-ts/user_roles.js';
+import { UserRoles } from '../../database/models-ts/user-roles.js';
 
 // --- Role Domain ---
 // Derive Role DTOs directly from the Roles model class

@@ -126,9 +126,9 @@ export class HiveInspectionController {
     try {
       const { locationId, majorInspectionId, hiveInspectionId } = req.params as { [key: string]: string };
       const userId = req.currentUser!.id;
-      const hiveId = req.body.hiveId as string;
+      const hiveId = req.query.hiveId as string;
 
-      const deleted = await this._hiveInspectionService.deleteHiveInspection(hiveInspectionId, majorInspectionId, locationId, userId);
+      const deleted = await this._hiveInspectionService.deleteHiveInspection(hiveInspectionId, majorInspectionId, locationId, userId, hiveId);
 
       if (!deleted) {
         const _err = new Error('Hive inspection not found or could not be deleted.') as CustomError;

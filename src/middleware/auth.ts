@@ -34,7 +34,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     // Ensure 'verifyToken' is imported correctly and handles token verification,
     // returning an object with 'userId' or throwing an error.
     const decoded = verifyToken(token);
-    console.log('Decoded token \u{1F534}:', decoded);
+    //console.log('Decoded token \u{1F534}:', decoded);
 
     // This line requires your 'express.d.ts' or 'custom-request.d.ts'
     // to extend the Request interface with a 'user' property.

@@ -1,6 +1,6 @@
 //import { hivesAttributes } from '../../../database/models-ts/hives.js';
 import { major_inspectionsAttributes } from '../../../database/models-ts/major-inspections.js';
-import { hive_inspectionsAttributes } from '../../../database/models-ts/hive_inspections.js';
+import { hive_inspectionsAttributes } from '../../../database/models-ts/hive-inspections.js';
 
 // Hive domain types
 //export type HiveServiceCreateDTO = Omit<hivesAttributes, 'hive_id' | 'created_at' | 'updated_at'>;

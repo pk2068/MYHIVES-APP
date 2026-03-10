@@ -3,7 +3,7 @@
 import { IAdminRepository } from '../interfaces/i-admin-repository.js';
 import { Users } from '../../database/models-ts/users.js';
 import { Roles } from '../../database/models-ts/roles.js';
-import { UserRoles } from '../../database/models-ts/user_roles.js';
+import { UserRoles } from '../../database/models-ts/user-roles.js';
 import { RoleCreateDTO, RoleRetrievedDTO, AdminUserRetrievedDTO, UserRoleLinkDTO, UserRoleRetrievedDTO } from '../../services/dto/admin-role-service.dto.js';
 
 export class AdminRepository implements IAdminRepository {

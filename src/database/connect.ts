@@ -2,15 +2,15 @@ import { Sequelize } from 'sequelize-typescript';
 import config from '../config/index.js';
 import { Users } from './models-ts/users.js'; // To be created
 import { Locations } from './models-ts/locations.js'; // To be created
-import { Hive_inspections } from './models-ts/hive_inspections.js';
+import { Hive_inspections } from './models-ts/hive-inspections.js';
 import { Major_inspections } from './models-ts/major-inspections.js';
 import { Hives } from './models-ts/hives.js'; // To be created
 import { Roles } from './models-ts/roles.js';
-import { UserRoles } from './models-ts/user_roles.js';
-import { Colony_health_statuses } from './models-ts/colony_health_statuses.js';
+import { UserRoles } from './models-ts/user-roles.js';
+import { Colony_health_statuses } from './models-ts/colony-health-statuses.js';
 import { Queen_cell_statuses } from './models-ts/queen-cell-statuses.js';
 import { Queen_statuses } from './models-ts/queen-statuses.js';
-import { Varroa_treatments } from './models-ts/varroa_treatments.js';
+import { Varroa_treatments } from './models-ts/varroa-treatments.js';
 import { associateModels } from './models-ts/associations.js'; // Adjust path if you placed it elsewhere, e.g., './models-obsolete/associations.js'
 
 console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);

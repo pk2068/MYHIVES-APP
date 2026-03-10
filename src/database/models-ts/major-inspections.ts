@@ -1,7 +1,7 @@
 import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 
 import { Locations } from './locations.js'; // Import locations model
-import { Hive_inspections } from './hive_inspections.js'; // Import hive_inspections model
+import { Hive_inspections } from './hive-inspections.js'; // Import hive_inspections model
 
 export interface major_inspectionsAttributes {
   major_inspection_id?: string;

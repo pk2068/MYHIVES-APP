@@ -164,7 +164,7 @@ describe('HiveInspectionService Unit Tests', () => {
       // Ensure the delete call succeeds
       mockRepository.delete.mockResolvedValue(1);
 
-      const result = await service.deleteHiveInspection(mockInspectionId, mockMajorInspectionId, mockLocationId, mockUserId);
+      const result = await service.deleteHiveInspection(mockInspectionId, mockMajorInspectionId, mockLocationId, mockUserId, mockHiveId);
 
       // 1. Verify ownership check was called
       expect(mockRepository.findHiveInspectionByMajorInspectionLocationAndUser).toHaveBeenCalledWith(mockInspectionId, mockMajorInspectionId, mockLocationId, mockUserId);
@@ -180,7 +180,7 @@ describe('HiveInspectionService Unit Tests', () => {
       // Setup mock to fail the ownership/existence check
       mockRepository.findHiveInspectionByMajorInspectionLocationAndUser.mockResolvedValue(null);
 
-      const result = await service.deleteHiveInspection('not-owned-id', mockHiveId, mockUserId);
+      const result = await service.deleteHiveInspection('not-owned-id', mockMajorInspectionId, mockLocationId, mockUserId, mockHiveId);
 
       expect(result).toBe(false);
 
@@ -194,7 +194,7 @@ describe('HiveInspectionService Unit Tests', () => {
       // Mock the repository to indicate no rows were deleted
       mockRepository.delete.mockResolvedValue(0);
 
-      const result = await service.deleteHiveInspection(mockInspectionId, mockHiveId, mockUserId);
+      const result = await service.deleteHiveInspection(mockInspectionId, mockMajorInspectionId, mockLocationId, mockUserId, mockHiveId);
 
       expect(result).toBe(false);
       expect(mockRepository.delete).toHaveBeenCalledTimes(1);

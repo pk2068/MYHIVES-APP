@@ -13,7 +13,7 @@
 @baseUrl = http://localhost:3000/api/v1/locations/{{locationId}}
 # @token = <paste_your_token_here>
 # @majorInspectionId = <paste_your_major_inspection_id_here>
-# @hiveId = <paste_your_hive_id_here> 
+# @hiveId = <paste_your_hive_id_here>
 # @token =
 @majorInspectionId = 52f99f80-965f-4900-8196-a8354d79cf4d
 
@@ -25,13 +25,9 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-    "email" : "tonyclark@gmail.com",    
+    "email" : "tonyclark@gmail.com",
     "password" : "password1234"
 }
-
-
-
-
 
 ###
 # Create a new hive inspection for a major inspection.
@@ -92,7 +88,7 @@ Authorization: Bearer {{token}}
   "brood_percentage": 33,
   "approx_honey_weight_kg": 25,
   "num_chambers": 8,
-  "drone_comb_frames_count": 3,  
+  "drone_comb_frames_count": 3,
   "colony_health_status_id": 3,
   "other_notes": "Updated notes: The colony is doing well, but I noticed a few varroa mites."
 }
@@ -100,9 +96,7 @@ Authorization: Bearer {{token}}
 ###
 # Delete a specific hive inspection.
 #
-# To run this, you must have a valid `hiveInspectionId` that has not already been deleted.
-#DELETE {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections/{{hiveInspectionId}}
+# To run this, you must have a valid `hiveInspectionId`.
+# The `hiveId` is passed as a query parameter, which is a more reliable method for DELETE requests than using a body.
 DELETE {{baseUrl}}/major-inspections/{{majorInspectionId}}/hive-inspections/{{hiveInspectionId}}?hiveId={{hiveId}}
-Content-Type: application/json
 Authorization: Bearer {{token}}
-

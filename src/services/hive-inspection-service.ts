@@ -1,4 +1,4 @@
-import { hive_inspectionsAttributes } from 'database/models-ts/hive_inspections.js';
+import { hive_inspectionsAttributes } from 'database/models-ts/hive-inspections.js';
 // src/services/hive-inspection-service.ts
 
 import { IHiveInspectionRepository } from '../repositories/interfaces/i-hive-inspection-repository.js';

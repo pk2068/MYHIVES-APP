@@ -2,9 +2,13 @@ import { Users } from './users.js';
 import { Locations } from './locations.js';
 import { Major_inspections } from './major-inspections.js';
 import { Hives } from './hives.js';
-import { Hive_inspections } from './hive_inspections.js';
+import { Hive_inspections } from './hive-inspections.js';
 import { Roles } from './roles.js';
-import { UserRoles } from './user_roles.js';
+import { UserRoles } from './user-roles.js';
+import { Varroa_treatments } from './varroa-treatments.js';
+import { Colony_health_statuses } from './colony-health-statuses.js';
+import { Queen_cell_statuses } from './queen-cell-statuses.js';
+import { Queen_statuses } from './queen-statuses.js';
 
 export function associateModels() {
   // --- User to Roles (Many-to-Many) ---
@@ -71,5 +75,45 @@ export function associateModels() {
   Hive_inspections.belongsTo(Hives, {
     foreignKey: 'hive_id',
     as: 'hiveInspections_hive',
+  });
+
+  // Varroa Treatments
+  Varroa_treatments.hasMany(Hive_inspections, {
+    foreignKey: 'varroa_treatment_id',
+    as: 'inspections',
+  });
+  Hive_inspections.belongsTo(Varroa_treatments, {
+    foreignKey: 'varroa_treatment_id',
+    as: 'varroa_treatment',
+  });
+
+  // Queen Statuses
+  Queen_statuses.hasMany(Hive_inspections, {
+    foreignKey: 'queen_status_id',
+    as: 'inspections',
+  });
+  Hive_inspections.belongsTo(Queen_statuses, {
+    foreignKey: 'queen_status_id',
+    as: 'queen_status',
+  });
+
+  // Queen Cell Statuses
+  Queen_cell_statuses.hasMany(Hive_inspections, {
+    foreignKey: 'queen_cell_status_id',
+    as: 'inspections',
+  });
+  Hive_inspections.belongsTo(Queen_cell_statuses, {
+    foreignKey: 'queen_cell_status_id',
+    as: 'queen_cell_status',
+  });
+
+  // Colony Health Statuses
+  Colony_health_statuses.hasMany(Hive_inspections, {
+    foreignKey: 'colony_health_status_id',
+    as: 'inspections',
+  });
+  Hive_inspections.belongsTo(Colony_health_statuses, {
+    foreignKey: 'colony_health_status_id',
+    as: 'colony_health_status',
   });
 }
