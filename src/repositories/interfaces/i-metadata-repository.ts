@@ -6,8 +6,8 @@ export interface IMetaDataRepository {
   // Creates records across all 4 tables (useful for seeding/initial setup)
   createMetadata(fullData: FullMetadataDTO): Promise<void>;
 
-  // Adds records to a specific table based on the key
-  addMetadata(key: MetadataCategory, data: LookupItem[]): Promise<void>;
+  // Replaces all records in a specific table with the new data provided.
+  replaceAllByCategory(key: MetadataCategory, data: LookupItem[]): Promise<void>;
 
   // Deletes multiple records from a specific table
   deleteMetadata(key: MetadataCategory, ids: number[]): Promise<number>;
