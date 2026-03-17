@@ -10,6 +10,7 @@ import errorHandler, { CustomError } from './middleware/errorHandler.js'; // Imp
 import authRoutes from './routes/auth-routes.js';
 import locationRoutes from './routes/location-routes.js';
 import adminRoutes from './routes/admin-routes.js';
+import metadataRoutes from './routes/metadata-routes.js';
 //import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 //  import majorInspectionRoutes from './routes/majorInspectionRoutes.js';
 // import hiveInspectionRoutes from './routes/hiveInspectionRoutes.js';
@@ -67,6 +68,7 @@ console.log('Health check route added');
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/locations', locationRoutes);
 apiRouter.use('/admin', adminRoutes); // Uncomment and add adminRoutes when available
+apiRouter.use('/metadata', metadataRoutes);
 
 console.log('API routes mounted');
 // --- Error Handling Middleware ---
