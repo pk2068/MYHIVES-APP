@@ -13,7 +13,7 @@ import { ColonyHealthStatus, QueenStatus, TreatmentApplied, QueenCellStatus } fr
 
 // Type definition for a validation schema map
 type SchemaMap = {
-  body?: Joi.ObjectSchema;
+  body?: Joi.Schema;
   params?: Joi.ObjectSchema;
   query?: Joi.ObjectSchema;
 };

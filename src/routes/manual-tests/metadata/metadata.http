@@ -1,0 +1,77 @@
+@hostname = localhost
+@port = 3000
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+# Replace with a valid Admin token to test protected routes
+@token = your_jwt_token_here
+
+### 1. Get All Metadata (Public)
+# Retrieves all configured lookup values grouped by category.
+GET http://{{host}}/api/v1/metadata
+Content-Type: {{contentType}}
+
+### 2. Seed Initial Metadata (Admin Only)
+# Creates or resets the entire metadata structure.
+# Useful for initial setup.
+POST http://{{host}}/api/v1/metadata/seed
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "varroa_treatments": [
+    { "name": "Apiguard" },
+    { "name": "Oxalic Acid Vaporization" },
+    { "name": "Formic Pro" }
+  ],
+  "queen_statuses": [
+    { "name": "Seen" },
+    { "name": "Not Seen" },
+    { "name": "Marked" },
+    { "name": "Virgin" }
+  ],
+  "queen_cell_statuses": [
+    { "name": "None" },
+    { "name": "Play Cups" },
+    { "name": "Uncapped" },
+    { "name": "Capped" }
+  ],
+  "colony_health_statuses": [
+    { "name": "Thriving" },
+    { "name": "Average" },
+    { "name": "Weak" },
+    { "name": "Critical" },
+    { "name": "Dead" }
+  ]
+}
+
+### 3. Add Items to Specific Category (Admin Only)
+# Example: Adding new treatment types to 'varroa_treatments'.
+# Valid Categories: varroa_treatments, queen_statuses, queen_cell_statuses, colony_health_statuses
+POST http://{{host}}/api/v1/metadata/varroa_treatments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+[
+  { "name": "Amitraz" },
+  { "name": "Thymol Wafer" }
+]
+
+### 4. Delete Items from Specific Category (Admin Only)
+# Requires the IDs of the items you want to delete.
+DELETE http://{{host}}/api/v1/metadata/varroa_treatments
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "ids": [1, 2]
+}
+
+### 5. Error Test: Invalid Category
+# Should return 400 Bad Request because 'invalid_category' is not in the allowed list.
+POST http://{{host}}/api/v1/metadata/invalid_category
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+[
+  { "name": "Test Item" }
+]
