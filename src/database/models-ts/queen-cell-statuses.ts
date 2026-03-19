@@ -23,4 +23,11 @@ export class Queen_cell_statuses extends Model<queen_cell_statusesAttributes, qu
     type: DataType.STRING(50),
   })
   status_name!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  is_active!: boolean;
 }

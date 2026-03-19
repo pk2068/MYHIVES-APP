@@ -78,4 +78,20 @@ export class MetadataController {
       next(error);
     }
   };
+
+  setMetadataStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { category, id } = req.params;
+      const { is_active } = req.body;
+
+      // Cast category to MetadataCategory type if needed, or validate it before this point
+      await this._metadataService.setMetadataStatus(category as MetadataCategory, Number(id), Boolean(is_active));
+
+      res.status(200).json({
+        message: `Metadata item ${id} in ${category} is now ${is_active ? 'active' : 'inactive'}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

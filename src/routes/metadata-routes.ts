@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import { MetadataController } from '../controllers/metadata-controller.js';
 import { MetadataService } from '../services/metadata-service.js';
 import { MetadataRepository } from '../repositories/implementations/metadata-repository.js';
@@ -43,5 +44,21 @@ router.post('/:category', isAuthenticated, authorizeRole(['admin']), validate(ad
  * @access Private (Admin only)
  */
 router.delete('/:category', isAuthenticated, authorizeRole(['admin']), validate(deleteMetadataSchema), metadataController.deleteMetadata);
+
+/**
+ * @route PATCH /api/v1/metadata/:category/:id/status
+ * @description Soft delete/restore a metadata item by updating its is_active status.
+ * @access Private (Admin only)
+ */
+router.patch(
+  '/:category/:id/status',
+  isAuthenticated,
+  authorizeRole(['admin']),
+  validate({
+    params: Joi.object({ category: Joi.string().required(), id: Joi.number().integer().required() }),
+    body: Joi.object({ is_active: Joi.boolean().required() }),
+  }),
+  metadataController.setMetadataStatus
+);
 
 export default router;

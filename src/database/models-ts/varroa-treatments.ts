@@ -3,6 +3,7 @@ import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'se
 export interface varroa_treatmentsAttributes {
   treatment_id?: number;
   treatment_name: string;
+  is_active: boolean;
 }
 
 @Table({
@@ -23,4 +24,11 @@ export class Varroa_treatments extends Model<varroa_treatmentsAttributes, varroa
     type: DataType.STRING(100),
   })
   treatment_name!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  is_active!: boolean;
 }

@@ -31,6 +31,34 @@ export class MetadataRepository implements IMetaDataRepository {
     },
   };
 
+  async getActiveMetadata(): Promise<AllMetadata> {
+    const { varroa_treatments, queen_statuses, queen_cell_statuses, colony_health_statuses } = this.configMeta;
+    // Helper to fetch and map only active data for a given metadata category
+    const fetchActiveData = async (configItem: (typeof this.configMeta)[MetadataCategory]): Promise<LookupItem[]> => {
+      const items = await (configItem.model as any).findAll({
+        where: { is_active: true },
+        attributes: [configItem.idAttr, configItem.nameAttr],
+        raw: true,
+      });
+      return items.map((item: any) => ({
+        id: item[configItem.idAttr],
+        name: item[configItem.nameAttr],
+      }));
+    };
+    const [varroa, queen, cells, health] = await Promise.all([
+      fetchActiveData(varroa_treatments),
+      fetchActiveData(queen_statuses),
+      fetchActiveData(queen_cell_statuses),
+      fetchActiveData(colony_health_statuses),
+    ]);
+    return {
+      varroa_treatments: varroa,
+      queen_statuses: queen,
+      queen_cell_statuses: cells,
+      colony_health_statuses: health,
+    };
+  }
+
   async getAllMetadata(): Promise<AllMetadata> {
     const { varroa_treatments, queen_statuses, queen_cell_statuses, colony_health_statuses } = this.configMeta;
 
@@ -89,7 +117,7 @@ export class MetadataRepository implements IMetaDataRepository {
     });
   }
 
-  private async addMetadata(key: MetadataCategory, data: LookupItem[], options?: { transaction: any }): Promise<void> {
+  async addMetadata(key: MetadataCategory, data: LookupItem[], options?: { transaction: any }): Promise<void> {
     const configItem = this.configMeta[key];
     const itemsToCreate = data.map((item) => ({
       [configItem.idAttr]: item.id,
@@ -114,8 +142,21 @@ export class MetadataRepository implements IMetaDataRepository {
     // Using truncate is more efficient for deleting all rows in a table.
     return await (configItem.model as any).destroy({
       where: {},
-      truncate: true,
       ...options,
     });
+  }
+
+  async setMetadataStatus(key: MetadataCategory, id: number, isActive: boolean): Promise<void> {
+    const configItem = this.configMeta[key];
+    const idColumn = configItem.idAttr;
+
+    await (configItem.model as any).update(
+      { is_active: isActive },
+      {
+        where: {
+          [idColumn]: id,
+        },
+      }
+    );
   }
 }

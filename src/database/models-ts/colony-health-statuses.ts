@@ -23,4 +23,11 @@ export class Colony_health_statuses extends Model<colony_health_statusesAttribut
     type: DataType.STRING(50),
   })
   status_name!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  is_active!: boolean;
 }
