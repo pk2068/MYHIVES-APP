@@ -36,11 +36,11 @@ Content-Type: application/json
 Authorization: Bearer {{token2}}
 
 {
-  "name": "Apiary 4",
+  "name": "Apiary 10",
   "address": "Sladki Vrh 11F",
   "latitude": 44.1569,
   "longitude": 13.1058,
-  "notes": "Primarno stojisce",  
+  "notes": "My Favoriote Apiary Location",  
   "country": "Slovenia"
 }
 

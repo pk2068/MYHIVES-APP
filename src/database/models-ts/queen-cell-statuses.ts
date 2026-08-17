@@ -3,6 +3,7 @@ import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'se
 export interface queen_cell_statusesAttributes {
   status_id?: number;
   status_name: string;
+  is_active: boolean;
 }
 
 @Table({

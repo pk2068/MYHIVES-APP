@@ -26,49 +26,49 @@ export class Users extends Model<IUsersAttributes, IUsersAttributes> implements 
     type: DataType.UUID,
     defaultValue: Sequelize.literal('gen_random_uuid()'),
   })
-  user_id?: string;
+  declare public user_id?: string;
 
   @Column({
     type: DataType.STRING(255),
   })
-  username!: string;
+  declare public username: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING(255),
   })
-  password_hash?: string;
+  declare public password_hash?: string;
 
   @Column({
     type: DataType.STRING(255),
   })
-  email!: string;
+  declare public email: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING(255),
   })
-  google_id?: string;
+  declare public google_id?: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING(255),
   })
-  linkedin_id?: string;
-
-  @Column({
-    allowNull: true,
-    type: DataType.DATE,
-    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-  })
-  created_at?: Date;
+  declare public linkedin_id?: string;
 
   @Column({
     allowNull: true,
     type: DataType.DATE,
     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
   })
-  updated_at?: Date;
+  declare public created_at?: Date;
+
+  @Column({
+    allowNull: true,
+    type: DataType.DATE,
+    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+  })
+  declare public updated_at?: Date;
 
   /*
 	// Association with locations model
@@ -76,7 +76,7 @@ export class Users extends Model<IUsersAttributes, IUsersAttributes> implements 
     locations?: locations[]; // This property would hold an array of associated locations
 	*/
   //@BelongsToMany(() => Roles, () => UserRoles)
-  declare roles_association?: Roles[];
+  declare public roles_association?: Roles[];
 
   roles?: string[];
 }

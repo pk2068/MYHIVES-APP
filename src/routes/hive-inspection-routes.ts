@@ -7,7 +7,7 @@ import { HiveInspectionRepository } from '../repositories/implementations/hive-i
 import { MajorInspectionRepository } from '../repositories/implementations/major-inspection-repository.js';
 import { sequelizeInstance as database } from '../database/connect.js';
 import { hive_inspectionsAttributes } from '../database/models-ts/hive-inspections.js';
-import { authorizeRole } from 'middleware/permission.js';
+import { authorizeRole } from '#middleware/permission.js';
 // import { isAuthenticated } from '../middleware/auth.js';
 import { checkHiveInspectionOwnership } from '../middleware/ownership.js';
 import { validate } from '../middleware/validation.js';

@@ -12,8 +12,10 @@ import { Queen_cell_statuses } from './models-ts/queen-cell-statuses.js';
 import { Queen_statuses } from './models-ts/queen-statuses.js';
 import { Varroa_treatments } from './models-ts/varroa-treatments.js';
 import { associateModels } from './models-ts/associations.js'; // Adjust path if you placed it elsewhere, e.g., './models-obsolete/associations.js'
+import { setupDummyData } from './seeders/dummy-data.js'; // Adjust path if needed
+import { seedInitialData } from './seeders/initial-data.js'; // Adjust path if needed
 
-console.log('Connecting to PostgreSQL database... ', process.env.DATABASE_URL);
+console.log('Connecting to PostgreSQL database... ', config.databaseUrl);
 
 const DB_DIALECT = process.env.DB_DIALECT as 'postgres'; // Cast to ensure correct type
 const DB_HOST = process.env.DB_HOST as string;
@@ -72,6 +74,9 @@ export const connectDB = async () => {
       await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
       // await sequelize.sync({ alter: false });
       console.log('✅Database models synchronized.');
+      await seedInitialData();
+      await setupDummyData();
+      console.log('✅ Dummy data setup completed.');
     } else {
       // In production, rely on migrations. If you haven't run migrations,
       // you might still want a simple sync without alter.

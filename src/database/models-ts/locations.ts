@@ -27,62 +27,62 @@ export class Locations extends Model<locationsAttributes, locationsAttributes> i
     type: DataType.UUID,
     defaultValue: Sequelize.literal('gen_random_uuid()'),
   })
-  location_id?: string;
+  declare public location_id?: string;
 
   @ForeignKey(() => Users)
   @Column({
     type: DataType.UUID,
   })
-  user_id!: string;
+  declare public user_id: string;
 
   @Column({
     type: DataType.STRING(255),
   })
-  name!: string;
+  declare public name: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING(500),
   })
-  address?: string;
+  declare public address?: string;
 
   @Column({
     allowNull: true,
     type: DataType.DECIMAL(9, 6),
   })
-  latitude?: string;
+  declare public latitude?: string;
 
   @Column({
     allowNull: true,
     type: DataType.DECIMAL(9, 6),
   })
-  longitude?: string;
+  declare public longitude?: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING(100),
   })
-  country?: string;
+  declare public country?: string;
 
   @Column({
     allowNull: true,
     type: DataType.STRING,
   })
-  notes?: string;
+  declare public notes?: string;
 
   @Column({
     allowNull: true,
     type: DataType.DATE,
     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
   })
-  created_at?: Date;
+  declare public created_at?: Date;
 
   @Column({
     allowNull: true,
     type: DataType.DATE,
     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
   })
-  updated_at?: Date;
+  declare public updated_at?: Date;
 
   // Association with users model
   //   @BelongsTo(() => users)

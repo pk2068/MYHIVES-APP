@@ -1,4 +1,4 @@
-import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from 'services/dto/major-inspection-service.dto.js';
+import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from '#services/dto/major-inspection-service.dto.js';
 
 export interface IMajorInspectionRepository {
   /**

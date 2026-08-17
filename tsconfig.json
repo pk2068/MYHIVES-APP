@@ -11,11 +11,11 @@
 
     /* Module Resolution */
     "moduleResolution": "NodeNext", // Use Node.js's ESM resolution algorithm
-    "baseUrl": "./src", // Base URL for module resolution (important for paths below)
     "paths": {
       // Define your path aliases for cleaner imports
-      "@config/*": ["config/*"],
-      "@utils/*": ["utils/*"]
+      "@config/*": ["./src/config/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@database/*": ["./src/database/*"]
       // Add other aliases as needed
     },
     "allowImportingTsExtensions": false, // Allow .ts extensions in imports during development

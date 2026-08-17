@@ -3,6 +3,7 @@ import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'se
 export interface colony_health_statusesAttributes {
   status_id?: number;
   status_name: string;
+  is_active: boolean;
 }
 
 @Table({

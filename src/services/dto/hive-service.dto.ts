@@ -1,4 +1,4 @@
-import { hivesAttributes } from 'database/models-ts/hives.js';
+import { hivesAttributes } from '#database/models-ts/hives.js';
 
 // Input for creating a new hive (omits ID and timestamps)
 export type HiveServiceCreateDTO = Omit<hivesAttributes, 'hive_id' | 'created_at' | 'updated_at'>;

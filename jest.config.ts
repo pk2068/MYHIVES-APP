@@ -1,27 +1,42 @@
-/** @type {import('jest').Config} */
+import type { Config } from 'jest';
 
-const config = {
-  transformIgnorePatterns: [],
+const config: Config = {
+  testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
+  testRegex: '.*\\.test\\.ts$',
+
+  transformIgnorePatterns: [],
+
   moduleNameMapper: {
     '^@config/(.*)$': '<rootDir>/src/config/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
-    // '^(\\.{1,2}/.*)\\.js$': '$1.ts',
   },
-  testRegex: '.*\\.test\\.ts$',
+
   transform: {
     '^.+\\.ts$': [
-      'ts-jest',
+      '@swc/jest',
       {
-        useESM: true,
-        tsconfig: 'tsconfig.test.json', // Use test-specific config
+        swcrc: false, // Prevents SWC from treating tsconfig.json as an .swcrc file
+        jsc: {
+          target: 'es2022',
+          parser: {
+            syntax: 'typescript',
+            tsx: false,
+            decorators: true,
+          },
+          transform: {
+            legacyDecorator: true,
+            decoratorMetadata: true,
+          },
+        },
+        module: {
+          type: 'es6',
+        },
       },
     ],
   },
-  testEnvironment: 'node',
-  preset: 'ts-jest/presets/js-with-ts-esm',
+
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
-  //   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'], // optional
 };
 
 export default config;

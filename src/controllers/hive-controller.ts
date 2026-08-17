@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HiveService } from '../services/hive-service.js';
 import { CustomError } from '../middleware/errorHandler.js';
-import { HiveServiceCreateDTO, HiveServiceRetrievedDTO, HiveServiceUpdateDTO } from 'services/dto/hive-service.dto.js';
+import { HiveServiceCreateDTO, HiveServiceRetrievedDTO, HiveServiceUpdateDTO } from '../services/dto/hive-service.dto.js';
 
 export class HiveController {
   private _hiveService: HiveService;

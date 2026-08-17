@@ -1,5 +1,4 @@
-// src/services/majorInspectionService.ts
-import { IMajorInspectionRepository } from 'repositories/interfaces/i-major-inspection-repository.js';
+import { IMajorInspectionRepository } from '#repositories/interfaces/i-major-inspection-repository.js';
 import { MajorInspectionServiceCreateDTO, MajorInspectionServiceRetrievedDTO, MajorInspectionServiceUpdateDTO } from './dto/major-inspection-service.dto.js';
 
 export class MajorInspectionService {

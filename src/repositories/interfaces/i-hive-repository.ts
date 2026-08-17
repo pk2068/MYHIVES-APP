@@ -1,4 +1,4 @@
-import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from 'services/dto/hive-service.dto.js';
+import { HiveServiceCreateDTO, HiveServiceUpdateDTO, HiveServiceRetrievedDTO } from '#services/dto/hive-service.dto.js';
 
 /**
  * Interface for the Hive data access layer.

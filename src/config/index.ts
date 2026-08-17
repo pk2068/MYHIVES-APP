@@ -12,7 +12,7 @@ console.log(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file
-const dotEnvConfigObject = dotenv.config({ path: path.resolve(__dirname, '../../src/.env') });
+const dotEnvConfigObject = dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 console.log('dotenv config object:', dotEnvConfigObject);
 console.log('#############################-');
 // Define the IConfig interface
@@ -48,13 +48,6 @@ const config: IConfig = {
   tokenExpiry: process.env.TOKEN_EXPIRY || '1h',
   refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || '1d',
 };
-
-// console.log('Config loaded:', config);
-// console.log('config.jwtSecret:', config.jwtSecret);
-
-// console.log('Loaded GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
-// console.log('Client ID length:', process.env.GOOGLE_CLIENT_ID?.length); // Should be around 80-90 chars
-// console.log('Loaded GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET?.substring(0, 10) + '...'); // Show first 10 chars only
 
 // Basic validation for critical environment variables
 if (!config.jwtSecret || config.jwtSecret === 'supersecretjwtkeythatshouldbeverylongandrandom') {

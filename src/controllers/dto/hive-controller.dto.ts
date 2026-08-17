@@ -1,4 +1,4 @@
-import { hivesAttributes } from 'database/models-ts/hives.js';
+import { hivesAttributes } from '@database/models-ts/hives.js';
 
 // these DTO types are used in the HiveRouter files to define the shape of request body data it expects to receive and send out
 export type HiveControllerCreateDTO = Omit<hivesAttributes, 'hive_id' | 'location_id' | 'created_at' | 'updated_at'>;

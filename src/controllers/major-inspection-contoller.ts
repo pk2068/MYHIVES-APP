@@ -3,8 +3,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../middleware/errorHandler.js';
 import { MajorInspectionService } from '../services/major-inspection-service.js';
-import { LocationService } from '../services/location-service.js'; // To check locat
-import { MajorInspectionServiceRetrievedDTO, MajorInspectionServiceCreateDTO, MajorInspectionServiceUpdateDTO } from 'services/dto/major-inspection-service.dto.js';
+//import { LocationService } from '../services/location-service.js'; // To check locat
+import { MajorInspectionServiceRetrievedDTO, MajorInspectionServiceCreateDTO, MajorInspectionServiceUpdateDTO } from '#services/dto/major-inspection-service.dto.js';
 
 export class MajorInspectionController {
   private readonly _majorInspectionService: MajorInspectionService;
