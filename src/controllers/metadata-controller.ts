@@ -20,6 +20,7 @@ export class MetadataController {
         data: result,
       });
     } catch (error) {
+      console.error('Can not read metadata', error);
       next(error);
     }
   };

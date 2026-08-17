@@ -17,7 +17,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - '${DB_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./myhives_backup.sql:/docker-entrypoint-initdb.d/init.sql
@@ -31,15 +31,13 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}_test
+      POSTGRES_DB: myhives_db_test
     ports:
-      - "${DB_PORT_TEST:-5433}:5432"
+      - '${DB_PORT_TEST:-5433}:5432'
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
-      # Enaka init skripta ali posebna testna skripta za testno bazo
-      - ./initial-hive-data.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./myhives_schema.sql:/docker-entrypoint-initdb.d/init.sql
 
-  # --- THIS PART WAS MISSING ---
 volumes:
   postgres_data:
   postgres_test_data:
